@@ -1,6 +1,6 @@
 # Projeto Final
 
-***VERSÃO DESCONTINUADA***
+***VERSÃO REIMAGINADA***
 
 **Autor:**
 
