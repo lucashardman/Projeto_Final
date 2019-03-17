@@ -1,0 +1,3 @@
+github "facebook/facebook-objc-sdk"
+github "facebook/facebook-sdk-swift"
+github "watson-developer-cloud/swift-sdk"  ~> 1.3.1
