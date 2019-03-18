@@ -61,23 +61,12 @@ class GenerateUserProfile {
     
     func sendUserInfoToFirebase(id: String, name: String, email: String, gender: String, posts: [Dictionary<String, Any>]){
         
-        //var firebase: DatabaseReference!
-        //firebase = Database.database().reference()
-        let dataToSave: [String: String] = ["id": id, "name": name, "email": email, "gender": gender]
+        let dataToSave: [String: String] = ["name": name, "email": email, "gender": gender]
+        firebase.collection("users").document(id).setData(dataToSave)
         
-        firebase.collection("users").addDocument(data: dataToSave) {
-            (error) in
-            if let error = error {
-                print("Save to Firebase Error: \(error.localizedDescription)")
-            }
-            else{
-                print("Personality data saved to Firebase")
-            }
-        }
-        
-        self.processFacebookPostsWithPersonalityInsights(posts: posts)
+        self.processFacebookPostsWithPersonalityInsights(posts: posts, id: id)
     }
-    private func processFacebookPostsWithPersonalityInsights(posts: [Dictionary<String, Any>]){
+    private func processFacebookPostsWithPersonalityInsights(posts: [Dictionary<String, Any>], id: String){
         
         //Inicializando PersonalityInsights
         let personalityInsights = PersonalityInsights(
@@ -111,42 +100,40 @@ class GenerateUserProfile {
                 return
             }
             print("I'm at Personality Insights profile request")
-            self.sendPersonalityInsightsUserProfileToFirebase(profile: profile)
+            self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, id: id)
         }
     }
     
-    private func sendPersonalityInsightsUserProfileToFirebase(profile: Profile){
-        print(profile)
-        /*
-        firebase = Firestore.firestore()
+    private func sendPersonalityInsightsUserProfileToFirebase(profile: Profile, id: String){
+
+        print("\nBIG FIVE OF USER \(id)")
+        for big_five in profile.personality{
+        firebase.collection("users").document(id).collection("big_five").document(big_five.name).setData(["name": big_five.name, "percentile": big_five.percentile])
+            print("\n-> \(big_five.name): \(big_five.percentile)")
+            
+            for facet in big_five.children!{
+            firebase.collection("users").document(id).collection("big_five").document(big_five.name).collection(big_five.name).document(facet.name).setData(["name": facet.name, "percentile": facet.percentile])
+                print("\(facet.name): \(facet.percentile)")
+            }
+        }
+        print("\nNEEDS OF USER \(id)")
+        for need in profile.needs{
+            print("\(need.name): \(need.percentile)")
+        }
+        print("\nVALUES OF USER \(id)")
+        for value in profile.values{
+            print("\(value.name): \(value.percentile)")
+        }
+        print("\nCONSUMPTION PREFERENCES OF USER \(id)")
+        for preferences in profile.consumptionPreferences!{
+            print("\n-> \(preferences.name):")
+            for preference in preferences.consumptionPreferences{
+                print("\(preference.name): \(preference.score)")
+            }
+        }
         
-        let id: String = profile
-        let name: String
-        let email: String
-        let gender: String
-        let dataToSave: [String: String] = ["quote": primeiro, "author": segundo]
-        firebase.collection("users")
-        firebase.collection("users").addDocument(data: dataToSave) {
-            (error) in
-            if let error = error {
-                print("Save to Firebase Error: \(error.localizedDescription)")
-            }
-            else{
-                print("Personality data saved to Firebase")
-            }
-        }
-        */
-       /*
-        firebase.setData(dataToSave){
-            (error) in
-            if let error = error {
-                print("Save to Firebase Error: \(error.localizedDescription)")
-            }
-            else{
-                print("Personality data saved to Firebase")
-            }
-        }
-        */
+        //firebase.collection("users").document(id).setData(dataToSave)
+        
     }
 
 }
