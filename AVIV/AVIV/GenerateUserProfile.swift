@@ -118,22 +118,21 @@ class GenerateUserProfile {
         }
         print("\nNEEDS OF USER \(id)")
         for need in profile.needs{
+        firebase.collection("users").document(id).collection("needs").document(need.name).setData(["name": need.name, "percentile": need.percentile])
             print("\(need.name): \(need.percentile)")
         }
         print("\nVALUES OF USER \(id)")
         for value in profile.values{
+            firebase.collection("users").document(id).collection("values").document(value.name).setData(["name": value.name, "percentile": value.percentile])
             print("\(value.name): \(value.percentile)")
         }
         print("\nCONSUMPTION PREFERENCES OF USER \(id)")
         for preferences in profile.consumptionPreferences!{
             print("\n-> \(preferences.name):")
             for preference in preferences.consumptionPreferences{
+            firebase.collection("users").document(id).collection("consumption_preferences").document(preferences.name).collection(preferences.name).document(preference.name).setData(["name": preference.name, "score": preference.score])
                 print("\(preference.name): \(preference.score)")
             }
         }
-        
-        //firebase.collection("users").document(id).setData(dataToSave)
-        
     }
-
 }
