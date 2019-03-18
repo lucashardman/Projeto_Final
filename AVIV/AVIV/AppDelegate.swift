@@ -7,8 +7,8 @@
  //
  
  import UIKit
- //import FBSDKCoreKit
  import FacebookCore
+ import Firebase
  
  @UIApplicationMain
  class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +17,9 @@
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         SDKApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        FirebaseApp.configure()
+        
         return true
     }
     

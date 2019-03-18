@@ -3,11 +3,10 @@
 <plist version="1.0">
     <dict>
       
+
+      <key>CFBundleURLTypes</key> <array> <dict> <key>CFBundleURLSchemes</key> <array> <string>fb1039430349530133</string> </array> </dict> </array> <key>FacebookAppID</key> <string>1039430349530133</string> <key>FacebookDisplayName</key> <string>AVIV PROTOTYPE</string>
       
-        <key>CFBundleURLTypes</key> <array> <dict> <key>CFBundleURLSchemes</key> <array> <string>fb770911393302334</string> </array> </dict> </array> <key>FacebookAppID</key> <string>770911393302334</string> <key>FacebookDisplayName</key> <string>AVIV</string>
-        
-        
-        <key>LSApplicationQueriesSchemes</key> <array> <string>fbapi</string> <string>fb-messenger-share-api</string> <string>fbauth2</string> <string>fbshareextension</string> </array>
+      <key>LSApplicationQueriesSchemes</key> <array> <string>fbapi</string> <string>fb-messenger-share-api</string> <string>fbauth2</string> <string>fbshareextension</string> </array>
       
         <key>CFBundleDevelopmentRegion</key>
         <string>$(DEVELOPMENT_LANGUAGE)</string>
