@@ -26,6 +26,7 @@
 		22CC9F9321FF74E8002DA79B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22CC9F9221FF74E8002DA79B /* Assets.xcassets */; };
 		22CC9F9621FF74E8002DA79B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */; };
 		22CC9FA121FF74E9002DA79B /* AVIVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC9FA021FF74E9002DA79B /* AVIVTests.swift */; };
+		22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777B2240656B00B64540 /* SearchViewController.swift */; };
 		34FD8B79C6B00D54DA915D34 /* Pods_AVIVTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9DE7914B9895A912E3932A6 /* Pods_AVIVTests.framework */; };
 		91B9E2F58F6F11AFDB0A0206 /* Pods_AVIV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */; };
 /* End PBXBuildFile section */
@@ -86,6 +87,7 @@
 		22CC9F9C21FF74E9002DA79B /* AVIVTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVIVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22CC9FA021FF74E9002DA79B /* AVIVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIVTests.swift; sourceTree = "<group>"; };
 		22CC9FA221FF74E9002DA79B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22E2777B2240656B00B64540 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVIV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6926CD558064680AE91BEAAA /* Pods-AVIV.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.debug.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.debug.xcconfig"; sourceTree = "<group>"; };
 		B1AB0F809CC0A16F6780F6CB /* Pods-AVIV.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.release.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.release.xcconfig"; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				22CC9F8D21FF74E3002DA79B /* LoginViewController.swift */,
 				22978759223824FE008348E9 /* LogoutViewController.swift */,
 				229787572237F519008348E9 /* GenerateUserProfile.swift */,
+				22E2777B2240656B00B64540 /* SearchViewController.swift */,
 				22398761223716D6003238CB /* Main.storyboard */,
 				22CC9F9221FF74E8002DA79B /* Assets.xcassets */,
 				22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */,
@@ -404,6 +407,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */,
 				22CC9F8E21FF74E3002DA79B /* LoginViewController.swift in Sources */,
 				22CC9F8C21FF74E3002DA79B /* AppDelegate.swift in Sources */,
 				223C07E3223EC7E1009BF449 /* Credentials.swift in Sources */,
