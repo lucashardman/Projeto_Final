@@ -204,7 +204,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <searchBar contentMode="redraw" searchBarStyle="minimal" placeholder="Cidade" translatesAutoresizingMaskIntoConstraints="NO" id="iHA-v6-FYw">
-                                <rect key="frame" x="0.0" y="185" width="375" height="56"/>
+                                <rect key="frame" x="0.0" y="185" width="336" height="56"/>
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IrV-ax-uDz">
@@ -225,44 +225,68 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QvI-DT-stF">
-                                <rect key="frame" x="16" y="299" width="53" height="30"/>
+                                <rect key="frame" x="16" y="299" width="54" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Ar Livre"/>
+                                <state key="normal" title="openAir"/>
+                                <connections>
+                                    <action selector="openAirClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="BEX-jn-Wm6"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="i94-Cj-qcE">
-                                <rect key="frame" x="16" y="328" width="148" height="30"/>
+                                <rect key="frame" x="158" y="383" width="59" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Museus e Exposições"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PdF-F9-nWu">
-                                <rect key="frame" x="297" y="299" width="62" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Compras"/>
+                                <state key="normal" title="Museum"/>
+                                <connections>
+                                    <action selector="museumClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="J1a-rH-eFO"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iFz-ec-eld">
-                                <rect key="frame" x="234" y="299" width="44" height="30"/>
+                                <rect key="frame" x="16" y="383" width="54" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Teatro"/>
+                                <state key="normal" title="Theater"/>
+                                <connections>
+                                    <action selector="theaterClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="MDc-fQ-Smb"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gBr-qX-3aC">
-                                <rect key="frame" x="314" y="328" width="45" height="30"/>
+                                <rect key="frame" x="251" y="450" width="37" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Hoteis"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HWl-IJ-Pr2">
-                                <rect key="frame" x="172" y="327" width="119" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Eventos Musicais"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZXa-c5-Ri5">
-                                <rect key="frame" x="91" y="299" width="123" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Eventos Noturnos"/>
+                                <state key="normal" title="Hotel"/>
+                                <connections>
+                                    <action selector="hotelClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="aJa-GI-xCZ"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cDt-O1-Ie8">
-                                <rect key="frame" x="16" y="359" width="88" height="30"/>
+                                <rect key="frame" x="313" y="383" width="46" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Gastronomia"/>
+                                <state key="normal" title="Gastro"/>
+                                <connections>
+                                    <action selector="gastronomyClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="8Ik-gP-vwz"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HWl-IJ-Pr2">
+                                <rect key="frame" x="318" y="299" width="41" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Music"/>
+                                <connections>
+                                    <action selector="musicClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="ukb-RF-46X"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZXa-c5-Ri5">
+                                <rect key="frame" x="164" y="299" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="nightC"/>
+                                <connections>
+                                    <action selector="nighClubsClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="gSw-KX-HM4"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PdF-F9-nWu">
+                                <rect key="frame" x="74" y="450" width="36" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Shop"/>
+                                <connections>
+                                    <action selector="shoppingClicked:" destination="p5U-rx-oLI" eventType="touchUpInside" id="oL9-yb-YQc"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -283,7 +307,15 @@
                     <tabBarItem key="tabBarItem" systemItem="search" id="oNU-FO-kw2"/>
                     <navigationItem key="navigationItem" id="jNv-PI-f2u"/>
                     <connections>
+                        <outlet property="gastronomy" destination="cDt-O1-Ie8" id="anC-VA-1LH"/>
+                        <outlet property="hotel" destination="gBr-qX-3aC" id="hNW-vN-lh5"/>
+                        <outlet property="museum" destination="i94-Cj-qcE" id="hYe-zL-XIo"/>
+                        <outlet property="music" destination="HWl-IJ-Pr2" id="RXX-aD-cFJ"/>
+                        <outlet property="nightClub" destination="ZXa-c5-Ri5" id="Cqc-fD-oPh"/>
+                        <outlet property="openAir" destination="QvI-DT-stF" id="kdL-BL-2k5"/>
                         <outlet property="refineButton" destination="IrV-ax-uDz" id="RCf-g2-zaj"/>
+                        <outlet property="shopping" destination="PdF-F9-nWu" id="wUu-tS-Xpy"/>
+                        <outlet property="theater" destination="iFz-ec-eld" id="4ZX-sf-eui"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uUl-FR-RCk" userLabel="First Responder" sceneMemberID="firstResponder"/>
