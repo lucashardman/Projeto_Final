@@ -16,6 +16,11 @@ class LogoutViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        loadLogoutButton()
+    }
+    
+    private func loadLogoutButton(){
+        
         let logoutButton = UIButton(type: .custom)
         logoutButton.backgroundColor = UIColor.darkGray
         logoutButton.frame = CGRect(x: 0, y: 0, width: 180, height: 40)

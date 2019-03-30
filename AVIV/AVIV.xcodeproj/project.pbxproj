@@ -26,8 +26,11 @@
 		22CC9F9321FF74E8002DA79B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22CC9F9221FF74E8002DA79B /* Assets.xcassets */; };
 		22CC9F9621FF74E8002DA79B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */; };
 		22CC9FA121FF74E9002DA79B /* AVIVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC9FA021FF74E9002DA79B /* AVIVTests.swift */; };
+		22D7001522486ADD00DEB17E /* LanguageTranslatorV3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; };
+		22D7001622486ADD00DEB17E /* LanguageTranslatorV3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777B2240656B00B64540 /* SearchViewController.swift */; };
 		22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777F2246EB0600B64540 /* FavoriteViewController.swift */; };
+		22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F040802247E5B9004FE7C4 /* Suggestion.swift */; };
 		34FD8B79C6B00D54DA915D34 /* Pods_AVIVTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9DE7914B9895A912E3932A6 /* Pods_AVIVTests.framework */; };
 		91B9E2F58F6F11AFDB0A0206 /* Pods_AVIV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */; };
 /* End PBXBuildFile section */
@@ -54,6 +57,7 @@
 				223987552236DE96003238CB /* FacebookShare.framework in Embed Frameworks */,
 				223987592236DE96003238CB /* FBSDKLoginKit.framework in Embed Frameworks */,
 				2239874F2236DE96003238CB /* RestKit.framework in Embed Frameworks */,
+				22D7001622486ADD00DEB17E /* LanguageTranslatorV3.framework in Embed Frameworks */,
 				2239875B2236DE97003238CB /* FBSDKPlacesKit.framework in Embed Frameworks */,
 				223987532236DE96003238CB /* FacebookLogin.framework in Embed Frameworks */,
 				223987512236DE96003238CB /* FacebookCore.framework in Embed Frameworks */,
@@ -88,8 +92,10 @@
 		22CC9F9C21FF74E9002DA79B /* AVIVTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVIVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22CC9FA021FF74E9002DA79B /* AVIVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIVTests.swift; sourceTree = "<group>"; };
 		22CC9FA221FF74E9002DA79B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LanguageTranslatorV3.framework; path = Carthage/Build/iOS/LanguageTranslatorV3.framework; sourceTree = "<group>"; };
 		22E2777B2240656B00B64540 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		22E2777F2246EB0600B64540 /* FavoriteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteViewController.swift; sourceTree = "<group>"; };
+		22F040802247E5B9004FE7C4 /* Suggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestion.swift; sourceTree = "<group>"; };
 		4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVIV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6926CD558064680AE91BEAAA /* Pods-AVIV.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.debug.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.debug.xcconfig"; sourceTree = "<group>"; };
 		B1AB0F809CC0A16F6780F6CB /* Pods-AVIV.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.release.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.release.xcconfig"; sourceTree = "<group>"; };
@@ -104,6 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				91B9E2F58F6F11AFDB0A0206 /* Pods_AVIV.framework in Frameworks */,
+				22D7001522486ADD00DEB17E /* LanguageTranslatorV3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +128,7 @@
 		228D9941220098FA00F1E729 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */,
 				2239874C2236CB41003238CB /* RestKit.framework */,
 				228D9947220099B900F1E729 /* FacebookCore.framework */,
 				228D994A220099B900F1E729 /* FacebookLogin.framework */,
@@ -161,6 +169,7 @@
 			children = (
 				22CC9F8B21FF74E3002DA79B /* AppDelegate.swift */,
 				223C07E2223EC7E1009BF449 /* Credentials.swift */,
+				22F040802247E5B9004FE7C4 /* Suggestion.swift */,
 				22CC9F8D21FF74E3002DA79B /* LoginViewController.swift */,
 				22978759223824FE008348E9 /* LogoutViewController.swift */,
 				229787572237F519008348E9 /* GenerateUserProfile.swift */,
@@ -338,6 +347,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/FBSDKShareKit.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/RestKit.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/Bolts.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/LanguageTranslatorV3.framework",
 			);
 			outputFileListPaths = (
 			);
@@ -413,6 +423,7 @@
 				22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */,
 				22CC9F8E21FF74E3002DA79B /* LoginViewController.swift in Sources */,
 				22CC9F8C21FF74E3002DA79B /* AppDelegate.swift in Sources */,
+				22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */,
 				22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */,
 				223C07E3223EC7E1009BF449 /* Credentials.swift in Sources */,
 				2297875A223824FE008348E9 /* LogoutViewController.swift in Sources */,

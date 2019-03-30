@@ -12,10 +12,16 @@ import FacebookCore
 
 class LoginViewController: UIViewController {
     
+    private var developerAddSuggestion: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        loadLoginButton()
+    }
+    
+    private func loadLoginButton(){
+        
         let loginButton = UIButton(type: .custom)
         loginButton.backgroundColor = UIColor.darkGray
         loginButton.frame = CGRect(x: 0, y: 0, width: 180, height: 40)
@@ -34,11 +40,9 @@ class LoginViewController: UIViewController {
                 print(error)
             case .cancelled:
                 print("User cancelled login.")
-            //case .success(let grantedPermissions, let declinedPermissions, let accessToken):
             case .success( _, _, _):
                 print("Logged in!")
                 
-                //let facebook = ProcessFacebookData()
                 let connection = GraphRequestConnection()
                 connection.add(FacebookProfileRequest()) { response, result in
                     switch result {

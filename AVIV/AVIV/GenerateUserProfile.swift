@@ -10,6 +10,7 @@ import Foundation
 import Firebase
 import FacebookCore
 import PersonalityInsightsV3
+import LanguageTranslatorV3
 /**********************************************
  
  Struct global responsavel por decodificar o json retornado pelo Facebook
@@ -70,22 +71,26 @@ class GenerateUserProfile {
         
         //Inicializando PersonalityInsights
         let personalityInsights = PersonalityInsights(
-            username: WatsonPersonalityInsightsCredentials.personalityInsightsUsername,
-            password: WatsonPersonalityInsightsCredentials.personalityInsightsPassword,
-            version: WatsonPersonalityInsightsCredentials.version)
+            username: WatsonCredentials.personalityInsightsUsername,
+            password: WatsonCredentials.personalityInsightsPassword,
+            version: WatsonCredentials.version)
         
+        let languageTranslator = LanguageTranslator(version: WatsonCredentials.version, apiKey: WatsonCredentials.languageTranslatorAPIKey, iamUrl: WatsonCredentials.languageTranslatorURL)
+    
         //Transferindo postagens para o tipo legivel pelo Personality Insights
         var contentItems: [ContentItem] = []
+        print("\nPostagens na lingua original:")
         posts.forEach{ post in
             if (post["message"] != nil){
                 //print(post["message"])
                 let message = post["message"] as! String
-                //print(message)
+                print(message)
                 contentItems.append(ContentItem.init(content: message))
             }
         }
         let profileContent = ProfileContent.content(Content.init(contentItems: contentItems))
-        //TESTE: contentItems está preenchida corretamente?
+        //TESTE: contentItems está preenchida corretamente com os posts em ingles?
+        print("\nPostagens traduzidas:")
         contentItems.forEach{ item in
             print(item.content)
         }

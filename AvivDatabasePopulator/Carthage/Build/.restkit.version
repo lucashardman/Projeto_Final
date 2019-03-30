@@ -1,0 +1,9 @@
+{
+  "commitish" : "2.0.0",
+  "iOS" : [
+    {
+      "name" : "RestKit",
+      "hash" : "4a727677cc9922459f3839b2a9e1abd3a92e8aeeedf090cdb60dc3ba613159b4"
+    }
+  ]
+}

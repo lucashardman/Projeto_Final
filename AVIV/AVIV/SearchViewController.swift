@@ -29,14 +29,14 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var refineButton: UIButton!
     private var hiddenRefinedSearch: Bool = false
     
-    @IBOutlet weak var openAir: UIButton!
-    @IBOutlet weak var nightClub: UIButton!
-    @IBOutlet weak var theater: UIButton!
-    @IBOutlet weak var shopping: UIButton!
-    @IBOutlet weak var museum: UIButton!
-    @IBOutlet weak var music: UIButton!
-    @IBOutlet weak var hotel: UIButton!
-    @IBOutlet weak var gastronomy: UIButton!
+    private let openAir: UIButton = UIButton(type: .custom)
+    private let nightClub: UIButton = UIButton(type: .custom)
+    private let theater: UIButton = UIButton(type: .custom)
+    private let shopping: UIButton = UIButton(type: .custom)
+    private let museum: UIButton = UIButton(type: .custom)
+    private let music: UIButton = UIButton(type: .custom)
+    private let hotel: UIButton = UIButton(type: .custom)
+    private let gastronomy: UIButton = UIButton(type: .custom)
     
     //Flags de filtro de busca inicializadas como false, pois não há filtros por default
     private var openAirFlag: Bool = false
@@ -57,13 +57,12 @@ class SearchViewController: UIViewController {
     private var backgroundColor: UIColor!
     private var color: UIColor!
     
+    private var suggestions: [Suggestion] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        refineButton.center = view.center;
-        refineButton.setTitle("\u{2193} Refinar pesquisa", for: .normal)
-        hiddenRefinedSearch = false
-        
-        
+
+        loadViewElements()
         loadRefineButtons(buttons: [openAir,
                                     nightClub,
                                     theater,
@@ -72,6 +71,26 @@ class SearchViewController: UIViewController {
                                     music,
                                     hotel,
                                     gastronomy])
+    }
+    
+    private func loadViewElements(){
+        
+        //Tratamento dos elementos visiveis na tela
+        refineButton.center = view.center;
+        refineButton.setTitle("\u{2193} Refinar pesquisa", for: .normal)
+        hiddenRefinedSearch = false
+        
+        //Buscando Sugestões
+        //let loadSuggestions = Suggestion.init()
+        //loadSuggestions.loadFromFirebase()
+    }
+    
+    private func loadSuggestionsFromFirebase(){
+        
+        let suggestion = Suggestion.init()
+        suggestion.loadElement(addName: "Corcovado", addId: "1", addCategory: "Ponto Turistico", addMasterCategory: "openAir", addMainPhoto: "foto", addText: "Um lugar muito lindo", addLink: "http://www.tremdocorcovado.rio", addPhotoGallery: "varias fotos", addCity: "Rio de Janeiro", addProfile: "caracteristicas")
+        suggestions.append(suggestion)
+        
     }
     
     private func loadRefineButtons(buttons: [UIButton]){
@@ -86,52 +105,61 @@ class SearchViewController: UIViewController {
         color = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1))
         backgroundColor = UIColor.white
         
+        openAir.titleLabel?.text = "openAir"
+        nightClub.titleLabel?.text = "nightClub"
+        theater.titleLabel?.text = "theater"
+        shopping.titleLabel?.text = "shopping"
+        museum.titleLabel?.text = "museum"
+        music.titleLabel?.text = "music"
+        hotel.titleLabel?.text = "hotel"
+        gastronomy.titleLabel?.text = "gastronomy"
         
         buttons.forEach{ button in
+            
+            view.addSubview(button)
             button.isHidden = true
             
             button.setImage(UIImage(named: (button.titleLabel?.text)!)?.addImagePadding(extraWidth: width*8, extraHeight: height*8), for: .normal)
-            button.frame.size = size
+            
             button.layer.cornerRadius = radius
             button.layer.borderWidth = borderWidth
             button.layer.borderColor = borderColor
             button.backgroundColor = backgroundColor
             button.tintColor = color
-            button.clipsToBounds = true
-            button.layer.masksToBounds = true
-            button.contentMode = UIView.ContentMode.scaleAspectFill
+            
+            openAir.frame = CGRect(x: 50, y: 300, width: width, height: height)
+            nightClub.frame = CGRect(x: 150, y: 300, width: width, height: height)
+            theater.frame = CGRect(x: 250, y: 300, width: width, height: height)
+            shopping.frame = CGRect(x: 50, y: 400, width: width, height: height)
+            museum.frame = CGRect(x: 150, y: 400, width: width, height: height)
+            music.frame = CGRect(x: 250, y: 400, width: width, height: height)
+            hotel.frame = CGRect(x: 50, y: 500, width: width, height: height)
+            gastronomy.frame = CGRect(x: 150, y: 500, width: width, height: height)
+            
+            openAir.addTarget(self, action: #selector(self.openAirClicked), for: .touchUpInside )
+            nightClub.addTarget(self, action: #selector(self.nighClubClicked), for: .touchUpInside)
+            theater.addTarget(self, action: #selector(self.theaterClicked), for: .touchUpInside)
+            shopping.addTarget(self, action: #selector(self.shoppingClicked), for: .touchUpInside)
+            museum.addTarget(self, action: #selector(self.museumClicked), for: .touchUpInside)
+            music.addTarget(self, action: #selector(self.musicClicked), for: .touchUpInside)
+            hotel.addTarget(self, action: #selector(self.hotelClicked), for: .touchUpInside)
+            gastronomy.addTarget(self, action: #selector(self.gastronomyClicked), for: .touchUpInside)
         }
     }
     
     private func selectRefineButton(button: UIButton){
-        /*
-        width = 70
-        height = 70
-        size = CGSize(width: width, height: height)
-        radius = CGFloat(Double(height/2))
-        button.frame.size = size
-        button.layer.cornerRadius = radius
-        */
-        
+
         button.layer.borderWidth = CGFloat(Double(0))
         button.backgroundColor = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1))
         button.tintColor = UIColor.white
-        
+
     }
     private func diselectRefineButton(button: UIButton){
-        /*
-        width = 70
-        height = 70
-        size = CGSize(width: width, height: height)
-        radius = CGFloat(Double(height/2))
-        button.frame.size = size
-        button.layer.cornerRadius = radius
-        */
-        
+
         button.layer.borderWidth = CGFloat(Double(3))
         button.backgroundColor = UIColor.white
         button.tintColor = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1))
-        
+
     }
     
     @IBAction func refineButtonClicked(_ sender: UIButton) {
@@ -163,7 +191,7 @@ class SearchViewController: UIViewController {
         }
     }
     
-    @IBAction func openAirClicked(_ sender: UIButton) {
+    @objc func openAirClicked() {
         if (openAirFlag == false){
             openAirFlag = true
             selectRefineButton(button: openAir)
@@ -173,7 +201,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: openAir)
         }
     }
-    @IBAction func nighClubsClicked(_ sender: UIButton) {
+    @objc func nighClubClicked() {
         if (nightClubFlag == false){
             nightClubFlag = true
             selectRefineButton(button: nightClub)
@@ -183,7 +211,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: nightClub)
         }
     }
-    @IBAction func theaterClicked(_ sender: UIButton) {
+    @objc func theaterClicked() {
         if (theaterFlag == false){
             theaterFlag = true
             selectRefineButton(button: theater)
@@ -193,7 +221,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: theater)
         }
     }
-    @IBAction func shoppingClicked(_ sender: UIButton) {
+    @objc func shoppingClicked() {
         if (shoppingFlag == false){
             shoppingFlag = true
             selectRefineButton(button: shopping)
@@ -203,7 +231,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: shopping)
         }
     }
-    @IBAction func museumClicked(_ sender: UIButton) {
+    @objc func museumClicked() {
         if (museumFlag == false){
             museumFlag = true
             selectRefineButton(button: museum)
@@ -213,7 +241,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: museum)
         }
     }
-    @IBAction func musicClicked(_ sender: UIButton) {
+    @objc func musicClicked() {
         if (musicFlag == false){
             musicFlag = true
             selectRefineButton(button: music)
@@ -223,7 +251,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: music)
         }
     }
-    @IBAction func hotelClicked(_ sender: UIButton) {
+    @objc func hotelClicked() {
         if (hotelFlag == false){
             hotelFlag = true
             selectRefineButton(button: hotel)
@@ -233,7 +261,7 @@ class SearchViewController: UIViewController {
             diselectRefineButton(button: hotel)
         }
     }
-    @IBAction func gastronomyClicked(_ sender: UIButton) {
+    @objc func gastronomyClicked() {
         if (gastronomyFlag == false){
             gastronomyFlag = true
             selectRefineButton(button: gastronomy)
