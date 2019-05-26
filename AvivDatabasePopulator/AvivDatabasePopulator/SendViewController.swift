@@ -26,7 +26,7 @@ class SendViewController: UIViewController {
         logoutButton.backgroundColor = UIColor.darkGray
         logoutButton.frame = CGRect(x: 0, y: 0, width: 180, height: 40)
         logoutButton.center = view.center;
-        logoutButton.setTitle("Enviar", for: .normal)
+        logoutButton.setTitle("Concluir", for: .normal)
         logoutButton.addTarget(self, action: #selector(self.logoutButtonAction), for: .touchUpInside)
         
         view.addSubview(logoutButton)
