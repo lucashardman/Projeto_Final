@@ -75,8 +75,64 @@ class GenerateUserProfile {
             password: WatsonCredentials.personalityInsightsPassword,
             version: WatsonCredentials.version)
         
-        let languageTranslator = LanguageTranslator(version: WatsonCredentials.version, apiKey: WatsonCredentials.languageTranslatorAPIKey, iamUrl: WatsonCredentials.languageTranslatorURL)
-    
+        let languageTranslator = LanguageTranslator(version: WatsonCredentials.version, apiKey: WatsonCredentials.languageTranslatorAPIKey)
+        
+        //Passando as postagens para um array de string para ser lido pelo Language Translator
+        var messageArray = [String]()
+        print("\nPostagens na lingua original:")
+        posts.forEach{ post in
+            if (post["message"] != nil){
+                let message = post["message"] as! String
+                print(message)
+                messageArray.append(message)
+            }
+        }
+        print (messageArray)
+        //Tradução das postagens pelo Language Translator
+        languageTranslator.translate(text: messageArray, modelID: "pt-en"){
+            response, error in
+            
+            //Tratamento de erro
+            guard let translation = response?.result else {
+                print("Language Translator error: ")
+               
+                print(error?.localizedDescription ?? "Erro desconhecido")
+                return
+            }
+            
+            //Transferindo postagens para o tipo legivel pelo Personality Insights
+            var contentItems: [ContentItem] = []
+            translation.translations.forEach{ post in
+                let message = post.translationOutput
+                contentItems.append(ContentItem.init(content: message))
+            }
+            
+            print("\nPostagens traduzidas:")
+            contentItems.forEach{ post in
+                print(post.content)
+                print("\n")
+            }
+            
+            //Enviando as postagens traduzidas para o Personality Insights
+            let profileContent = ProfileContent.content(Content.init(contentItems: contentItems))
+            let customHeader: [String: String] = ["Custom-Header": "{Header-Value}"]
+            
+            personalityInsights.profile(profileContent: profileContent, contentLanguage: "en", acceptLanguage: "en", rawScores: true, consumptionPreferences: true, headers: customHeader){ response, error in
+                
+                //Tratamento de erro
+                guard let profile = response?.result else {
+                    print("Personality Insights error: ")
+                    print(error?.localizedDescription ?? "Erro desconhecido")
+                    return
+                }
+                
+                //LEMBRAR DE ATUALIZAR ESTA CHAMADA QUANDO IMPLEMENTAR O FORMULARIO
+                print("Personality Insights: perfil gerado com sucesso")
+                self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, id: id)
+            }
+        }
+        
+        /*
         //Transferindo postagens para o tipo legivel pelo Personality Insights
         var contentItems: [ContentItem] = []
         print("\nPostagens na lingua original:")
@@ -86,6 +142,17 @@ class GenerateUserProfile {
                 let message = post["message"] as! String
                 print(message)
                 contentItems.append(ContentItem.init(content: message))
+            }
+        }
+ 
+        //Passando as postagens para um array de string para ser lido pelo Language Translator
+        var messageArray = [String]()
+        print("\nPostagens na lingua original:")
+        posts.forEach{ post in
+            if (post["message"] != nil){
+                let message = post["message"] as! String
+                print(message)
+                messageArray.append(message)
             }
         }
         let profileContent = ProfileContent.content(Content.init(contentItems: contentItems))
@@ -107,6 +174,7 @@ class GenerateUserProfile {
             print("I'm at Personality Insights profile request")
             self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, id: id)
         }
+        */
     }
     
     private func sendPersonalityInsightsUserProfileToFirebase(profile: Profile, id: String){
