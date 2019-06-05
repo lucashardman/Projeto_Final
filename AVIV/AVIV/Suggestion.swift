@@ -20,8 +20,9 @@ class Suggestion {
     private var photoGallery: String!
     private var city: String!
     private var profile: String!
+    private var match: Double = 0
     
-    func loadElement(addName: String, addId: String, addCategory: String, addMasterCategory: String, addMainPhoto: String, addText: String, addLink: String, addPhotoGallery: String, addCity: String, addProfile: String){
+    func loadElement(addName: String, addId: String, addCategory: String, addMasterCategory: String, addMainPhoto: String, addText: String, addLink: String, addPhotoGallery: String, addCity: String, addProfile: String, match: Double){
         
         name = addName
         id = addId
@@ -64,5 +65,8 @@ class Suggestion {
     }
     func getProfile() -> String{
         return profile
+    }
+    func getMatch() -> Double{
+        return match
     }
 }

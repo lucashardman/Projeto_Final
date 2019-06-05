@@ -55,9 +55,11 @@ struct FacebookProfileRequest: GraphRequestProtocol {
 class GenerateUserProfile {
     
     var firebase: Firestore!
+    var view: UIViewController!
     
-    init(){
-        firebase = Firestore.firestore()
+    init(view: UIViewController){
+        self.firebase = Firestore.firestore()
+        self.view = view
     }
     
     func sendUserInfoToFirebase(id: String, name: String, email: String, gender: String, posts: [Dictionary<String, Any>]){
@@ -131,50 +133,6 @@ class GenerateUserProfile {
                 self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, id: id)
             }
         }
-        
-        /*
-        //Transferindo postagens para o tipo legivel pelo Personality Insights
-        var contentItems: [ContentItem] = []
-        print("\nPostagens na lingua original:")
-        posts.forEach{ post in
-            if (post["message"] != nil){
-                //print(post["message"])
-                let message = post["message"] as! String
-                print(message)
-                contentItems.append(ContentItem.init(content: message))
-            }
-        }
- 
-        //Passando as postagens para um array de string para ser lido pelo Language Translator
-        var messageArray = [String]()
-        print("\nPostagens na lingua original:")
-        posts.forEach{ post in
-            if (post["message"] != nil){
-                let message = post["message"] as! String
-                print(message)
-                messageArray.append(message)
-            }
-        }
-        let profileContent = ProfileContent.content(Content.init(contentItems: contentItems))
-        //TESTE: contentItems está preenchida corretamente com os posts em ingles?
-        print("\nPostagens traduzidas:")
-        contentItems.forEach{ item in
-            print(item.content)
-        }
-        
-        //Requerindo o Perfil do usuário
-        let customHeader: [String: String] = ["Custom-Header": "{Header-Value}"] //não sei pra que serve isso ç_ç
-        personalityInsights.profile(profileContent: profileContent, contentLanguage: "en", acceptLanguage: "en", rawScores: true, consumptionPreferences: true, headers: customHeader){ response, error in
-            
-            guard let profile = response?.result else {
-                print("Personality Insights error: ")
-                print(error?.localizedDescription ?? "unknown error")
-                return
-            }
-            print("I'm at Personality Insights profile request")
-            self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, id: id)
-        }
-        */
     }
     
     private func sendPersonalityInsightsUserProfileToFirebase(profile: Profile, id: String){

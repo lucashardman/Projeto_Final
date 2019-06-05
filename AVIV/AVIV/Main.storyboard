@@ -212,9 +212,16 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Send"/>
                                 <connections>
-                                    <segue destination="hSQ-mm-ZlO" kind="show" id="Pzl-LQ-C2R"/>
+                                    <action selector="searchButton:" destination="p5U-rx-oLI" eventType="touchUpInside" id="WCU-MV-nBJ"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="TESTEEE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8vr-nT-gqy">
+                                <rect key="frame" x="160" y="413" width="71" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -235,22 +242,35 @@
                     <navigationItem key="navigationItem" id="jNv-PI-f2u"/>
                     <connections>
                         <outlet property="refineButton" destination="IrV-ax-uDz" id="RCf-g2-zaj"/>
+                        <outlet property="testandoParaVerSeMuda" destination="8vr-nT-gqy" id="xF0-Zd-La7"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uUl-FR-RCk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2589.5999999999999" y="-752.47376311844084"/>
         </scene>
-        <!--View Controller-->
+        <!--Teste Da Resposta-->
         <scene sceneID="Th6-2E-WEZ">
             <objects>
-                <viewController id="hSQ-mm-ZlO" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TesteDaResposta" id="hSQ-mm-ZlO" customClass="TesteDaResposta" customModule="AVIV" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="drA-ir-EwY">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B5n-QO-fJn">
+                                <rect key="frame" x="251" y="238" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="qpI-xv-ZEe"/>
                     </view>
+                    <connections>
+                        <outlet property="respostaDoTreco" destination="B5n-QO-fJn" id="5Fg-bP-Lzy"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sLH-8O-E45" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

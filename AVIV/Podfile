@@ -8,6 +8,7 @@ target 'AVIV' do
   # Pods for AVIV
   pod 'Firebase/Core'
   pod 'Firebase/Firestore'
+  pod 'PromiseKit', '~> 6.8'
 
   target 'AVIVTests' do
     inherit! :search_paths

@@ -88,7 +88,7 @@ class SearchViewController: UIViewController {
     private func loadSuggestionsFromFirebase(){
         
         let suggestion = Suggestion.init()
-        suggestion.loadElement(addName: "Corcovado", addId: "1", addCategory: "Ponto Turistico", addMasterCategory: "openAir", addMainPhoto: "foto", addText: "Um lugar muito lindo", addLink: "http://www.tremdocorcovado.rio", addPhotoGallery: "varias fotos", addCity: "Rio de Janeiro", addProfile: "caracteristicas")
+        suggestion.loadElement(addName: "Corcovado", addId: "1", addCategory: "Ponto Turistico", addMasterCategory: "openAir", addMainPhoto: "foto", addText: "Um lugar muito lindo", addLink: "http://www.tremdocorcovado.rio", addPhotoGallery: "varias fotos", addCity: "Rio de Janeiro", addProfile: "caracteristicas", match: 0)
         suggestions.append(suggestion)
         
     }
@@ -270,6 +270,15 @@ class SearchViewController: UIViewController {
             gastronomyFlag = false
             diselectRefineButton(button: gastronomy)
         }
+    }
+    @IBOutlet weak var testandoParaVerSeMuda: UILabel!
+    
+    @IBAction func searchButton(_ sender: UIButton) {
+        var a = MatchProfile.init()
+        a.calculate()
+        //print("recebido por fora????? \(a.calculate())")
+        //testandoParaVerSeMuda.text = String(a.calculate()[0].getMatch())
+        //navigationController?.pushViewController(a.calculate(), animated: true)
     }
     
     override func didReceiveMemoryWarning() {

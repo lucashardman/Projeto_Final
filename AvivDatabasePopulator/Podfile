@@ -8,6 +8,7 @@ target 'AvivDatabasePopulator' do
   # Pods for AvivDatabasePopulator
   pod 'Firebase/Core'
   pod 'Firebase/Firestore'
+  pod 'PromiseKit'
 
   target 'AvivDatabasePopulatorTests' do
     inherit! :search_paths

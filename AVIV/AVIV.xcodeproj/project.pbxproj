@@ -30,6 +30,8 @@
 		22D7001622486ADD00DEB17E /* LanguageTranslatorV3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777B2240656B00B64540 /* SearchViewController.swift */; };
 		22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777F2246EB0600B64540 /* FavoriteViewController.swift */; };
+		22E6388522A41B7E005EF55F /* MatchProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E6388422A41B7E005EF55F /* MatchProfile.swift */; };
+		22E6388722A5808F005EF55F /* TesteDaResposta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E6388622A5808F005EF55F /* TesteDaResposta.swift */; };
 		22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F040802247E5B9004FE7C4 /* Suggestion.swift */; };
 		34FD8B79C6B00D54DA915D34 /* Pods_AVIVTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9DE7914B9895A912E3932A6 /* Pods_AVIVTests.framework */; };
 		91B9E2F58F6F11AFDB0A0206 /* Pods_AVIV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */; };
@@ -95,6 +97,8 @@
 		22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LanguageTranslatorV3.framework; path = Carthage/Build/iOS/LanguageTranslatorV3.framework; sourceTree = "<group>"; };
 		22E2777B2240656B00B64540 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		22E2777F2246EB0600B64540 /* FavoriteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteViewController.swift; sourceTree = "<group>"; };
+		22E6388422A41B7E005EF55F /* MatchProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchProfile.swift; sourceTree = "<group>"; };
+		22E6388622A5808F005EF55F /* TesteDaResposta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TesteDaResposta.swift; sourceTree = "<group>"; };
 		22F040802247E5B9004FE7C4 /* Suggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestion.swift; sourceTree = "<group>"; };
 		4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVIV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6926CD558064680AE91BEAAA /* Pods-AVIV.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.debug.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.debug.xcconfig"; sourceTree = "<group>"; };
@@ -173,7 +177,9 @@
 				22CC9F8D21FF74E3002DA79B /* LoginViewController.swift */,
 				22978759223824FE008348E9 /* LogoutViewController.swift */,
 				229787572237F519008348E9 /* GenerateUserProfile.swift */,
+				22E6388422A41B7E005EF55F /* MatchProfile.swift */,
 				22E2777B2240656B00B64540 /* SearchViewController.swift */,
+				22E6388622A5808F005EF55F /* TesteDaResposta.swift */,
 				22E2777F2246EB0600B64540 /* FavoriteViewController.swift */,
 				22398761223716D6003238CB /* Main.storyboard */,
 				22CC9F9221FF74E8002DA79B /* Assets.xcassets */,
@@ -368,6 +374,7 @@
 				"${PODS_ROOT}/Target Support Files/Pods-AVIV/Pods-AVIV-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/BoringSSL-GRPC/openssl_grpc.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
@@ -380,6 +387,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl_grpc.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
@@ -425,6 +433,8 @@
 				22CC9F8C21FF74E3002DA79B /* AppDelegate.swift in Sources */,
 				22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */,
 				22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */,
+				22E6388722A5808F005EF55F /* TesteDaResposta.swift in Sources */,
+				22E6388522A41B7E005EF55F /* MatchProfile.swift in Sources */,
 				223C07E3223EC7E1009BF449 /* Credentials.swift in Sources */,
 				2297875A223824FE008348E9 /* LogoutViewController.swift in Sources */,
 				229787582237F519008348E9 /* GenerateUserProfile.swift in Sources */,

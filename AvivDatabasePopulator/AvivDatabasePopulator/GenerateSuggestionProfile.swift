@@ -65,9 +65,9 @@ class GenerateUserProfile {
         print("\nDados recebidos do formulario:\n")
         print("nome: \(name)\ncity: \(city)\ncategory: \(category)\nlink: \(link)\nimage: \(image)\ndescription: \(description)\n")
         
-        //Enviando informações basicas para o Firebase
-        let dataToSave: [String: String] = ["name": name, "link": image, "description": description]
-        firebase.collection("cities").document(city).collection(category).document(id).setData(dataToSave)
+        let dataToSave: [String: String] = ["name": name,"city": city, "category": category, "link": image, "description": description]
+        
+        firebase.collection("suggestions").document(id).setData(dataToSave)
  
         //Requisitando o processamento das postagens pelo Personality Insights
         self.processFacebookPostsWithPersonalityInsights(posts: posts, id: id, city: city, category: category)
@@ -143,29 +143,29 @@ class GenerateUserProfile {
         
         print("\nBIG FIVE OF CITY \(city)")
         for big_five in profile.personality{
-            firebase.collection("cities").document(city).collection(category).document(id).collection("big_five").document(big_five.name).setData(["name": big_five.name, "percentile": big_five.percentile])
+            firebase.collection("suggestions").document(id).collection("big_five").document(big_five.name).setData(["name": big_five.name, "percentile": big_five.percentile])
             print("\n-> \(big_five.name): \(big_five.percentile)")
             
             for facet in big_five.children!{
-                firebase.collection("cities").document(city).collection(category).document(id).collection("big_five").document(big_five.name).collection(big_five.name).document(facet.name).setData(["name": facet.name, "percentile": facet.percentile])
+                firebase.collection("suggestions").document(id).collection("big_five").document(big_five.name).collection(big_five.name).document(facet.name).setData(["name": facet.name, "percentile": facet.percentile])
                 print("\(facet.name): \(facet.percentile)")
             }
         }
         print("\nNEEDS OF CITY\(city)")
         for need in profile.needs{
-            firebase.collection("cities").document(city).collection(category).document(id).collection("needs").document(need.name).setData(["name": need.name, "percentile": need.percentile])
+            firebase.collection("suggestions").document(id).collection("needs").document(need.name).setData(["name": need.name, "percentile": need.percentile])
             print("\(need.name): \(need.percentile)")
         }
         print("\nVALUES OF CITY \(city)")
         for value in profile.values{
-            firebase.collection("cities").document(city).collection(category).document(id).collection("values").document(value.name).setData(["name": value.name, "percentile": value.percentile])
+            firebase.collection("suggestions").document(id).collection("values").document(value.name).setData(["name": value.name, "percentile": value.percentile])
             print("\(value.name): \(value.percentile)")
         }
         print("\nCONSUMPTION PREFERENCES OF CITY \(city)")
         for preferences in profile.consumptionPreferences!{
             print("\n-> \(preferences.name):")
             for preference in preferences.consumptionPreferences{
-                firebase.collection("cities").document(city).collection(category).document(id).collection("consumption_preferences").document(preferences.name).collection(preferences.name).document(preference.name).setData(["name": preference.name, "score": preference.score])
+                firebase.collection("suggestions").document(id).collection("consumption_preferences").document(preferences.name).collection(preferences.name).document(preference.name).setData(["name": preference.name, "score": preference.score])
                 print("\(preference.name): \(preference.score)")
             }
         }

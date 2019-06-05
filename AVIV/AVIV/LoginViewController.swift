@@ -12,7 +12,7 @@ import FacebookCore
 
 class LoginViewController: UIViewController {
     
-    private var developerAddSuggestion: Bool = false
+    public var profileGenerated: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +33,7 @@ class LoginViewController: UIViewController {
     }
     
     @objc func loginButtonClicked() {
+        
         let loginManager = LoginManager()
         loginManager.logIn(readPermissions: [.publicProfile, .email, .userGender, .userPosts] , viewController: self){loginResult in
             switch loginResult {
@@ -56,7 +57,7 @@ class LoginViewController: UIViewController {
                         print("My gender is \(response.gender)")
                         print("My e-mail is \(response.email)")
                         
-                        let profile = GenerateUserProfile.init()
+                        let profile = GenerateUserProfile.init(view: self)
                         
                         profile.sendUserInfoToFirebase(
                             id: response.id,
@@ -64,13 +65,14 @@ class LoginViewController: UIViewController {
                             email: response.email,
                             gender: response.gender,
                             posts: response.posts)
-                        
                     case .failed(let error):
                         print("Graph request at login have failed: \(error)")
                     }
                 }
                 connection.start()
  
+                
+                
                 //Change view to Tab Bar Controller
                 let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 let newViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
