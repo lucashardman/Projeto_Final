@@ -57,14 +57,25 @@ class LoginViewController: UIViewController {
                         print("My gender is \(response.gender)")
                         print("My e-mail is \(response.email)")
                         
-                        let profile = GenerateUserProfile.init(view: self)
+//                        let profile = GenerateUserProfile.init()
+//
+//                        profile.sendUserInfoToFirebase(
+//                            id: response.id,
+//                            name: response.name,
+//                            email: response.email,
+//                            gender: response.gender,
+//                            posts: response.posts)
+                        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                        let newViewController = storyBoard.instantiateViewController(withIdentifier: "generateUserProfile") as! GenerateUserProfile
+                    
+                        newViewController.id = response.id
+                        newViewController.name = response.name
+                        newViewController.email = response.email
+                        newViewController.gender = response.gender
+                        newViewController.posts = response.posts
                         
-                        profile.sendUserInfoToFirebase(
-                            id: response.id,
-                            name: response.name,
-                            email: response.email,
-                            gender: response.gender,
-                            posts: response.posts)
+                        self.present(newViewController, animated: true, completion: nil)
+
                     case .failed(let error):
                         print("Graph request at login have failed: \(error)")
                     }
@@ -73,10 +84,10 @@ class LoginViewController: UIViewController {
  
                 
                 
-                //Change view to Tab Bar Controller
-                let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-                let newViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
-                self.present(newViewController, animated: true, completion: nil)
+//                Change view to Tab Bar Controller
+//                let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//                let newViewController = storyBoard.instantiateViewController(withIdentifier: "generateUserProfile")
+//                self.present(newViewController, animated: true, completion: nil)
             }
         }
     }

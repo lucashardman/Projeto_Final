@@ -25,6 +25,21 @@
             </objects>
             <point key="canvasLocation" x="140" y="41.829085457271368"/>
         </scene>
+        <!--Generate User Profile-->
+        <scene sceneID="H7E-b2-vKx">
+            <objects>
+                <viewController restorationIdentifier="generateUserProfile" storyboardIdentifier="generateUserProfile" id="jKT-TL-KEA" customClass="GenerateUserProfile" customModule="AVIV" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="7N8-zy-f4r">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="0w7-qs-BzE"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qO8-J8-34U" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="149" y="703"/>
+        </scene>
         <!--Favorite View Controller-->
         <scene sceneID="sgS-Q0-ASB">
             <objects>

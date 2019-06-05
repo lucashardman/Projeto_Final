@@ -52,23 +52,47 @@ struct FacebookProfileRequest: GraphRequestProtocol {
     var apiVersion: GraphAPIVersion = .defaultVersion
 }
 
-class GenerateUserProfile {
+class GenerateUserProfile: UIViewController {
     
-    var firebase: Firestore!
-    var view: UIViewController!
+    private var firebase: Firestore!
+    private var readyToChangeViewController: Bool = false
+    private let group = DispatchGroup()
     
-    init(view: UIViewController){
+    var id: String!
+    var name: String!
+    var email: String!
+    var gender: String!
+    var posts: [Dictionary<String, Any>]!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         self.firebase = Firestore.firestore()
-        self.view = view
+        group.enter()
+        sendUserInfoToFirebase()
+
+        group.notify(queue: .main, execute: {
+            //Change view to Tab Bar Controller
+            self.changeViewController()
+        })
+        
     }
     
-    func sendUserInfoToFirebase(id: String, name: String, email: String, gender: String, posts: [Dictionary<String, Any>]){
-        
-        let dataToSave: [String: String] = ["name": name, "email": email, "gender": gender]
-        firebase.collection("users").document(id).setData(dataToSave)
-        
-        self.processFacebookPostsWithPersonalityInsights(posts: posts, id: id)
+    private func changeViewController(){
+        print("Checando se mudou a tela depois de carregar tudo...")
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
+        self.present(newViewController, animated: true, completion: nil)
     }
+    
+    func sendUserInfoToFirebase(){
+        
+        let dataToSave: [String: String] = ["name": self.name, "email": self.email, "gender": self.gender]
+        
+        firebase.collection("users").document(self.id).setData(dataToSave)
+        
+        self.processFacebookPostsWithPersonalityInsights(posts: self.posts, id: self.id)
+    }
+
     private func processFacebookPostsWithPersonalityInsights(posts: [Dictionary<String, Any>], id: String){
         
         //Inicializando PersonalityInsights
@@ -165,5 +189,7 @@ class GenerateUserProfile {
                 print("\(preference.name): \(preference.score)")
             }
         }
+        group.leave()
+        
     }
 }
