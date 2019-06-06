@@ -67,6 +67,7 @@ class GenerateUserProfile: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.firebase = Firestore.firestore()
+        
         group.enter()
         sendUserInfoToFirebase()
 
@@ -74,13 +75,13 @@ class GenerateUserProfile: UIViewController {
             //Change view to Tab Bar Controller
             self.changeViewController()
         })
-        
     }
     
     private func changeViewController(){
         print("Checando se mudou a tela depois de carregar tudo...")
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        let newViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
+        //let newViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile")
         self.present(newViewController, animated: true, completion: nil)
     }
     
@@ -190,6 +191,5 @@ class GenerateUserProfile: UIViewController {
             }
         }
         group.leave()
-        
     }
 }

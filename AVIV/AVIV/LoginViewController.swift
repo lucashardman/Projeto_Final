@@ -57,14 +57,6 @@ class LoginViewController: UIViewController {
                         print("My gender is \(response.gender)")
                         print("My e-mail is \(response.email)")
                         
-//                        let profile = GenerateUserProfile.init()
-//
-//                        profile.sendUserInfoToFirebase(
-//                            id: response.id,
-//                            name: response.name,
-//                            email: response.email,
-//                            gender: response.gender,
-//                            posts: response.posts)
                         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                         let newViewController = storyBoard.instantiateViewController(withIdentifier: "generateUserProfile") as! GenerateUserProfile
                     
@@ -81,13 +73,6 @@ class LoginViewController: UIViewController {
                     }
                 }
                 connection.start()
- 
-                
-                
-//                Change view to Tab Bar Controller
-//                let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//                let newViewController = storyBoard.instantiateViewController(withIdentifier: "generateUserProfile")
-//                self.present(newViewController, animated: true, completion: nil)
             }
         }
     }

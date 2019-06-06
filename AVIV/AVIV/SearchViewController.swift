@@ -26,6 +26,8 @@ extension UIImage {
 
 class SearchViewController: UIViewController {
     
+    var listOfSuggestions: [Suggestion]!
+    
     @IBOutlet weak var refineButton: UIButton!
     private var hiddenRefinedSearch: Bool = false
     
@@ -274,8 +276,8 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var testandoParaVerSeMuda: UILabel!
     
     @IBAction func searchButton(_ sender: UIButton) {
-        var a = MatchProfile.init()
-        a.calculate()
+//        var a = MatchProfile.init()
+//        a.calculate()
         //print("recebido por fora????? \(a.calculate())")
         //testandoParaVerSeMuda.text = String(a.calculate()[0].getMatch())
         //navigationController?.pushViewController(a.calculate(), animated: true)

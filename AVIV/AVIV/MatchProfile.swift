@@ -11,13 +11,38 @@ import Firebase
 import FBSDKLoginKit
 import PromiseKit
 
-class MatchProfile {
+class MatchProfile: UIViewController {
     
     var teste: Double = 0
+    private var listOfSuggestions: [Suggestion]!
+    private let group = DispatchGroup()
     
-    func calculate() -> [Suggestion]{
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        var suggestionList = [Suggestion]()
+        self.group.enter()
+        self.calculate()
+        group.notify(queue: .main, execute: {
+            //Change view to Tab Bar Controller
+            let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            
+            let searchViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
+            let favoriteViewController = storyBoard.instantiateViewController(withIdentifier: "favoriteViewController")
+            let otherNavigationController = storyBoard.instantiateViewController(withIdentifier: "otherNavigationController")
+            
+            let tabViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
+            
+            searchViewController.listOfSuggestions = self.listOfSuggestions
+            
+            tabViewController.viewControllers = [searchViewController, favoriteViewController, otherNavigationController]
+            tabViewController.selectedViewController = searchViewController
+            
+            self.present(tabViewController, animated: true, completion: nil)
+        })
+    }
+    
+    func calculate(){
+        
         let firebase = Firestore.firestore()
         let userID = FBSDKAccessToken.current()?.userID
         let userDocRef = firebase.collection("users").document(userID!)
@@ -25,7 +50,7 @@ class MatchProfile {
         
         var count: Int = 0
         
-        let group = DispatchGroup()
+//        let group = DispatchGroup()
         
         var name = [String]()
         
@@ -39,7 +64,7 @@ class MatchProfile {
                     var user = userDocRef.collection("big_five").document("Agreeableness")
                     var suggestion = suggestionDocRef.document(document.documentID)
                     
-                    group.enter()
+                    self.group.enter()
                     suggestion.getDocument { (document, error) in
                         
                         if let document = document, document.exists {
@@ -52,10 +77,10 @@ class MatchProfile {
                             let suggestion = Suggestion.init()
                             suggestion.loadElement(addName: suggestionName as! String, addId: "renata", addCategory: "renata", addMasterCategory: "renata", addMainPhoto: "renata", addText: "renata", addLink: "renata", addPhotoGallery: "renata", addCity: "renata", addProfile: "renata", match: 0)
                             
-                            suggestionList.append(suggestion)
+                            //suggestionList.append(suggestion)
                             
                             count = count + 1
-                            group.leave()
+                            self.group.leave()
                         } else {
                             print("Document does not exist")
                         }
@@ -65,7 +90,7 @@ class MatchProfile {
                     
                     
                     var i: Int = 0
-                    group.enter()
+                    self.group.enter()
                     user.getDocument { (document, error) in
                         
                         if let document = document, document.exists {
@@ -84,7 +109,7 @@ class MatchProfile {
                                     
                                     self.teste = match2
                                     i = i + 1
-                                    group.leave()
+                                    self.group.leave()
                                 } else {
                                     print("Document does not exist")
                                 }
@@ -101,21 +126,12 @@ class MatchProfile {
                 }
  
             }
-            group.notify(queue: .main, execute: {
-                print("Quantas sugestões? \(count)")
-                print("nome: \(suggestionList[0].getName())")
-                print("Percentual: \(self.teste)")
-            })
+//            group.notify(queue: .main, execute: {
+//                print("Quantas sugestões? \(count)")
+//                print("nome: \(suggestionList[0].getName())")
+//                print("Percentual: \(self.teste)")
+//            })
         }
-        
-        
-        
-        //SÓ PARA RETORNAR ALGUMA COISA POR ENQUANTO
-        //let olar = Suggestion.init()
-        //olar.loadElement(addName: "renata", addId: "renata", addCategory: "renata", addMasterCategory: "renata", addMainPhoto: "renata", addText: "renata", addLink: "renata", addPhotoGallery: "renata", addCity: "renata", addProfile: "renata", match: 0)
-        //suggestionList.append(olar)
-        
-        return suggestionList
+        self.group.leave()
     }
-
 }
