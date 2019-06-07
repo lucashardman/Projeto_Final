@@ -86,7 +86,7 @@ class SearchViewController: UIViewController {
         //let loadSuggestions = Suggestion.init()
         //loadSuggestions.loadFromFirebase()
     }
-    
+    /*
     private func loadSuggestionsFromFirebase(){
         
         let suggestion = Suggestion.init()
@@ -94,6 +94,7 @@ class SearchViewController: UIViewController {
         suggestions.append(suggestion)
         
     }
+    */
     
     private func loadRefineButtons(buttons: [UIButton]){
         

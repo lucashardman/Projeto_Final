@@ -65,7 +65,7 @@ class GenerateUserProfile {
         print("\nDados recebidos do formulario:\n")
         print("nome: \(name)\ncity: \(city)\ncategory: \(category)\nlink: \(link)\nimage: \(image)\ndescription: \(description)\n")
         
-        let dataToSave: [String: String] = ["name": name,"city": city, "category": category, "link": image, "description": description]
+        let dataToSave: [String: String] = ["name": name,"city": city, "category": category, "link": link, "image": image, "description": description]
         
         firebase.collection("suggestions").document(id).setData(dataToSave)
  
