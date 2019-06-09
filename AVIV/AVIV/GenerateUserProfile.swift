@@ -57,6 +57,7 @@ class GenerateUserProfile: UIViewController {
     private var firebase: Firestore!
     private var readyToChangeViewController: Bool = false
     private let group = DispatchGroup()
+    private var sendProfile: Profile!
     
     var id: String!
     var name: String!
@@ -73,6 +74,7 @@ class GenerateUserProfile: UIViewController {
 
         group.notify(queue: .main, execute: {
             //Change view to Tab Bar Controller
+            
             self.changeViewController()
         })
     }
@@ -80,8 +82,11 @@ class GenerateUserProfile: UIViewController {
     private func changeViewController(){
         print("Checando se mudou a tela depois de carregar tudo...")
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        //let newViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
-        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile")
+        
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
+        
+        newViewController.profile = self.sendProfile
+        
         self.present(newViewController, animated: true, completion: nil)
     }
     
@@ -190,6 +195,7 @@ class GenerateUserProfile: UIViewController {
                 print("\(preference.name): \(preference.score)")
             }
         }
+        sendProfile = profile
         group.leave()
     }
 }

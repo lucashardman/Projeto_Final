@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import FirebaseFirestore
 import FacebookCore
 import PersonalityInsightsV3
 import LanguageTranslatorV3
@@ -67,13 +68,13 @@ class GenerateUserProfile {
         
         let dataToSave: [String: String] = ["name": name,"city": city, "category": category, "link": link, "image": image, "description": description]
         
-        firebase.collection("suggestions").document(id).setData(dataToSave)
+        //firebase.collection("suggestions").document(id).setData(dataToSave)
  
         //Requisitando o processamento das postagens pelo Personality Insights
-        self.processFacebookPostsWithPersonalityInsights(posts: posts, id: id, city: city, category: category)
+        self.processFacebookPostsWithPersonalityInsights(posts: posts, id: id, city: city, category: category, data: dataToSave)
     }
     
-    private func processFacebookPostsWithPersonalityInsights(posts: [Dictionary<String, Any>], id: String, city: String, category: String){
+    private func processFacebookPostsWithPersonalityInsights(posts: [Dictionary<String, Any>], id: String, city: String, category: String, data: [String : String]){
         
         //Inicializando PersonalityInsights
         let personalityInsights = PersonalityInsights(
@@ -134,38 +135,40 @@ class GenerateUserProfile {
                 
                 //LEMBRAR DE ATUALIZAR ESTA CHAMADA QUANDO IMPLEMENTAR O FORMULARIO
                 print("Personality Insights: perfil gerado com sucesso")
-                self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, city: city, category: category, id: id)
+                self.sendPersonalityInsightsUserProfileToFirebase(profile: profile, city: city, category: category, id: id, data: data)
             }
         }
     }
     
-    private func sendPersonalityInsightsUserProfileToFirebase(profile: Profile, city: String, category: String, id: String){
+    private func sendPersonalityInsightsUserProfileToFirebase(profile: Profile, city: String, category: String, id: String, data: [String: String]){
+        
+        firebase.collection("suggestions").document(id).setData(data, merge: false)
         
         print("\nBIG FIVE OF CITY \(city)")
         for big_five in profile.personality{
-            firebase.collection("suggestions").document(id).collection("big_five").document(big_five.name).setData(["name": big_five.name, "percentile": big_five.percentile])
+            firebase.collection("suggestions").document(id).setData([big_five.name: big_five.percentile], merge: true)
             print("\n-> \(big_five.name): \(big_five.percentile)")
             
             for facet in big_five.children!{
-                firebase.collection("suggestions").document(id).collection("big_five").document(big_five.name).collection(big_five.name).document(facet.name).setData(["name": facet.name, "percentile": facet.percentile])
+                firebase.collection("suggestions").document(id).setData([facet.name: facet.percentile], merge: true)
                 print("\(facet.name): \(facet.percentile)")
             }
         }
         print("\nNEEDS OF CITY\(city)")
         for need in profile.needs{
-            firebase.collection("suggestions").document(id).collection("needs").document(need.name).setData(["name": need.name, "percentile": need.percentile])
+            firebase.collection("suggestions").document(id).setData([need.name: need.percentile], merge: true)
             print("\(need.name): \(need.percentile)")
         }
         print("\nVALUES OF CITY \(city)")
         for value in profile.values{
-            firebase.collection("suggestions").document(id).collection("values").document(value.name).setData(["name": value.name, "percentile": value.percentile])
+            firebase.collection("suggestions").document(id).setData([value.name: value.percentile], merge: true)
             print("\(value.name): \(value.percentile)")
         }
         print("\nCONSUMPTION PREFERENCES OF CITY \(city)")
         for preferences in profile.consumptionPreferences!{
             print("\n-> \(preferences.name):")
             for preference in preferences.consumptionPreferences{
-                firebase.collection("suggestions").document(id).collection("consumption_preferences").document(preferences.name).collection(preferences.name).document(preference.name).setData(["name": preference.name, "score": preference.score])
+                firebase.collection("suggestions").document(id).setData([preference.name: preference.score], merge: true)
                 print("\(preference.name): \(preference.score)")
             }
         }
