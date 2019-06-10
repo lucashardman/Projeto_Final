@@ -41,6 +41,7 @@ class MatchProfile: UIViewController {
             
             let tabViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
             
+            self.sort()
             searchViewController.listOfSuggestions = self.listOfSuggestions
             
             tabViewController.viewControllers = [searchViewController, favoriteViewController, otherNavigationController]
@@ -153,5 +154,9 @@ class MatchProfile: UIViewController {
             result = result + (1 - (suggestion - user))
         }
         return result
+    }
+    
+    private func sort(){
+        
     }
 }
