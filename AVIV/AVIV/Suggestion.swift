@@ -16,12 +16,10 @@ class Suggestion {
     private var mainPhoto: String!
     private var text: String!
     private var link: String!
-    private var photoGallery: String!
     private var city: String!
-    private var profile: String!
     private var match: Double = 0
     
-    func loadElement(addName: String, addId: String, addCategory: String, addMainPhoto: String, addText: String, addLink: String, addPhotoGallery: String, addCity: String, addProfile: String, match: Double){
+    func loadElement(addName: String, addId: String, addCategory: String, addMainPhoto: String, addText: String, addLink: String, addCity: String){
         
         name = addName
         id = addId
@@ -29,9 +27,7 @@ class Suggestion {
         mainPhoto = addMainPhoto
         text = addText
         link = addLink
-        photoGallery = addPhotoGallery
         city = addCity
-        profile = addProfile
     }
     
     func setMatch(match: Double){
@@ -56,14 +52,8 @@ class Suggestion {
     func getLink() -> String{
         return link
     }
-    func getPhotoGallery() -> String{
-        return photoGallery
-    }
     func getCity() -> String{
         return city
-    }
-    func getProfile() -> String{
-        return profile
     }
     func getMatch() -> Double{
         return match

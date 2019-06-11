@@ -83,18 +83,18 @@ class MatchProfile: UIViewController {
                             var count: Double = 0
                             
                             let suggestion = Suggestion.init()
-                            suggestion.loadElement(addName: suggestionName, addId: suggestionId, addCategory: suggestionCategory, addMainPhoto: suggestionImage, addText: suggestionDescription, addLink: suggestionLink, addPhotoGallery: "FALTANDO", addCity: suggestionCity, addProfile: "FALTANDOS", match: 0)
+                            suggestion.loadElement(addName: suggestionName, addId: suggestionId, addCategory: suggestionCategory, addMainPhoto: suggestionImage, addText: suggestionDescription, addLink: suggestionLink, addCity: suggestionCity)
                             
                             print("\nBIG FIVE")
                             for big_five in self.profile.personality{
                                
                                 print("\n-> \(big_five.name): \(big_five.percentile)")
-                                sum = sum + self.compareIndicators(user: big_five.percentile, suggestion: document.get(big_five.name) as! Double)
+                                sum = sum + self.compareIndicators(user: big_five.percentile, suggestion: (document.get(big_five.name) ?? 0.0) as! Double)
                                 count = count + 1
                                 for facet in big_five.children!{
                                     
                                     print("\(facet.name): \(facet.percentile)")
-                                    sum = sum + self.compareIndicators(user: facet.percentile, suggestion: document.get(facet.name) as! Double)
+                                    sum = sum + self.compareIndicators(user: facet.percentile, suggestion: (document.get(facet.name) ?? 0.0) as! Double)
                                     count = count + 1
                                 }
                             }
@@ -102,14 +102,14 @@ class MatchProfile: UIViewController {
                             for need in self.profile.needs{
                                
                                 print("\(need.name): \(need.percentile)")
-                                sum = sum + self.compareIndicators(user: need.percentile, suggestion: document.get(need.name) as! Double)
+                                sum = sum + self.compareIndicators(user: need.percentile, suggestion: (document.get(need.name) ?? 0.0) as! Double)
                                 count = count + 1
                             }
                             print("\nVALUES")
                             for value in self.profile.values{
                                
                                 print("\(value.name): \(value.percentile)")
-                                sum = sum + self.compareIndicators(user: value.percentile, suggestion: document.get(value.name) as! Double)
+                                sum = sum + self.compareIndicators(user: value.percentile, suggestion: (document.get(value.name) ?? 0.0) as! Double)
                                 count = count + 1
                             }
                             print("\nCONSUMPTION PREFERENCES")
@@ -118,7 +118,7 @@ class MatchProfile: UIViewController {
                                 for preference in preferences.consumptionPreferences{
                                    
                                     print("\(preference.name): \(preference.score)")
-                                    sum = sum + self.compareIndicators(user: preference.score, suggestion: document.get(preference.name) as! Double)
+                                    sum = sum + self.compareIndicators(user: preference.score, suggestion: (document.get(preference.name) ?? 0.0) as! Double)
                                     count = count + 1
                                 }
                             }
