@@ -28,6 +28,8 @@
 		22CC9FA121FF74E9002DA79B /* AVIVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC9FA021FF74E9002DA79B /* AVIVTests.swift */; };
 		22D7001522486ADD00DEB17E /* LanguageTranslatorV3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; };
 		22D7001622486ADD00DEB17E /* LanguageTranslatorV3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		22E1907B22B180C700C05B2E /* SearchResultTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E1907A22B180C700C05B2E /* SearchResultTableViewController.swift */; };
+		22E1907D22B180F700C05B2E /* SuggestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E1907C22B180F700C05B2E /* SuggestionViewController.swift */; };
 		22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777B2240656B00B64540 /* SearchViewController.swift */; };
 		22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777F2246EB0600B64540 /* FavoriteViewController.swift */; };
 		22E6388522A41B7E005EF55F /* MatchProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E6388422A41B7E005EF55F /* MatchProfile.swift */; };
@@ -94,6 +96,8 @@
 		22CC9FA021FF74E9002DA79B /* AVIVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIVTests.swift; sourceTree = "<group>"; };
 		22CC9FA221FF74E9002DA79B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LanguageTranslatorV3.framework; path = Carthage/Build/iOS/LanguageTranslatorV3.framework; sourceTree = "<group>"; };
+		22E1907A22B180C700C05B2E /* SearchResultTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultTableViewController.swift; sourceTree = "<group>"; };
+		22E1907C22B180F700C05B2E /* SuggestionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewController.swift; sourceTree = "<group>"; };
 		22E2777B2240656B00B64540 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		22E2777F2246EB0600B64540 /* FavoriteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteViewController.swift; sourceTree = "<group>"; };
 		22E6388422A41B7E005EF55F /* MatchProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchProfile.swift; sourceTree = "<group>"; };
@@ -178,6 +182,8 @@
 				22E6388422A41B7E005EF55F /* MatchProfile.swift */,
 				22E2777B2240656B00B64540 /* SearchViewController.swift */,
 				22E2777F2246EB0600B64540 /* FavoriteViewController.swift */,
+				22E1907A22B180C700C05B2E /* SearchResultTableViewController.swift */,
+				22E1907C22B180F700C05B2E /* SuggestionViewController.swift */,
 				22398761223716D6003238CB /* Main.storyboard */,
 				22CC9F9221FF74E8002DA79B /* Assets.xcassets */,
 				22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */,
@@ -429,11 +435,13 @@
 				22CC9F8E21FF74E3002DA79B /* LoginViewController.swift in Sources */,
 				22CC9F8C21FF74E3002DA79B /* AppDelegate.swift in Sources */,
 				22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */,
+				22E1907B22B180C700C05B2E /* SearchResultTableViewController.swift in Sources */,
 				22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */,
 				22E6388522A41B7E005EF55F /* MatchProfile.swift in Sources */,
 				223C07E3223EC7E1009BF449 /* Credentials.swift in Sources */,
 				2297875A223824FE008348E9 /* LogoutViewController.swift in Sources */,
 				229787582237F519008348E9 /* GenerateUserProfile.swift in Sources */,
+				22E1907D22B180F700C05B2E /* SuggestionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

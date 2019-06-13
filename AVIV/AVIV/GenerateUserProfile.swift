@@ -57,7 +57,7 @@ class GenerateUserProfile: UIViewController {
     private var firebase: Firestore!
     private var readyToChangeViewController: Bool = false
     private let group = DispatchGroup()
-    private var sendProfile: Profile!
+    private var profile: Profile!
     
     var id: String!
     var name: String!
@@ -83,9 +83,10 @@ class GenerateUserProfile: UIViewController {
         print("Checando se mudou a tela depois de carregar tudo...")
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         
-        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
+//        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
+         let newViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
         
-        newViewController.profile = self.sendProfile
+        newViewController.profile = self.profile
         
         self.present(newViewController, animated: true, completion: nil)
     }
@@ -195,7 +196,7 @@ class GenerateUserProfile: UIViewController {
                 print("\(preference.name): \(preference.score)")
             }
         }
-        sendProfile = profile
+        self.profile = profile
         group.leave()
     }
 }

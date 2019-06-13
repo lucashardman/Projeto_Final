@@ -300,6 +300,7 @@
                     <navigationItem key="navigationItem" id="jNv-PI-f2u"/>
                     <connections>
                         <outlet property="refineButton" destination="IrV-ax-uDz" id="RCf-g2-zaj"/>
+                        <outlet property="searchCityBar" destination="iHA-v6-FYw" id="I9j-3K-3cz"/>
                         <outlet property="testandoParaVerSeMuda" destination="8vr-nT-gqy" id="xF0-Zd-La7"/>
                     </connections>
                 </viewController>

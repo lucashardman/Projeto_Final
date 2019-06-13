@@ -18,9 +18,14 @@ class MatchProfile: UIViewController {
     
     var countSuggestions: Int = 0
     var profile: Profile!
+    var categoryFilters: [String]!
+    var searchForCity: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("Filtros: \(self.categoryFilters ?? <#default value#>)")
+        print("Cidade: \(self.searchForCity ?? <#default value#>)")
         
         self.group.enter()
         self.calculate()

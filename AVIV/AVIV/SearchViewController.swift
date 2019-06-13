@@ -8,6 +8,7 @@
 
 import UIKit
 import Foundation
+import PersonalityInsightsV3
 
 extension UIImage {
     
@@ -27,6 +28,7 @@ extension UIImage {
 class SearchViewController: UIViewController {
     
     var listOfSuggestions: [Suggestion]!
+    var profile: Profile!
     
     @IBOutlet weak var refineButton: UIButton!
     private var hiddenRefinedSearch: Bool = false
@@ -50,6 +52,10 @@ class SearchViewController: UIViewController {
     private var hotelFlag: Bool = false
     private var gastronomyFlag: Bool = false
     
+    private var arrayOfCategoryFilter: [String] = []
+    private var sendCity: String = ""
+    
+    @IBOutlet weak var searchCityBar: UISearchBar!
     private var width: Double!
     private var height: Double!
     private var size: CGSize!
@@ -167,6 +173,8 @@ class SearchViewController: UIViewController {
     
     @IBAction func refineButtonClicked(_ sender: UIButton) {
         
+        print("Quais botões estão clicados? \(self.arrayOfCategoryFilter)")
+        
         if (hiddenRefinedSearch == false){
             refineButton.setTitle("\u{2191} Ocultar opções refinadas", for: .normal)
             hiddenRefinedSearch = true
@@ -198,90 +206,110 @@ class SearchViewController: UIViewController {
         if (openAirFlag == false){
             openAirFlag = true
             selectRefineButton(button: openAir)
+            arrayOfCategoryFilter.append("openAir")
         }
         else{
             openAirFlag = false
             diselectRefineButton(button: openAir)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "openAir"}
         }
     }
     @objc func nighClubClicked() {
         if (nightClubFlag == false){
             nightClubFlag = true
             selectRefineButton(button: nightClub)
+            arrayOfCategoryFilter.append("nightClub")
         }
         else{
             nightClubFlag = false
             diselectRefineButton(button: nightClub)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "nightClub"}
         }
     }
     @objc func theaterClicked() {
         if (theaterFlag == false){
             theaterFlag = true
             selectRefineButton(button: theater)
+            arrayOfCategoryFilter.append("theater")
         }
         else{
             theaterFlag = false
             diselectRefineButton(button: theater)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "theater"}
         }
     }
     @objc func shoppingClicked() {
         if (shoppingFlag == false){
             shoppingFlag = true
             selectRefineButton(button: shopping)
+            arrayOfCategoryFilter.append("shopping")
         }
         else{
             shoppingFlag = false
             diselectRefineButton(button: shopping)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "shopping"}
         }
     }
     @objc func museumClicked() {
         if (museumFlag == false){
             museumFlag = true
             selectRefineButton(button: museum)
+            arrayOfCategoryFilter.append("museum")
         }
         else{
             museumFlag = false
             diselectRefineButton(button: museum)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "museum"}
         }
     }
     @objc func musicClicked() {
         if (musicFlag == false){
             musicFlag = true
             selectRefineButton(button: music)
+            arrayOfCategoryFilter.append("music")
         }
         else{
             musicFlag = false
             diselectRefineButton(button: music)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "music"}
         }
     }
     @objc func hotelClicked() {
         if (hotelFlag == false){
             hotelFlag = true
             selectRefineButton(button: hotel)
+            arrayOfCategoryFilter.append("hotel")
         }
         else{
             hotelFlag = false
             diselectRefineButton(button: hotel)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "hotel"}
         }
     }
     @objc func gastronomyClicked() {
         if (gastronomyFlag == false){
             gastronomyFlag = true
             selectRefineButton(button: gastronomy)
+            arrayOfCategoryFilter.append("gastronomy")
         }
         else{
             gastronomyFlag = false
             diselectRefineButton(button: gastronomy)
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "gastronomy"}
         }
     }
     @IBOutlet weak var testandoParaVerSeMuda: UILabel!
     
     @IBAction func searchButton(_ sender: UIButton) {
-//        var a = MatchProfile.init()
-//        a.calculate()
-        //print("recebido por fora????? \(a.calculate())")
-        //testandoParaVerSeMuda.text = String(a.calculate()[0].getMatch())
-        //navigationController?.pushViewController(a.calculate(), animated: true)
+        
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
+        
+        newViewController.profile = self.profile
+        newViewController.categoryFilters = self.arrayOfCategoryFilter
+        newViewController.searchForCity = searchCityBar.text ?? "Cidade invalida"//self.sendCity
+        
+        self.present(newViewController, animated: true, completion: nil)
     }
     
     override func didReceiveMemoryWarning() {
