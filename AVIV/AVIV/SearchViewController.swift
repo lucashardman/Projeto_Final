@@ -25,11 +25,19 @@ extension UIImage {
     }
 }
 
-class SearchViewController: UIViewController {
+class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
-    var listOfSuggestions: [Suggestion]!
+    //Variaveis globais recebidas de outras views
     var profile: Profile!
+    var listOfCities = [String]()
+    var currentListOfCities = [String]()
+    @IBOutlet weak var tableViewOfCities: UITableView!
     
+    //Variaveis globais que serão passadas para outras views
+    private var arrayOfCategoryFilter: [String] = []
+    private var sendCity: String = ""
+    
+    //Variaveis globais do botões de filtro
     @IBOutlet weak var refineButton: UIButton!
     private var hiddenRefinedSearch: Bool = false
     
@@ -52,9 +60,7 @@ class SearchViewController: UIViewController {
     private var hotelFlag: Bool = false
     private var gastronomyFlag: Bool = false
     
-    private var arrayOfCategoryFilter: [String] = []
-    private var sendCity: String = ""
-    
+    //Variaveis globais do search bar
     @IBOutlet weak var searchCityBar: UISearchBar!
     private var width: Double!
     private var height: Double!
@@ -65,11 +71,13 @@ class SearchViewController: UIViewController {
     private var backgroundColor: UIColor!
     private var color: UIColor!
     
-    private var suggestions: [Suggestion] = []
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        tableViewOfCities.isHidden = true
+        
+        print("Todas as cidades: \(self.listOfCities)")
+        
         loadViewElements()
         loadRefineButtons(buttons: [openAir,
                                     nightClub,
@@ -87,20 +95,7 @@ class SearchViewController: UIViewController {
         refineButton.center = view.center;
         refineButton.setTitle("\u{2193} Refinar pesquisa", for: .normal)
         hiddenRefinedSearch = false
-        
-        //Buscando Sugestões
-        //let loadSuggestions = Suggestion.init()
-        //loadSuggestions.loadFromFirebase()
     }
-    /*
-    private func loadSuggestionsFromFirebase(){
-        
-        let suggestion = Suggestion.init()
-        suggestion.loadElement(addName: "Corcovado", addId: "1", addCategory: "Ponto Turistico", addMasterCategory: "openAir", addMainPhoto: "foto", addText: "Um lugar muito lindo", addLink: "http://www.tremdocorcovado.rio", addPhotoGallery: "varias fotos", addCity: "Rio de Janeiro", addProfile: "caracteristicas", match: 0)
-        suggestions.append(suggestion)
-        
-    }
-    */
     
     private func loadRefineButtons(buttons: [UIButton]){
         
@@ -206,24 +201,24 @@ class SearchViewController: UIViewController {
         if (openAirFlag == false){
             openAirFlag = true
             selectRefineButton(button: openAir)
-            arrayOfCategoryFilter.append("openAir")
+            arrayOfCategoryFilter.append("Familia")
         }
         else{
             openAirFlag = false
             diselectRefineButton(button: openAir)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "openAir"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Familia"}
         }
     }
     @objc func nighClubClicked() {
         if (nightClubFlag == false){
             nightClubFlag = true
             selectRefineButton(button: nightClub)
-            arrayOfCategoryFilter.append("nightClub")
+            arrayOfCategoryFilter.append("Gastronomia")
         }
         else{
             nightClubFlag = false
             diselectRefineButton(button: nightClub)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "nightClub"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Gastronomia"}
         }
     }
     @objc func theaterClicked() {
@@ -302,6 +297,21 @@ class SearchViewController: UIViewController {
     
     @IBAction func searchButton(_ sender: UIButton) {
         
+        if openAirFlag == false && nightClubFlag == false && theaterFlag == false && shoppingFlag == false && museumFlag == false && musicFlag == false && hotelFlag == false && gastronomyFlag == false{
+            
+            arrayOfCategoryFilter.append("Familia")
+            arrayOfCategoryFilter.append("Gastronomia")
+            arrayOfCategoryFilter.append("Natureza")
+            arrayOfCategoryFilter.append("Esportes")
+            arrayOfCategoryFilter.append("Arte")
+            arrayOfCategoryFilter.append("Cultura")
+            arrayOfCategoryFilter.append("Tecnologia")
+            arrayOfCategoryFilter.append("Vida Noturna")
+            arrayOfCategoryFilter.append("Landmarks")
+            arrayOfCategoryFilter.append("Compras")
+            arrayOfCategoryFilter.append("Negocios")
+        }
+        
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
         
@@ -312,8 +322,78 @@ class SearchViewController: UIViewController {
         self.present(newViewController, animated: true, completion: nil)
     }
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.currentListOfCities.count
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as? CityTableCell else {
+            return UITableViewCell()
+        }
+        cell.cityLabel.text = currentListOfCities[indexPath.row]
+        cell.cityLabel.sizeToFit()
+        //cell.backgroundColor = UIColor.darkGray
+        return cell
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as? CityTableCell else {
+            return 0
+        }
+        return cell.bounds.height
+    }
+    
+    //Ao clicar na cidade da table view, ela some e o texto dela passa para a search bar
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        searchCityBar.text = currentListOfCities[indexPath.row]
+        tableViewOfCities.isHidden = true
+    }
+    
+    //Muda a table view conforme o texto da search bar
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        currentListOfCities = listOfCities.filter({ city -> Bool in
+   
+            if searchText.isEmpty {
+                return true
+            }
+            return city.lowercased().contains(searchText.lowercased())
+        
+        })
+        if searchText.isEmpty{
+            tableViewOfCities.isHidden = true
+            currentListOfCities = []
+        }
+        else{
+            tableViewOfCities.isHidden = false
+            //Serve para deixar a tableview no tamanho certo
+            tableViewOfCities.frame = CGRect(x: tableViewOfCities.frame.origin.x, y: tableViewOfCities.frame.origin.y, width: tableViewOfCities.frame.size.width, height: tableViewOfCities.contentSize.height)
+        }
+        tableViewOfCities.reloadData()
+    }
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+      
+        currentListOfCities = listOfCities
+        
+        tableViewOfCities.reloadData()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+}
+
+class CityTableCell: UITableViewCell{
+    
+    @IBOutlet weak var cityLabel: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
     }
 }

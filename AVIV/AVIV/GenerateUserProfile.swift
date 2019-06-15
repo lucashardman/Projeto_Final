@@ -57,7 +57,9 @@ class GenerateUserProfile: UIViewController {
     private var firebase: Firestore!
     private var readyToChangeViewController: Bool = false
     private let group = DispatchGroup()
+    private let groupCities = DispatchGroup()
     private var profile: Profile!
+    private var listOfCities = [String]()
     
     var id: String!
     var name: String!
@@ -73,22 +75,53 @@ class GenerateUserProfile: UIViewController {
         sendUserInfoToFirebase()
 
         group.notify(queue: .main, execute: {
+            self.groupCities.enter()
+            self.getListOfCities()
+        })
+    }
+    
+    private func getListOfCities(){
+        
+        let firebase = Firestore.firestore()
+        let suggestionDocRef = firebase.collection("suggestions")
+        
+        suggestionDocRef.getDocuments { (snapshot, error) in
+            if let snapshot = snapshot {
+                
+                for document in snapshot.documents {
+                    if self.listOfCities.contains(document.get("city") as! String) == false{
+                        self.listOfCities.append(document.get("city") as! String)
+                    }
+                }
+            }
+            self.groupCities.leave()
+        }
+        groupCities.notify(queue: .main, execute: {
+            //print("Todas as cidades: \(self.listOfCities)")
             //Change view to Tab Bar Controller
-            
             self.changeViewController()
         })
     }
     
     private func changeViewController(){
-        print("Checando se mudou a tela depois de carregar tudo...")
+        
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         
-//        let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
-         let newViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
+        let searchViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
+        let favoriteViewController = storyBoard.instantiateViewController(withIdentifier: "favoriteViewController")
+        let otherNavigationController = storyBoard.instantiateViewController(withIdentifier: "otherNavigationController")
         
-        newViewController.profile = self.profile
+        let tabViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
         
-        self.present(newViewController, animated: true, completion: nil)
+        searchViewController.profile = self.profile
+        searchViewController.listOfCities = self.listOfCities
+        
+        tabViewController.viewControllers = [searchViewController, favoriteViewController, otherNavigationController]
+        tabViewController.selectedViewController = searchViewController
+        
+        
+        self.present(tabViewController, animated: true, completion: nil)
+        
     }
     
     func sendUserInfoToFirebase(){
