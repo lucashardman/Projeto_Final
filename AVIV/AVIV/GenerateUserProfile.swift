@@ -89,8 +89,11 @@ class GenerateUserProfile: UIViewController {
             if let snapshot = snapshot {
                 
                 for document in snapshot.documents {
-                    if self.listOfCities.contains(document.get("city") as! String) == false{
-                        self.listOfCities.append(document.get("city") as! String)
+                    
+                    let city = "\(document.get("city") as! String), \(document.get("province") as! String), \(document.get("country") as! String)"
+                    
+                    if self.listOfCities.contains(city) == false{
+                        self.listOfCities.append(city)
                     }
                 }
             }

@@ -310,6 +310,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             arrayOfCategoryFilter.append("Landmarks")
             arrayOfCategoryFilter.append("Compras")
             arrayOfCategoryFilter.append("Negocios")
+            arrayOfCategoryFilter.append("Teste")
         }
         
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
@@ -317,7 +318,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         
         newViewController.profile = self.profile
         newViewController.categoryFilters = self.arrayOfCategoryFilter
-        newViewController.searchForCity = searchCityBar.text ?? "Cidade invalida"//self.sendCity
+        
+        let delimiter = ","
+        let token = searchCityBar.text?.components(separatedBy: delimiter)
+        let city = token![0]
+        //let province = token![1]
+        //let country = token![2]
+        
+        newViewController.searchForCity = city
         
         self.present(newViewController, animated: true, completion: nil)
     }
