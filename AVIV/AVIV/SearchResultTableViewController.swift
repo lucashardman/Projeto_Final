@@ -7,84 +7,99 @@
 //
 
 import UIKit
+import PersonalityInsightsV3
 
-class SearchResultTableViewController: UITableViewController {
-
+class SearchResultTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    var suggestionsList = [Suggestion]()
+    var profile: Profile!
+    var listOfCities = [String]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    @IBAction func backButton(_ sender: UIButton) {
+        
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let searchViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
+        let favoriteViewController = storyBoard.instantiateViewController(withIdentifier: "favoriteViewController")
+        let otherNavigationController = storyBoard.instantiateViewController(withIdentifier: "otherNavigationController")
+        
+        let tabViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
+        
+        searchViewController.profile = self.profile
+        searchViewController.listOfCities = self.listOfCities
+        
+        tabViewController.viewControllers = [searchViewController, favoriteViewController, otherNavigationController]
+        tabViewController.selectedViewController = searchViewController
+        
+        
+        self.present(tabViewController, animated: true, completion: nil)
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.suggestionsList.count
     }
 
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
-    }
-
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ResultCell") as? ResultCell else {
+            return UITableViewCell()
+        }
+        
+        cell.namePlaceHolder.text = suggestionsList[indexPath.row].getName()
+        cell.cityPlaceHolder.text = suggestionsList[indexPath.row].getCity()
+        cell.categoryPlaceHolder.text = suggestionsList[indexPath.row].getCategory()
+        cell.descriptionPlaceHolder.text = suggestionsList[indexPath.row].getText()
+        cell.descriptionPlaceHolder.numberOfLines = 3
+        cell.imagePlaceHolder.loadGif(name: "loading_image")
+        
+        let link = suggestionsList[indexPath.row].getMainPhoto()
+        
+        let url = URL(string: link)
+        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+        
+            if error != nil{
+                print(error ?? "Erro desconhecido")
+                return
+            }
+            DispatchQueue.main.async {
+                cell.imagePlaceHolder.image = UIImage(data: data!)
+            }
+        }).resume()
+        
+        
         return cell
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ResultCell") as? ResultCell else {
+            return 0
+        }
+        return cell.bounds.height
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+    
 }
+class ResultCell: UITableViewCell{
+    
+    @IBOutlet weak var imagePlaceHolder: UIImageView!
+    @IBOutlet weak var namePlaceHolder: UILabel!
+    @IBOutlet weak var cityPlaceHolder: UILabel!
+    @IBOutlet weak var categoryPlaceHolder: UILabel!
+    @IBOutlet weak var descriptionPlaceHolder: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+    }
+}
+
+

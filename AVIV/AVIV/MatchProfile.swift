@@ -63,7 +63,7 @@ class MatchProfile: UIViewController {
                     print("Testando: \(i.getId())\n\(i.getName())\n\(i.getCity())")
                     print ("O match é de \(i.getMatch())%")
                 }
-                
+                /*
                 //Change view to Tab Bar Controller
                 let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 
@@ -82,6 +82,15 @@ class MatchProfile: UIViewController {
                 
                 
                 self.present(tabViewController, animated: true, completion: nil)
+                */
+                let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                let newViewController = storyBoard.instantiateViewController(withIdentifier: "searchResultTableViewController") as! SearchResultTableViewController
+                
+                newViewController.suggestionsList = self.listOfSuggestions
+                newViewController.profile = self.profile
+                newViewController.listOfCities = self.listOfCities
+                    
+                self.present(newViewController, animated: true, completion: nil)
             })
         })
     }
@@ -106,7 +115,7 @@ class MatchProfile: UIViewController {
                         if let document = document, document.exists {
                             
                             if self.categoryFilters.contains(document.get("category") as! String){
-                            
+                                
                                 self.countSuggestionsFiltered = self.countSuggestionsFiltered + 1
                                 
                                 let suggestionName = document.get("name") as! String
