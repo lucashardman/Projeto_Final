@@ -5,6 +5,8 @@
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Documentation](https://img.shields.io/badge/Documentation-API-blue.svg)](http://watson-developer-cloud.github.io/swift-sdk)
 [![CLA assistant](https://cla-assistant.io/readme/badge/watson-developer-cloud/swift-sdk)](https://cla-assistant.io/watson-developer-cloud/swift-sdk)
+[![wdc-community.slack.com](https://wdc-slack-inviter.mybluemix.net/badge.svg)](http://wdc-slack-inviter.mybluemix.net/)
+
 
 ## Overview
 
@@ -13,7 +15,7 @@ The Watson Developer Cloud Swift SDK makes it easy for mobile developers to buil
 There are many resources to help you build your first cognitive application with the Swift SDK:
 
 - Follow the [QuickStart Guide](https://watson-developer-cloud.github.io/swift-sdk/docs/quickstart)
-- Review a [Sample Application](#sample-applications)
+- Review a [Featured Project](#featured-projects)
 - Browse the [Documentation](https://watson-developer-cloud.github.io/swift-sdk/)
 
 ## Contents
@@ -26,7 +28,7 @@ There are many resources to help you build your first cognitive application with
 * [Authentication](#authentication)
 * [Custom Service URLs](#custom-service-urls)
 * [Custom Headers](#custom-headers)
-* [Sample Applications](#sample-applications)
+* [Featured Projects](#featured-projects)
 * [Synchronous Execution](#synchronous-execution)
 * [Objective-C Compatibility](#objective-c-compatibility)
 * [Linux Compatibility](#linux-compatibility)
@@ -55,10 +57,8 @@ This SDK provides classes and methods to access the following Watson services.
 ## Requirements
 
 - Xcode 9.3+
-- Swift 4.1+
+- Swift 4.2+
 - iOS 10.0+
-
-
 
 ## Installation
 
@@ -78,18 +78,18 @@ If your project does not yet have a Podfile, use the `pod init` command in the r
 use_frameworks!
 
 target 'MyApp' do
-    pod 'IBMWatsonAssistantV1', '~> 1.4.0'
-    pod 'IBMWatsonAssistantV2', '~> 1.4.0'
-    pod 'IBMWatsonCompareComplyV1', '~> 1.4.0'
-    pod 'IBMWatsonDiscoveryV1', '~> 1.4.0'
-    pod 'IBMWatsonLanguageTranslatorV3', '~> 1.4.0'
-    pod 'IBMWatsonNaturalLanguageClassifierV1', '~> 1.4.0'
-    pod 'IBMWatsonNaturalLanguageUnderstandingV1', '~> 1.4.0'
-    pod 'IBMWatsonPersonalityInsightsV3', '~> 1.4.0'
-    pod 'IBMWatsonSpeechToTextV1', '~> 1.4.0'
-    pod 'IBMWatsonTextToSpeechV1', '~> 1.4.0'
-    pod 'IBMWatsonToneAnalyzerV3', '~> 1.4.0'
-    pod 'IBMWatsonVisualRecognitionV3', '~> 1.4.0'
+    pod 'IBMWatsonAssistantV1', '~> 2.1.1'
+    pod 'IBMWatsonAssistantV2', '~> 2.1.1'
+    pod 'IBMWatsonCompareComplyV1', '~> 2.1.1'
+    pod 'IBMWatsonDiscoveryV1', '~> 2.1.1'
+    pod 'IBMWatsonLanguageTranslatorV3', '~> 2.1.1'
+    pod 'IBMWatsonNaturalLanguageClassifierV1', '~> 2.1.1'
+    pod 'IBMWatsonNaturalLanguageUnderstandingV1', '~> 2.1.1'
+    pod 'IBMWatsonPersonalityInsightsV3', '~> 2.1.1'
+    pod 'IBMWatsonSpeechToTextV1', '~> 2.1.1'
+    pod 'IBMWatsonTextToSpeechV1', '~> 2.1.1'
+    pod 'IBMWatsonToneAnalyzerV3', '~> 2.1.1'
+    pod 'IBMWatsonVisualRecognitionV3', '~> 2.1.1'
 end
 ```
 
@@ -109,16 +109,16 @@ $ brew update
 $ brew install carthage
 ```
 
-If your project does not have a Cartfile yet, use the `touch Cartfile` command in the root directory of your project. To install the IBM Watson Swift SDK using Carthage, add the following to your Cartfile. 
+If your project does not have a Cartfile yet, use the `touch Cartfile` command in the root directory of your project. To install the IBM Watson Swift SDK using Carthage, add the following to your Cartfile.
 
 ```
-github "watson-developer-cloud/swift-sdk" ~> 1.4.0
+github "watson-developer-cloud/swift-sdk" ~> 2.1.1
 ```
 
 Then run the following command to build the dependencies and frameworks:
 
 ```bash
-$ carthage update --platform iOS
+$ carthage bootstrap --platform iOS
 ```
 
 Follow the remaining Carthage installation instructions [here](https://github.com/Carthage/Carthage#getting-started). Note that the above command will download and build all of the services in the IBM Watson Swift SDK. Make sure to drag-and-drop the built frameworks (only for the services your app requires) into your Xcode project and import them in the source files that require them. The following frameworks need to be added to your app:
@@ -135,18 +135,15 @@ Add the following to your `Package.swift` file to identify the IBM Watson Swift 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/watson-developer-cloud/swift-sdk", from: "1.4.0")
+    .package(url: "https://github.com/watson-developer-cloud/swift-sdk", from: "2.1.1")
 ]
 ```
 
 
 ## Authentication
 
-Watson services are migrating to token-based Identity and Access Management (IAM) authentication.
-
-- With some service instances, you authenticate to the API by using **[IAM](#iam)**.
-- In other instances, you authenticate by providing the **[username and password](#username-and-password)** for the service instance.
-- Visual Recognition uses a form of [API key](#api-key) only with instances created before May 23, 2018. Newer instances of Visual Recognition use [IAM](#iam).
+The Identity and Access Management (IAM) service of the IBM Cloud is the primary method of authentication to IBM Cloud services.
+Some service instances may use an alternate form of authentication, such as basic authentication (username and password).
 
 ### Getting credentials
 To find out which authentication to use, view the service credentials. You find the service credentials for authentication the same way for all Watson services:
@@ -158,16 +155,25 @@ To find out which authentication to use, view the service credentials. You find 
 On this page, you will see your credentials to use in the SDK to access your service instance.
 
 ### Supplying credentials
-There are two ways to supply the credentials from the steps above to the SDK: either downloading and using the credentials file, or copy-pasting the credentials into the SDK.
 
-#### Credentials File
+The SDK provides separate init methods for each form of authentication that may be used by instances of the service.
 
-On the **Manage** tab of your service instance on IBM Cloud, there is an button to download the credentials. The file will be called `ibm-credentials.env`, but you can rename it after downloading. Add this file to a location that is accessible from your project. For iOS apps, make sure to add it to the application target.
+- For service instances that use **[IAM](#iam)** authentication, the SDK provides two init methods -- one that accepts an apikey and another
+that accepts an access token created from an apikey. If you use the init method that supplies the apikey, the SDK will obtain an
+access token and refresh it when needed. If you initialize the SDK with the method that supplies an access token, you will need
+to periodically refresh the token as they expire after a short time. Learn more about [IAM](link).
 
-Get the `URL` for the credential file's location (you can use [Bundle](https://developer.apple.com/documentation/foundation/bundle) for iOS), and pass it to the service initializer.
+- For service instances that use basic authentication (username and password), use the init method that specifies the username
+and password.
+
+#### Credentials in the environment or a local credentials file
+
+The SDK can extract service credentails from the environment, e.g. the VCAP_SERVICES environment variable, or a local credentials file.
+
+To use credentials stored in a local file, go to the **Manage** tab of your service instance on IBM Cloud, and click on the button to download the credentials. The file will be called `ibm-credentials.env`. Add this file to a location that is accessible from your project. For iOS apps, make sure to add it to the application target.
 
 ```swift
-let discovery = Discovery(credentialsFile: credentialsURL, version: "your-version")
+let discovery = Discovery(version: "your-version")
 ```
 
 If your project is using multiple Watson services, you can merge the contents of the `ibm-credentials.env` files into a single file. Lines in the file can be added, deleted, or reordered, but the content of each line **must not** be changed.
@@ -175,14 +181,6 @@ If your project is using multiple Watson services, you can merge the contents of
 #### Copy-Pasting Credentials
 
 Copy the credentials from IBM Cloud and store them within your project. Then pass those values to the service initializer that accepts the type of credentials you have.
-
-
-##### Username and Password
-
-```swift
-let discovery = Discovery(username: "your-username", password: "your-password", version: "your-version")
-```
-
 
 ##### IAM
 
@@ -210,6 +208,14 @@ discovery.accessToken("new-accessToken")
 ```
 
 
+##### Username and Password
+
+```swift
+let discovery = Discovery(version: "your-version", username: "your-username", password: "your-password")
+```
+
+
+
 ## Custom Service URLs
 
 You can set a custom service URL by modifying the `serviceURL` property. A custom service URL may be required when running an  instance in a particular region or connecting through a proxy.
@@ -218,12 +224,21 @@ For example, here is how to connect to a Tone Analyzer instance that is hosted i
 
 ```swift
 let toneAnalyzer = ToneAnalyzer(
+    version: "yyyy-mm-dd",
     username: "your-username",
-    password: "your-password",
-    version: "yyyy-mm-dd"
+    password: "your-password"
 )
 toneAnalyzer.serviceURL = "https://gateway-fra.watsonplatform.net/tone-analyzer/api"
 ```
+
+## Disable SSL certificate verification
+
+For ICP(IBM Cloud Private), you can disable the SSL certificate verification by:
+```
+service.disableSSLVerification()
+```
+
+Note: `disableSSLVerification()` is currently not supported on Linux.
 
 ## Custom Headers
 There are different headers that can be sent to the Watson services. For example, Watson services log requests and their results for the purpose of improving the services, but you can include the `X-Watson-Learning-Opt-Out` header to opt out of this.
@@ -237,15 +252,15 @@ naturalLanguageClassifier.defaultHeaders = ["X-Watson-Learning-Opt-Out": "true"]
 
 Each service method also accepts an optional `headers` parameter which is a dictionary of request headers to be sent with the request.
 
-## Sample Applications
+## Featured Projects
+
+We love to highlight cool open-source projects that use this SDK! If you'd like to get your project added to the list, feel free to make an issue linking us to it.
 
 * [Simple Chat (Swift)](https://github.com/watson-developer-cloud/simple-chat-swift)
-* [Simple Chat (Objective-C)](https://github.com/watson-developer-cloud/simple-chat-objective-c)
 * [Visual Recognition with Core ML](https://github.com/watson-developer-cloud/visual-recognition-coreml)
 * [Visual Recognition and Discovery with Core ML](https://github.com/watson-developer-cloud/visual-recognition-with-discovery-coreml)
 * [Speech to Text](https://github.com/watson-developer-cloud/speech-to-text-swift)
 * [Text to Speech](https://github.com/watson-developer-cloud/text-to-speech-swift)
-* [Cognitive Concierge](https://github.com/IBM-MIL/CognitiveConcierge)
 
 ## Synchronous Execution
 
@@ -285,4 +300,4 @@ available in [LICENSE](https://github.com/watson-developer-cloud/swift-sdk/blob/
 
 This SDK is intended for use with an Apple iOS product and intended to be used in conjunction with officially licensed Apple development tools.
 
-[ibm-cloud-onboarding]: http://console.bluemix.net/registration?target=/developer/watson&cm_sp=WatsonPlatform-WatsonServices-_-OnPageNavLink-IBMWatson_SDKs-_-Swift
+[ibm-cloud-onboarding]: http://cloud.ibm.com/registration?target=/developer/watson&cm_sp=WatsonPlatform-WatsonServices-_-OnPageNavLink-IBMWatson_SDKs-_-Swift

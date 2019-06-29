@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,6 @@ public struct EnrichmentOptions: Codable, Equatable {
         case sv = "sv"
     }
 
-    /**
-     An object representing the enrichment features that will be applied to the specified field.
-     */
     public var features: NluEnrichmentFeatures?
 
     /**
@@ -67,8 +64,7 @@ public struct EnrichmentOptions: Codable, Equatable {
     /**
      Initialize a `EnrichmentOptions` with member variables.
 
-     - parameter features: An object representing the enrichment features that will be applied to the specified
-       field.
+     - parameter features:
      - parameter language: ISO 639-1 code indicating the language to use for the analysis. This code overrides the
        automatic language detection performed by the service. Valid codes are `ar` (Arabic), `en` (English), `fr`
        (French), `de` (German), `it` (Italian), `pt` (Portuguese), `ru` (Russian), `es` (Spanish), and `sv` (Swedish).

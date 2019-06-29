@@ -29,7 +29,8 @@
 #import "FBSDKLoginUtilityTests.h"
 
 static NSString *const kFakeAppID = @"7391628439";
-static NSString *const kFakeChallenge = @"a+=bcdef";
+
+static NSString *const kFakeChallenge = @"a =bcdef";
 
 @interface FBSDKLoginManagerTests : XCTestCase
 
@@ -127,38 +128,6 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
   XCTAssertEqualObjects(actualToken.declinedPermissions, expectedDeclined, @"unexpected permissions");
 }
 
-// verify a cancellation of reauth.
-- (void)testOpenURLReauthCancel
-{
-  XCTestExpectation *expectation = [self expectationWithDescription:@"completed reauth"];
-  // set up a current token with public_profile
-  FBSDKAccessToken *existingToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
-                                                                      permissions:@[@"public_profile"]
-                                                              declinedPermissions:nil
-                                                                            appID:nil
-                                                                           userID:nil
-                                                                   expirationDate:nil
-                                                                      refreshDate:nil];
-
-  [FBSDKAccessToken setCurrentAccessToken:existingToken];
-  // receive url with no additional granted scopes and a denial (as if they asked user_likes and user said no).
-  // and verify it's treated as a cancellation.
-  NSURL *url = [self authorizeURLWithFragment:@"granted_scopes=public_profile&denied_scopes=user_likes=&signed_request=ggarbage.eyJhbGdvcml0aG0iOiJITUFDSEEyNTYiLCJjb2RlIjoid2h5bm90IiwiaXNzdWVkX2F0IjoxNDIyNTAyMDkyLCJ1c2VyX2lkIjoiMTIzIn0&access_token=sometoken&expires_in=5183949"];
-
-  FBSDKLoginManagerRequestTokenHandler handler = ^(FBSDKLoginManagerLoginResult *result, NSError *error) {
-    XCTAssertTrue(result.isCancelled);
-    [expectation fulfill];
-  };
-  FBSDKLoginManager *target = [self loginManagerExpectingChallenge];
-  [target setRequestedPermissions:[NSSet setWithObject:@"user_likes"]];
-  [target setHandler:handler];
-  XCTAssertTrue([target application:nil openURL:url sourceApplication:@"com.apple.mobilesafari" annotation:nil]);
-
-  [self waitForExpectationsWithTimeout:3 handler:^(NSError *error) {
-    XCTAssertNil(error);
-  }];
-}
-
 // verify that recentlyDeclined is a subset of requestedPermissions (i.e., other declined permissions are not in recentlyDeclined)
 - (void)testOpenURLRecentlyDeclined
 {
@@ -167,7 +136,7 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
   // receive url with denied_scopes more than what was requested.
   NSURL *url = [self authorizeURLWithFragment:@"granted_scopes=public_profile&denied_scopes=user_friends,user_likes&signed_request=ggarbage.eyJhbGdvcml0aG0iOiJITUFDSEEyNTYiLCJjb2RlIjoid2h5bm90IiwiaXNzdWVkX2F0IjoxNDIyNTAyMDkyLCJ1c2VyX2lkIjoiMTIzIn0&access_token=sometoken&expires_in=5183949"];
 
-  FBSDKLoginManagerRequestTokenHandler handler = ^(FBSDKLoginManagerLoginResult *result, NSError *error) {
+  FBSDKLoginManagerLoginResultBlock handler = ^(FBSDKLoginManagerLoginResult *result, NSError *error) {
     XCTAssertFalse(result.isCancelled);
     XCTAssertEqualObjects(result.declinedPermissions, [NSSet setWithObject:@"user_friends"]);
     NSSet *expectedDeclinedPermissions = [NSSet setWithObjects:@"user_friends", @"user_likes", nil];
@@ -184,33 +153,6 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
   }];
 }
 
-// verify that a reauth that returns other grants on the wire but not what was requested, is classified as a cancel.
-- (void)testOpenURLReauthOtherGrantsButStillCancelled
-{
-  XCTestExpectation *expectation = [self expectationWithDescription:@"completed reauth"];
-  // set up a current token with public_profile
-  FBSDKAccessToken *existingToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
-                                                                      permissions:@[@"public_profile"]
-                                                              declinedPermissions:nil
-                                                                            appID:nil
-                                                                           userID:nil
-                                                                   expirationDate:nil
-                                                                      refreshDate:nil];
-  [FBSDKAccessToken setCurrentAccessToken:existingToken];
-  NSURL *url = [self authorizeURLWithFragment:@"granted_scopes=public_profile,read_stream&denied_scopes=email%2Cuser_friends&signed_request=ggarbage.eyJhbGdvcml0aG0iOiJITUFDSEEyNTYiLCJjb2RlIjoid2h5bm90IiwiaXNzdWVkX2F0IjoxNDIyNTAyMDkyLCJ1c2VyX2lkIjoiMTIzIn0&access_token=sometoken&expires_in=5183949"];
-  FBSDKLoginManager *target = [self loginManagerExpectingChallenge];
-  [target setRequestedPermissions:[NSSet setWithObject:@"email"]];
-  [target setHandler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
-    XCTAssertTrue(result.isCancelled);
-    XCTAssertEqualObjects(existingToken, [FBSDKAccessToken currentAccessToken]);
-    [expectation fulfill];
-  }];
-  XCTAssertTrue([target application:nil openURL:url sourceApplication:@"com.apple.mobilesafari" annotation:nil]);
-  [self waitForExpectationsWithTimeout:3 handler:^(NSError *error) {
-    XCTAssertNil(error);
-  }];
-}
-
 //verify that a reauth for already granted permissions is not treated as a cancellation.
 - (void)testOpenURLReauthSamePermissionsIsNotCancelled
 {
@@ -218,11 +160,13 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
   // set up a current token with public_profile
   FBSDKAccessToken *existingToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
                                                                       permissions:@[@"public_profile", @"read_stream"]
-                                                              declinedPermissions:nil
-                                                                            appID:nil
-                                                                           userID:nil
+                                                              declinedPermissions:@[]
+                                                              expiredPermissions:@[]
+                                                                            appID:@""
+                                                                           userID:@""
                                                                    expirationDate:nil
-                                                                      refreshDate:nil];
+                                                                      refreshDate:nil
+                                                         dataAccessExpirationDate:nil];
   [FBSDKAccessToken setCurrentAccessToken:existingToken];
   NSURL *url = [self authorizeURLWithFragment:@"granted_scopes=public_profile,read_stream&denied_scopes=email%2Cuser_friends&signed_request=ggarbage.eyJhbGdvcml0aG0iOiJITUFDSEEyNTYiLCJjb2RlIjoid2h5bm90IiwiaXNzdWVkX2F0IjoxNDIyNTAyMDkyLCJ1c2VyX2lkIjoiMTIzIn0&access_token=sometoken&expires_in=5183949"];
   // Use OCMock to verify the validateReauthentication: call and verify the result there.
@@ -253,11 +197,13 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
     // set up a current token with public_profile
     FBSDKAccessToken *existingToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
                                                                         permissions:@[@"public_profile", @"read_stream"]
-                                                                declinedPermissions:nil
-                                                                              appID:nil
-                                                                             userID:nil
+                                                                declinedPermissions:@[]
+                                                                 expiredPermissions:@[]
+                                                                              appID:@""
+                                                                             userID:@""
                                                                      expirationDate:nil
-                                                                        refreshDate:nil];
+                                                                        refreshDate:nil
+                                                           dataAccessExpirationDate:nil];
     [FBSDKAccessToken setCurrentAccessToken:existingToken];
     NSURL *url = [self authorizeURLWithFragment:@"granted_scopes=public_profile,read_stream&denied_scopes=email%2Cuser_friends&signed_request=ggarbage.eyJhbGdvcml0aG0iOiJITUFDSEEyNTYiLCJjb2RlIjoid2h5bm90IiwiaXNzdWVkX2F0IjoxNDIyNTAyMDkyLCJ1c2VyX2lkIjoiMTIzIn0&access_token=sometoken&expires_in=5183949"];
     // Use OCMock to verify the validateReauthentication: call and verify the result there.
@@ -279,30 +225,6 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
 #pragma clang diagnostic pop
 
     [target verify];
-}
-
-- (void)testInvalidPermissions
-{
-  FBSDKLoginManager *target = [self loginManagerExpectingChallenge];
-  NSArray *publishPermissions = @[@"publish_actions", @"manage_notifications"];
-  NSArray *readPermissions = @[@"user_birthday", @"user_hometown"];
-  XCTAssertThrowsSpecificNamed([target logInWithPublishPermissions:@[[publishPermissions componentsJoinedByString:@","]]
-                                                fromViewController:nil
-                                                           handler:NULL],
-                               NSException,
-                               NSInvalidArgumentException);
-  XCTAssertThrowsSpecificNamed([target logInWithPublishPermissions:readPermissions
-                                                fromViewController:nil
-                                                           handler:NULL],
-                               NSException, NSInvalidArgumentException);
-  XCTAssertThrowsSpecificNamed([target logInWithReadPermissions:@[[readPermissions componentsJoinedByString:@","]]
-                                             fromViewController:nil
-                                                        handler:NULL],
-                               NSException,
-                               NSInvalidArgumentException);
-  XCTAssertThrowsSpecificNamed([target logInWithReadPermissions:publishPermissions
-                                             fromViewController:nil
-                                                        handler:NULL], NSException, NSInvalidArgumentException);
 }
 
 - (void)testOpenURLWithBadChallenge
@@ -363,7 +285,7 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
 
   XCTestExpectation *expectation = [self expectationWithDescription:@"completed auth"];
   FBSDKLoginManager *manager = [FBSDKLoginManager new];
-  [manager logInWithReadPermissions:@[@"public_profile"] fromViewController:nil handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
+  [manager logInWithPermissions:@[@"public_profile"] fromViewController:nil handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
     [expectation fulfill];
   }];
   // This makes sure that FBSDKLoginManager is retaining itself for the duration of the call
@@ -386,13 +308,13 @@ static NSString *const kFakeChallenge = @"a+=bcdef";
   FBSDKLoginManager *manager = [OCMockObject partialMockForObject:[FBSDKLoginManager new]];
   [[[(id)manager stub] andDo:^(NSInvocation *invocation) {
     loginCount++;
-  }] logInWithBehavior:FBSDKLoginBehaviorNative];
-  [manager logInWithReadPermissions:@[@"public_profile"] fromViewController:nil handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
+  }] logInWithBehavior:FBSDKLoginBehaviorBrowser];
+  [manager logInWithPermissions:@[@"public_profile"] fromViewController:nil handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
     // This will never be called
     XCTFail(@"Should not be called");
   }];
 
-  [manager logInWithReadPermissions:@[@"public_profile"] fromViewController:nil handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
+  [manager logInWithPermissions:@[@"public_profile"] fromViewController:nil handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
     // This will never be called
     XCTFail(@"Should not be called");
   }];

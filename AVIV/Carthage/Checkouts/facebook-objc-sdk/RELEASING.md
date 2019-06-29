@@ -15,8 +15,15 @@ sh scripts/run.sh bump-version 4.40.0
 
 This script will modify the relevant version references and will edit the Changelog.
 
-Ensure that the version changes and Changelog updates are correct, then commit these changes with the title: "Bump
-Version: 4.40.0" and submit a Pull Request.
+If you need to bump the Graph API version as well, run this script:
+
+```sh
+# Call `bump-version` and pass in the desired semantic version, e.g. 4.40.0
+sh scripts/run.sh bump-api-version v3.2
+```
+
+Ensure that the version changes and Changelog updates are correct, then commit with the title: "Bump Version: 4.40.0"
+and submit a Pull Request.
 
 ### Tag Version
 
@@ -33,11 +40,10 @@ sh scripts/run.sh tag-current-version --push
 
 ### Release Version
 
-Head over to the [GitHub Releases](https://github.com/facebook/facebook-objc-sdk/releases), select the pushed tag, and
-add the copy for the new release from the Changelog to the release body. Give it the title of "Facebook SDK: X.Y.Z" and
-click "Publish Release".
+Travis will handle publishing the new release to:
 
-**Note:** Automation of this step is a WIP.
+- GitHub Releases (complete with framework binaries for Carthage)
+- CocoaPods
 
 ### Release FBSDKMarketingKit
 
@@ -46,10 +52,11 @@ On your machine, run:
 ```sh
 cd internal/FBSDKMarketingKit/
 carthage build --archive
+cd Carthage/Build/iOS/Static/
 zip \
   -x "*.DS_Store" \
-  -r Carthage/Build/iOS/Static/FBSDKMarketingKit.zip \
-  Carthage/Build/iOS/Static/FBSDKMarketingKit.framework
+  -r FBSDKMarketingKit.framework.zip \
+  FBSDKMarketingKit.framework
 ```
 
 Take this file and upload it to the latest GitHub releases.

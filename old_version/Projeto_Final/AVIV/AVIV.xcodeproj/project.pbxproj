@@ -1,0 +1,735 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2239874F2236DE96003238CB /* RestKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2239874C2236CB41003238CB /* RestKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		223987512236DE96003238CB /* FacebookCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9947220099B900F1E729 /* FacebookCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		223987532236DE96003238CB /* FacebookLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D994A220099B900F1E729 /* FacebookLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		223987552236DE96003238CB /* FacebookShare.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9944220099B800F1E729 /* FacebookShare.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		223987572236DE96003238CB /* FBSDKCoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9948220099B900F1E729 /* FBSDKCoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		223987592236DE96003238CB /* FBSDKLoginKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9946220099B900F1E729 /* FBSDKLoginKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2239875B2236DE97003238CB /* FBSDKPlacesKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9945220099B800F1E729 /* FBSDKPlacesKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2239875D2236DE97003238CB /* FBSDKShareKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9949220099B900F1E729 /* FBSDKShareKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2239875F2236DE97003238CB /* PersonalityInsightsV3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 228D9942220098FA00F1E729 /* PersonalityInsightsV3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		22398762223716D6003238CB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22398761223716D6003238CB /* Main.storyboard */; };
+		223C07E3223EC7E1009BF449 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 223C07E2223EC7E1009BF449 /* Credentials.swift */; };
+		2254786922B59882002178D3 /* GifLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2254786822B59882002178D3 /* GifLoader.swift */; };
+		2254786C22B59A18002178D3 /* loading_image.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2254786B22B59A18002178D3 /* loading_image.gif */; };
+		227C8747223F15ED001C9BC2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 227C8746223F15ED001C9BC2 /* GoogleService-Info.plist */; };
+		229787582237F519008348E9 /* GenerateUserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229787572237F519008348E9 /* GenerateUserProfile.swift */; };
+		2297875A223824FE008348E9 /* LogoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22978759223824FE008348E9 /* LogoutViewController.swift */; };
+		22CC9F8C21FF74E3002DA79B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC9F8B21FF74E3002DA79B /* AppDelegate.swift */; };
+		22CC9F8E21FF74E3002DA79B /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC9F8D21FF74E3002DA79B /* LoginViewController.swift */; };
+		22CC9F9321FF74E8002DA79B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22CC9F9221FF74E8002DA79B /* Assets.xcassets */; };
+		22CC9F9621FF74E8002DA79B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */; };
+		22CC9FA121FF74E9002DA79B /* AVIVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC9FA021FF74E9002DA79B /* AVIVTests.swift */; };
+		22D7001522486ADD00DEB17E /* LanguageTranslatorV3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; };
+		22D7001622486ADD00DEB17E /* LanguageTranslatorV3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		22E1907B22B180C700C05B2E /* SearchResultTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E1907A22B180C700C05B2E /* SearchResultTableViewController.swift */; };
+		22E1907D22B180F700C05B2E /* SuggestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E1907C22B180F700C05B2E /* SuggestionViewController.swift */; };
+		22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777B2240656B00B64540 /* SearchViewController.swift */; };
+		22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E2777F2246EB0600B64540 /* FavoriteViewController.swift */; };
+		22E6388522A41B7E005EF55F /* MatchProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E6388422A41B7E005EF55F /* MatchProfile.swift */; };
+		22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F040802247E5B9004FE7C4 /* Suggestion.swift */; };
+		34FD8B79C6B00D54DA915D34 /* Pods_AVIVTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9DE7914B9895A912E3932A6 /* Pods_AVIVTests.framework */; };
+		91B9E2F58F6F11AFDB0A0206 /* Pods_AVIV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		22CC9F9D21FF74E9002DA79B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 22CC9F8021FF74E3002DA79B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22CC9F8721FF74E3002DA79B;
+			remoteInfo = AVIV;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		223987602236DE98003238CB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2239875D2236DE97003238CB /* FBSDKShareKit.framework in Embed Frameworks */,
+				223987572236DE96003238CB /* FBSDKCoreKit.framework in Embed Frameworks */,
+				223987552236DE96003238CB /* FacebookShare.framework in Embed Frameworks */,
+				223987592236DE96003238CB /* FBSDKLoginKit.framework in Embed Frameworks */,
+				2239874F2236DE96003238CB /* RestKit.framework in Embed Frameworks */,
+				22D7001622486ADD00DEB17E /* LanguageTranslatorV3.framework in Embed Frameworks */,
+				2239875B2236DE97003238CB /* FBSDKPlacesKit.framework in Embed Frameworks */,
+				223987532236DE96003238CB /* FacebookLogin.framework in Embed Frameworks */,
+				223987512236DE96003238CB /* FacebookCore.framework in Embed Frameworks */,
+				2239875F2236DE97003238CB /* PersonalityInsightsV3.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		2239874C2236CB41003238CB /* RestKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RestKit.framework; path = Carthage/Build/iOS/RestKit.framework; sourceTree = "<group>"; };
+		22398761223716D6003238CB /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		223C07E2223EC7E1009BF449 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
+		2254786822B59882002178D3 /* GifLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifLoader.swift; sourceTree = "<group>"; };
+		2254786B22B59A18002178D3 /* loading_image.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = loading_image.gif; sourceTree = "<group>"; };
+		227C8746223F15ED001C9BC2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		228D9942220098FA00F1E729 /* PersonalityInsightsV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PersonalityInsightsV3.framework; path = Carthage/Build/iOS/PersonalityInsightsV3.framework; sourceTree = "<group>"; };
+		228D9944220099B800F1E729 /* FacebookShare.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookShare.framework; path = Carthage/Build/iOS/FacebookShare.framework; sourceTree = "<group>"; };
+		228D9945220099B800F1E729 /* FBSDKPlacesKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKPlacesKit.framework; path = Carthage/Build/iOS/FBSDKPlacesKit.framework; sourceTree = "<group>"; };
+		228D9946220099B900F1E729 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = Carthage/Build/iOS/FBSDKLoginKit.framework; sourceTree = "<group>"; };
+		228D9947220099B900F1E729 /* FacebookCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookCore.framework; path = Carthage/Build/iOS/FacebookCore.framework; sourceTree = "<group>"; };
+		228D9948220099B900F1E729 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = Carthage/Build/iOS/FBSDKCoreKit.framework; sourceTree = "<group>"; };
+		228D9949220099B900F1E729 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = Carthage/Build/iOS/FBSDKShareKit.framework; sourceTree = "<group>"; };
+		228D994A220099B900F1E729 /* FacebookLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookLogin.framework; path = Carthage/Build/iOS/FacebookLogin.framework; sourceTree = "<group>"; };
+		229787572237F519008348E9 /* GenerateUserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateUserProfile.swift; sourceTree = "<group>"; };
+		22978759223824FE008348E9 /* LogoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutViewController.swift; sourceTree = "<group>"; };
+		22CC9F8821FF74E3002DA79B /* AVIV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVIV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		22CC9F8B21FF74E3002DA79B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		22CC9F8D21FF74E3002DA79B /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		22CC9F9221FF74E8002DA79B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		22CC9F9521FF74E8002DA79B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		22CC9F9721FF74E8002DA79B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22CC9F9C21FF74E9002DA79B /* AVIVTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVIVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22CC9FA021FF74E9002DA79B /* AVIVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIVTests.swift; sourceTree = "<group>"; };
+		22CC9FA221FF74E9002DA79B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LanguageTranslatorV3.framework; path = Carthage/Build/iOS/LanguageTranslatorV3.framework; sourceTree = "<group>"; };
+		22E1907A22B180C700C05B2E /* SearchResultTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultTableViewController.swift; sourceTree = "<group>"; };
+		22E1907C22B180F700C05B2E /* SuggestionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewController.swift; sourceTree = "<group>"; };
+		22E2777B2240656B00B64540 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		22E2777F2246EB0600B64540 /* FavoriteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteViewController.swift; sourceTree = "<group>"; };
+		22E6388422A41B7E005EF55F /* MatchProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchProfile.swift; sourceTree = "<group>"; };
+		22F040802247E5B9004FE7C4 /* Suggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestion.swift; sourceTree = "<group>"; };
+		4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVIV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6926CD558064680AE91BEAAA /* Pods-AVIV.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.debug.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.debug.xcconfig"; sourceTree = "<group>"; };
+		B1AB0F809CC0A16F6780F6CB /* Pods-AVIV.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIV.release.xcconfig"; path = "Target Support Files/Pods-AVIV/Pods-AVIV.release.xcconfig"; sourceTree = "<group>"; };
+		D50EBD1E9F4A509ED9384C14 /* Pods-AVIVTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIVTests.debug.xcconfig"; path = "Target Support Files/Pods-AVIVTests/Pods-AVIVTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D9DE7914B9895A912E3932A6 /* Pods_AVIVTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVIVTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA7E2C9986ED802D2CD90B8C /* Pods-AVIVTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVIVTests.release.xcconfig"; path = "Target Support Files/Pods-AVIVTests/Pods-AVIVTests.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		22CC9F8521FF74E3002DA79B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				91B9E2F58F6F11AFDB0A0206 /* Pods_AVIV.framework in Frameworks */,
+				22D7001522486ADD00DEB17E /* LanguageTranslatorV3.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22CC9F9921FF74E9002DA79B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34FD8B79C6B00D54DA915D34 /* Pods_AVIVTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		228D9941220098FA00F1E729 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				22D7001422486ADD00DEB17E /* LanguageTranslatorV3.framework */,
+				2239874C2236CB41003238CB /* RestKit.framework */,
+				228D9947220099B900F1E729 /* FacebookCore.framework */,
+				228D994A220099B900F1E729 /* FacebookLogin.framework */,
+				228D9944220099B800F1E729 /* FacebookShare.framework */,
+				228D9948220099B900F1E729 /* FBSDKCoreKit.framework */,
+				228D9946220099B900F1E729 /* FBSDKLoginKit.framework */,
+				228D9945220099B800F1E729 /* FBSDKPlacesKit.framework */,
+				228D9949220099B900F1E729 /* FBSDKShareKit.framework */,
+				228D9942220098FA00F1E729 /* PersonalityInsightsV3.framework */,
+				4E8340C7541A880AE715E7B7 /* Pods_AVIV.framework */,
+				D9DE7914B9895A912E3932A6 /* Pods_AVIVTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		22CC9F7F21FF74E3002DA79B = {
+			isa = PBXGroup;
+			children = (
+				22CC9F8A21FF74E3002DA79B /* AVIV */,
+				22CC9F9F21FF74E9002DA79B /* AVIVTests */,
+				22CC9F8921FF74E3002DA79B /* Products */,
+				228D9941220098FA00F1E729 /* Frameworks */,
+				2A275CD49C50A9407CFA089C /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		22CC9F8921FF74E3002DA79B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				22CC9F8821FF74E3002DA79B /* AVIV.app */,
+				22CC9F9C21FF74E9002DA79B /* AVIVTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		22CC9F8A21FF74E3002DA79B /* AVIV */ = {
+			isa = PBXGroup;
+			children = (
+				22CC9F8B21FF74E3002DA79B /* AppDelegate.swift */,
+				223C07E2223EC7E1009BF449 /* Credentials.swift */,
+				22F040802247E5B9004FE7C4 /* Suggestion.swift */,
+				22CC9F8D21FF74E3002DA79B /* LoginViewController.swift */,
+				22978759223824FE008348E9 /* LogoutViewController.swift */,
+				229787572237F519008348E9 /* GenerateUserProfile.swift */,
+				22E6388422A41B7E005EF55F /* MatchProfile.swift */,
+				22E2777B2240656B00B64540 /* SearchViewController.swift */,
+				22E2777F2246EB0600B64540 /* FavoriteViewController.swift */,
+				22E1907A22B180C700C05B2E /* SearchResultTableViewController.swift */,
+				2254786822B59882002178D3 /* GifLoader.swift */,
+				22E1907C22B180F700C05B2E /* SuggestionViewController.swift */,
+				22398761223716D6003238CB /* Main.storyboard */,
+				22CC9F9221FF74E8002DA79B /* Assets.xcassets */,
+				2254786B22B59A18002178D3 /* loading_image.gif */,
+				22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */,
+				227C8746223F15ED001C9BC2 /* GoogleService-Info.plist */,
+				22CC9F9721FF74E8002DA79B /* Info.plist */,
+			);
+			path = AVIV;
+			sourceTree = "<group>";
+		};
+		22CC9F9F21FF74E9002DA79B /* AVIVTests */ = {
+			isa = PBXGroup;
+			children = (
+				22CC9FA021FF74E9002DA79B /* AVIVTests.swift */,
+				22CC9FA221FF74E9002DA79B /* Info.plist */,
+			);
+			path = AVIVTests;
+			sourceTree = "<group>";
+		};
+		2A275CD49C50A9407CFA089C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6926CD558064680AE91BEAAA /* Pods-AVIV.debug.xcconfig */,
+				B1AB0F809CC0A16F6780F6CB /* Pods-AVIV.release.xcconfig */,
+				D50EBD1E9F4A509ED9384C14 /* Pods-AVIVTests.debug.xcconfig */,
+				FA7E2C9986ED802D2CD90B8C /* Pods-AVIVTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		22CC9F8721FF74E3002DA79B /* AVIV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22CC9FA521FF74E9002DA79B /* Build configuration list for PBXNativeTarget "AVIV" */;
+			buildPhases = (
+				1AA57BFD01B991D0D6C9CD9F /* [CP] Check Pods Manifest.lock */,
+				22CC9F8421FF74E3002DA79B /* Sources */,
+				22CC9F8521FF74E3002DA79B /* Frameworks */,
+				22CC9F8621FF74E3002DA79B /* Resources */,
+				228D99522200A62700F1E729 /* ShellScript */,
+				223987602236DE98003238CB /* Embed Frameworks */,
+				5CEE506FAC856ADCF5DEC586 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AVIV;
+			productName = AVIV;
+			productReference = 22CC9F8821FF74E3002DA79B /* AVIV.app */;
+			productType = "com.apple.product-type.application";
+		};
+		22CC9F9B21FF74E9002DA79B /* AVIVTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22CC9FA821FF74E9002DA79B /* Build configuration list for PBXNativeTarget "AVIVTests" */;
+			buildPhases = (
+				C1463E0804B34AE964A5E90D /* [CP] Check Pods Manifest.lock */,
+				22CC9F9821FF74E9002DA79B /* Sources */,
+				22CC9F9921FF74E9002DA79B /* Frameworks */,
+				22CC9F9A21FF74E9002DA79B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				22CC9F9E21FF74E9002DA79B /* PBXTargetDependency */,
+			);
+			name = AVIVTests;
+			productName = AVIVTests;
+			productReference = 22CC9F9C21FF74E9002DA79B /* AVIVTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		22CC9F8021FF74E3002DA79B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1010;
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = "Lucas Hardman";
+				TargetAttributes = {
+					22CC9F8721FF74E3002DA79B = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					22CC9F9B21FF74E9002DA79B = {
+						CreatedOnToolsVersion = 10.1;
+						TestTargetID = 22CC9F8721FF74E3002DA79B;
+					};
+				};
+			};
+			buildConfigurationList = 22CC9F8321FF74E3002DA79B /* Build configuration list for PBXProject "AVIV" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 22CC9F7F21FF74E3002DA79B;
+			productRefGroup = 22CC9F8921FF74E3002DA79B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				22CC9F8721FF74E3002DA79B /* AVIV */,
+				22CC9F9B21FF74E9002DA79B /* AVIVTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		22CC9F8621FF74E3002DA79B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22398762223716D6003238CB /* Main.storyboard in Resources */,
+				227C8747223F15ED001C9BC2 /* GoogleService-Info.plist in Resources */,
+				22CC9F9621FF74E8002DA79B /* LaunchScreen.storyboard in Resources */,
+				2254786C22B59A18002178D3 /* loading_image.gif in Resources */,
+				22CC9F9321FF74E8002DA79B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22CC9F9A21FF74E9002DA79B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1AA57BFD01B991D0D6C9CD9F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AVIV-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		228D99522200A62700F1E729 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/PersonalityInsightsV3.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FacebookCore.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FacebookLogin.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FacebookShare.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FBSDKCoreKit.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FBSDKLoginKit.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FBSDKPlacesKit.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/FBSDKShareKit.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/RestKit.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Bolts.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/LanguageTranslatorV3.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+		5CEE506FAC856ADCF5DEC586 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AVIV/Pods-AVIV-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/BoringSSL-GRPC/openssl_grpc.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl_grpc.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AVIV/Pods-AVIV-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C1463E0804B34AE964A5E90D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AVIVTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22CC9F8421FF74E3002DA79B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22E2777C2240656B00B64540 /* SearchViewController.swift in Sources */,
+				22CC9F8E21FF74E3002DA79B /* LoginViewController.swift in Sources */,
+				22CC9F8C21FF74E3002DA79B /* AppDelegate.swift in Sources */,
+				2254786922B59882002178D3 /* GifLoader.swift in Sources */,
+				22F040812247E5B9004FE7C4 /* Suggestion.swift in Sources */,
+				22E1907B22B180C700C05B2E /* SearchResultTableViewController.swift in Sources */,
+				22E277802246EB0600B64540 /* FavoriteViewController.swift in Sources */,
+				22E6388522A41B7E005EF55F /* MatchProfile.swift in Sources */,
+				223C07E3223EC7E1009BF449 /* Credentials.swift in Sources */,
+				2297875A223824FE008348E9 /* LogoutViewController.swift in Sources */,
+				229787582237F519008348E9 /* GenerateUserProfile.swift in Sources */,
+				22E1907D22B180F700C05B2E /* SuggestionViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22CC9F9821FF74E9002DA79B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22CC9FA121FF74E9002DA79B /* AVIVTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		22CC9F9E21FF74E9002DA79B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22CC9F8721FF74E3002DA79B /* AVIV */;
+			targetProxy = 22CC9F9D21FF74E9002DA79B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		22CC9F9421FF74E8002DA79B /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				22CC9F9521FF74E8002DA79B /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		22CC9FA321FF74E9002DA79B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		22CC9FA421FF74E9002DA79B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		22CC9FA621FF74E9002DA79B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6926CD558064680AE91BEAAA /* Pods-AVIV.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5A4RJ634ZY;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = AVIV/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AVIV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		22CC9FA721FF74E9002DA79B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B1AB0F809CC0A16F6780F6CB /* Pods-AVIV.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5A4RJ634ZY;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = AVIV/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AVIV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		22CC9FA921FF74E9002DA79B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D50EBD1E9F4A509ED9384C14 /* Pods-AVIVTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5A4RJ634ZY;
+				INFOPLIST_FILE = AVIVTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AVIVTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AVIV.app/AVIV";
+			};
+			name = Debug;
+		};
+		22CC9FAA21FF74E9002DA79B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA7E2C9986ED802D2CD90B8C /* Pods-AVIVTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5A4RJ634ZY;
+				INFOPLIST_FILE = AVIVTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AVIVTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AVIV.app/AVIV";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		22CC9F8321FF74E3002DA79B /* Build configuration list for PBXProject "AVIV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22CC9FA321FF74E9002DA79B /* Debug */,
+				22CC9FA421FF74E9002DA79B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22CC9FA521FF74E9002DA79B /* Build configuration list for PBXNativeTarget "AVIV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22CC9FA621FF74E9002DA79B /* Debug */,
+				22CC9FA721FF74E9002DA79B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22CC9FA821FF74E9002DA79B /* Build configuration list for PBXNativeTarget "AVIVTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22CC9FA921FF74E9002DA79B /* Debug */,
+				22CC9FAA21FF74E9002DA79B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 22CC9F8021FF74E3002DA79B /* Project object */;
+}

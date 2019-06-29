@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,11 +127,7 @@ internal class SpeechToTextRecorder {
             userInfo: nil,
             repeats: true
         )
-        #if swift(>=4.2)
         RunLoop.current.add(powerTimer!, forMode: RunLoop.Mode.common)
-        #else
-        RunLoop.current.add(powerTimer!, forMode: RunLoopMode.commonModes)
-        #endif
     }
 
     internal func startRecording() throws {

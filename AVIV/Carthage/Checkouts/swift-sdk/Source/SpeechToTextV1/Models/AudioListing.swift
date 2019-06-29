@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 import Foundation
 
-/** AudioListing. */
+/**
+ Information about an audio resource from a custom acoustic model.
+ */
 public struct AudioListing: Codable, Equatable {
 
     /**
@@ -35,10 +37,9 @@ public struct AudioListing: Codable, Equatable {
     }
 
     /**
-     **For an audio-type resource,**  the total seconds of audio in the resource. The value is always a whole number.
-     Omitted for an archive-type resource.
+     **For an audio-type resource,**  the total seconds of audio in the resource. Omitted for an archive-type resource.
      */
-    public var duration: Double?
+    public var duration: Int?
 
     /**
      **For an audio-type resource,** the user-specified name of the resource. Omitted for an archive-type resource.

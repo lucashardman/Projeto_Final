@@ -5,11 +5,14 @@ target 'AVIV' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
 
+# ignore all warnings from all pods
+inhibit_all_warnings!
+
   # Pods for AVIV
   pod 'Firebase/Core'
   pod 'Firebase/Firestore'
-  pod 'Firebase/Storage'
-  pod 'PromiseKit', '~> 6.8'
+
+  pod 'Bolts'
 
   target 'AVIVTests' do
     inherit! :search_paths

@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016-2017
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@
 
 import XCTest
 import Foundation
+// Do not import @testable to ensure only public interface is exposed
 import VisualRecognitionV3
+import RestKit
 
 class VisualRecognitionTests: XCTestCase {
 
@@ -28,14 +30,17 @@ class VisualRecognitionTests: XCTestCase {
     private let classifierID = WatsonCredentials.VisualRecognitionClassifierID
 
     static var allTests: [(String, (VisualRecognitionTests) -> () throws -> Void)] {
-        return [
+        let tests: [(String, (VisualRecognitionTests) -> () throws -> Void)] = [
+            // Classifiers CRUD
             ("testListClassifiers", testListClassifiers),
             ("testListClassifiersVerbose", testListClassifiersVerbose),
-            // disabled: ("testCreateDeleteClassifier1", testCreateDeleteClassifier1),
-            // disabled: ("testCreateDeleteClassifier2", testCreateDeleteClassifier2),
+            ("testCreateDeleteClassifier1", testCreateDeleteClassifier1),
+            ("testCreateDeleteClassifier2", testCreateDeleteClassifier2),
             ("testGetClassifier", testGetClassifier),
             // disabled: ("testUpdateClassifierWithPositiveExample", testUpdateClassifierWithPositiveExample),
             // disabled: ("testUpdateClassifierWithNegativeExample", testUpdateClassifierWithNegativeExample),
+            ("testGetCoreMlModel", testGetCoreMlModel),
+            // Classify
             ("testClassifyByURL1", testClassifyByURL1),
             ("testClassifyByURL2", testClassifyByURL2),
             ("testClassifyByURL3", testClassifyByURL3),
@@ -47,15 +52,18 @@ class VisualRecognitionTests: XCTestCase {
             ("testClassifyImage4", testClassifyImage4),
             ("testClassifyImage5", testClassifyImage5),
             ("testClassifyImage6", testClassifyImage6),
+            // Detect faces
             ("testDetectFacesByURL", testDetectFacesByURL),
             ("testDetectFacesByImage1", testDetectFacesByImage1),
             ("testDetectFacesByImage2", testDetectFacesByImage2),
+            // Negative tests
             ("testAuthenticationError", testAuthenticationError),
             ("testCreateClassifierWithInvalidPositiveExamples", testCreateClassifierWithInvalidPositiveExamples),
             ("testClassifyByInvalidURL", testClassifyByInvalidURL),
             ("testDetectFacesByInvalidURL", testDetectFacesByInvalidURL),
             ("testGetUnknownClassifier", testGetUnknownClassifier),
         ]
+        return tests
     }
 
     // MARK: - Test Configuration
@@ -544,7 +552,7 @@ class VisualRecognitionTests: XCTestCase {
     func testClassifyByURL1() {
         let expectation = self.expectation(description: "Classify an image by URL")
 
-        visualRecognition.classify(acceptLanguage: "en", url: obamaURL) {
+        visualRecognition.classify(url: obamaURL, acceptLanguage: "en") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))
@@ -599,11 +607,11 @@ class VisualRecognitionTests: XCTestCase {
     func testClassifyByURL2() {
         let expectation = self.expectation(description: "Classify an image by URL using the default classifier.")
         visualRecognition.classify(
-            acceptLanguage: "en",
             url: obamaURL,
             threshold: 0.5,
             owners: ["IBM"],
-            classifierIDs: ["default"])
+            classifierIDs: ["default"],
+            acceptLanguage: "en")
         {
             response, error in
             if let error = error {
@@ -658,9 +666,9 @@ class VisualRecognitionTests: XCTestCase {
     func testClassifyByURL3() {
         let expectation = self.expectation(description: "Classify an image by URL using a custom classifier.")
         visualRecognition.classify(
-            acceptLanguage: "en",
             url: carURL,
-            classifierIDs: [classifierID])
+            classifierIDs: [classifierID],
+            acceptLanguage: "en")
         {
             response, error in
             if let error = error {
@@ -702,11 +710,11 @@ class VisualRecognitionTests: XCTestCase {
     func testClassifyByURL4() {
         let expectation = self.expectation(description: "Classify an image by URL using a custom classifier.")
         visualRecognition.classify(
-            acceptLanguage: "en",
             url: carURL,
             threshold: 0.5,
             owners: ["me"],
-            classifierIDs: [classifierID])
+            classifierIDs: [classifierID],
+            acceptLanguage: "en")
         {
             response, error in
             if let error = error {
@@ -747,7 +755,7 @@ class VisualRecognitionTests: XCTestCase {
     /** Classify an image by URL with both the default classifier and a custom classifier. */
     func testClassifyByURL5() {
         let expectation = self.expectation(description: "Classify an image by URL using a custom classifier.")
-        visualRecognition.classify(acceptLanguage: "en", url: carURL, classifierIDs: ["default", classifierID]) {
+        visualRecognition.classify(url: carURL, classifierIDs: ["default", classifierID]) {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))
@@ -810,7 +818,7 @@ class VisualRecognitionTests: XCTestCase {
     /** Classify an uploaded image using the default classifier and all default parameters. */
     func testClassifyImage1() {
         let expectation = self.expectation(description: "Classify an uploaded image using the default classifier.")
-        visualRecognition.classify(imagesFile: car, acceptLanguage: "en") {
+        visualRecognition.classify(imagesFile: car, imagesFilename: "car.png", acceptLanguage: "en") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))
@@ -863,7 +871,7 @@ class VisualRecognitionTests: XCTestCase {
         let expectation = self.expectation(description: "Classify an uploaded image using the default classifier.")
         visualRecognition.classify(
             imagesFile: car,
-            acceptLanguage: "en",
+            imagesFilename: "car.png",
             threshold: 0.5,
             owners: ["IBM"],
             classifierIDs: ["default"])
@@ -921,7 +929,7 @@ class VisualRecognitionTests: XCTestCase {
         let expectation = self.expectation(description: "Classify an uploaded image using a custom classifier.")
         visualRecognition.classify(
             imagesFile: car,
-            acceptLanguage: "en",
+            imagesFilename: "car.png",
             classifierIDs: [classifierID]) {
             response, error in
             if let error = error {
@@ -964,7 +972,7 @@ class VisualRecognitionTests: XCTestCase {
         let expectation = self.expectation(description: "Classify an uploaded image using a custom classifier.")
         visualRecognition.classify(
             imagesFile: car,
-            acceptLanguage: "en",
+            imagesFilename: "car.png",
             threshold: 0.5,
             owners: ["me"],
             classifierIDs: [classifierID])
@@ -1010,7 +1018,7 @@ class VisualRecognitionTests: XCTestCase {
         let expectation = self.expectation(description: "Classify an uploaded image with the default and custom classifiers.")
         visualRecognition.classify(
             imagesFile: car,
-            acceptLanguage: "en",
+            imagesFilename: "car.png",
             classifierIDs: ["default", classifierID])
         {
             response, error in
@@ -1078,7 +1086,7 @@ class VisualRecognitionTests: XCTestCase {
         let expectation = self.expectation(description: "Classify multiple images using a custom classifier.")
         visualRecognition.classify(
             imagesFile: carz,
-            acceptLanguage: "en",
+            imagesFilename: "cars.zip",
             classifierIDs: ["default", classifierID])
         {
             response, error in
@@ -1192,7 +1200,7 @@ class VisualRecognitionTests: XCTestCase {
     /** Detect faces in an uploaded image */
     func testDetectFacesByImage1() {
         let expectation = self.expectation(description: "Detect faces in an uploaded image.")
-        visualRecognition.detectFaces(imagesFile: obama) {
+        visualRecognition.detectFaces(imagesFile: obama, imagesFilename: "obama.jpg") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))
@@ -1242,7 +1250,7 @@ class VisualRecognitionTests: XCTestCase {
     /** Detect faces in uploaded images. */
     func testDetectFacesByImage2() {
         let expectation = self.expectation(description: "Detect faces in uploaded images.")
-        visualRecognition.detectFaces(imagesFile: faces) {
+        visualRecognition.detectFaces(imagesFile: faces, imagesFilename: "faces.zip") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))

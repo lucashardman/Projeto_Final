@@ -1,3 +1,68 @@
+
+## 2.1.1 (https://github.com/watson-developer-cloud/swift-sdk/compare/2.1.0...2.1.1) (2019-06-28)
+
+### Bug Fixes
+
+* SpeechToTextV1: Add configureSession parameter to RecognizeMicrophone. (87f5aed (https://github.com/watson-developer-cloud/swift-sdk/commit/87f5aed))
+
+# 2.1.0 (https://github.com/watson-developer-cloud/swift-sdk/compare/2.0.3...2.1.0) (2019-06-08)
+
+### Features
+
+* Add support for insecure connections (975bb68 (https://github.com/watson-developer-cloud/swift-sdk/commit/975bb68))
+* Assistant V1 updated DialogNodeOutputOptionsElementValue PR
+* LTv3 Document Translator API
+* NLU categories explanations
+* STT processing metrics and audio metrics features
+
+### Bug Fixes
+
+* Remove support for insecure connections for Linux (76f15f2 (https://github.com/watson-developer-cloud/swift-sdk/commit/76f15f2))
+
+## 2.0.3 (https://github.com/watson-developer-cloud/swift-sdk/compare/2.0.3...2.0.3) (2019-04-15)
+
+### Bug Fixes
+
+* **All:**
+  * Use bootstrap instead of update in carthage
+  * Use full url in semantic release
+  * Refactor bluemix to cloud.ibm
+  * Add Featured Projects section to README
+
+## 2.0.2 (https://github.com/watson-developer-cloud/swift-sdk/compare/2.0.1...2.0.2) (2019-04-15)
+
+### Bug Fixes
+
+* core: Look for iam_apikey in credential file with IAM auth (689d748 (https://github.com/watson-developer-cloud/swift-sdk/commit/689d748))
+* Fix swiftlint errors (9b12dba (https://github.com/watson-developer-cloud/swift-sdk/commit/9b12dba))
+
+# [2.0.1](https://github.com/watson-developer-cloud/swift-sdk/compare/2.0.0...2.0.1) (2019-04-07)
+
+
+### Bug Fixes
+* **VisualRecognitionV3:**
+  * Add .zip to filenames passed to create/update classifier
+  * Fix multiple calls to completionHandler from classifyWithLocalModel.
+
+
+# [2.0.0](https://github.com/watson-developer-cloud/swift-sdk/compare/1.4.0...2.0.0) (2019-03-28)
+
+
+### Features
+
+* **All:**
+  * Version moved to first parameter of init methods for basic authentication
+  * Credentials file support in the intializer dropped for iOS. Only supported in Linux
+  * Error response handling reworked for consistency across services and languages
+  * Ordering of parameters in some methods has changed due to migration of the API docs and generator to OpenAPI 3.0
+  * File-type parameters are now defined as `Data` rather than `URL`
+* **AssistantV1:**
+  * Some model classes have been merged / simplified
+  * The `InputData` class has been renamed to `MessageInput`
+* **SpeechToTextV1:**
+  * The `recognizeWithWebsockets` method has been revised to accept a `RecognizeCallback` object with `onResults` and `onError` callback properties
+
+
 # [1.4.0](https://github.com/watson-developer-cloud/swift-sdk/compare/1.3.1...1.4.0) (2019-02-12)
 
 
@@ -449,7 +514,7 @@ _2017-03-2_
 This update includes:
 
 - Updates for Natural Language Understanding service.
-- Bug fixes for memory leak in text to speech. 
+- Bug fixes for memory leak in text to speech.
 
 ## Version 0.14.0
 _2017-02-10_
@@ -690,7 +755,7 @@ The iOS-sdk version 0.3.0 has many major changes with this new release.  The tea
 **Major updates**
 
 * Added IBM Watson Tone Analyzer
-* Added IBM Watson Visual Recognition 
+* Added IBM Watson Visual Recognition
 * Updated all of the code to use the new Rest-kit and removed NetworkUtils and WatsonGateway.  We still have one service to convert, Alchemy Language, but we anticipate that change coming in the next minor release.
 * Removed many dependencies and reducing the total number to three.  Alamofire, Freddy, and Starscream.
 * You will notice an update to the targets available and now the developer can pick and choose the services to include.

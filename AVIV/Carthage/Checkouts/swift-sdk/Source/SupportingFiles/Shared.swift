@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,44 @@ public typealias WatsonError = RestError
 internal struct Shared {
 
     struct Constant {
-        static let credentialsFileName = "ibm-credentials"
+        static let credentialsFileName = "ibm-credentials.env"
         static let serviceURL = "url"
         static let username = "username"
         static let password = "password"
         static let apiKey = "apikey"
+        static let iamApiKey = "iam_apikey"
         static let iamURL = "iam_url"
         static let icpPrefix = "icp-"
     }
 
-    static let sdkVersion = "1.4.0"
+    static let sdkVersion = "2.1.1"
 
+    /// The "User-Agent" header to be sent with every RestRequest
+    static let userAgent: String? = {
+        let sdk = "watson-apis-swift-sdk"
+
+        let operatingSystem: String = {
+            #if os(iOS)
+            return "iOS"
+            #elseif os(watchOS)
+            return "watchOS"
+            #elseif os(tvOS)
+            return "tvOS"
+            #elseif os(macOS)
+            return "macOS"
+            #elseif os(Linux)
+            return "Linux"
+            #else
+            return "Unknown"
+            #endif
+        }()
+        let operatingSystemVersion: String = {
+            // swiftlint:disable:next identifier_name
+            let os = ProcessInfo.processInfo.operatingSystemVersion
+            return "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
+        }()
+        return "\(sdk)/\(sdkVersion) \(operatingSystem)/\(operatingSystemVersion)"
+    }()
 
     /// For Basic Authentication, switch to using IAM tokens for "apikey" usernames,
     /// but only for api keys that are not for ICP (which currently does not support IAM token authentication)
@@ -59,13 +86,11 @@ internal struct Shared {
     /// Get the auth method based on the provided credentials
     static func getAuthMethod(from credentials: [String: String]) -> AuthenticationMethod? {
         // Get the appropriate auth method for the provided credentials
-        if let apiKey = credentials[Constant.apiKey] {
+        if let apiKey = (credentials[Constant.apiKey] ?? credentials[Constant.iamApiKey]) {
             let iamURL = credentials[Constant.iamURL]
             return getAuthMethod(apiKey: apiKey, iamURL: iamURL)
-        }
-        else if let username = credentials[Constant.username],
+        } else if let username = credentials[Constant.username],
             let password = credentials[Constant.password] {
-
             return getAuthMethod(username: username, password: password)
         }
         return nil
@@ -76,16 +101,35 @@ internal struct Shared {
         return credentials[Constant.serviceURL]
     }
 
+    /// These headers must be sent with every request in order to collect SDK metrics
+    static func getSDKHeaders(serviceName: String, serviceVersion: String, methodName: String) -> [String: String] {
+        let serviceInfo = "service_name=\(serviceName);service_version=\(serviceVersion);operation_id=\(methodName);async=true"
+
+        return [
+            "X-IBMCloud-SDK-Analytics": serviceInfo,
+        ]
+    }
+}
+
+#if os(Linux)
+extension Shared {
+
     /// Get all credentials for the given service from a credentials file (ibm-credentials.env)
     /// See the discussion below for an example of what the credentials file could look like.
     ///
     ///     VISUAL_RECOGNITION_APIKEY=1234abcd
-    ///     VISUAL_RECOGNITION_URL=https://test.us-south.containers.mybluemix.net/visual-recognition/api
+    ///     VISUAL_RECOGNITION_URL=https://test.us-south.containers.cloud.ibm.com/visual-recognition/api
     ///     VISUAL_RECOGNITION_IAM_URL=https://cloud.ibm.com/iam
     ///     DISCOVERY_USERNAME=me
     ///     DISCOVERY_PASSWORD=hunter2
-    static func extractCredentials(from credentialsFile: URL, serviceName: String) -> [String: String]? {
-        // Extract credentials from file line-by-line
+    static func extractCredentials(serviceName: String) -> [String: String]? {
+
+        // first look for an env variable called IBM_CREDENTIALS_FILE
+        // it should be the path to the file
+        let credentialsFileName = ProcessInfo.processInfo.environment["IBM_CREDENTIALS_FILE"] ??
+            Constant.credentialsFileName
+
+        let credentialsFile = URL(fileURLWithPath: credentialsFileName)
         guard let fileLines = try? String(contentsOf: credentialsFile).components(separatedBy: .newlines) else {
             return nil
         }
@@ -104,39 +148,5 @@ internal struct Shared {
         return serviceCredentials
     }
 
-    /// These headers must be sent with every request in order to collect SDK metrics
-    static func getMetadataHeaders(serviceName: String, serviceVersion: String, methodName: String) -> [String: String] {
-        let userAgent: String = {
-            let sdk = "watson-apis-swift-sdk"
-
-            let operatingSystem: String = {
-                #if os(iOS)
-                return "iOS"
-                #elseif os(watchOS)
-                return "watchOS"
-                #elseif os(tvOS)
-                return "tvOS"
-                #elseif os(macOS)
-                return "macOS"
-                #elseif os(Linux)
-                return "Linux"
-                #else
-                return "Unknown"
-                #endif
-            }()
-            let operatingSystemVersion: String = {
-                // swiftlint:disable:next identifier_name
-                let os = ProcessInfo.processInfo.operatingSystemVersion
-                return "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
-            }()
-            return "\(sdk)-\(sdkVersion) \(operatingSystem) \(operatingSystemVersion)"
-        }()
-
-        let serviceInfo = "service_name=\(serviceName);service_version=\(serviceVersion);operation_id=\(methodName);async=true"
-
-        return [
-            "User-Agent": userAgent,
-            "X-IBMCloud-SDK-Analytics": serviceInfo,
-        ]
-    }
 }
+#endif

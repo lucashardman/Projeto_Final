@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>149664665206-f3utjvjokmbgac4311vc5v76klprv8li.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.149664665206-f3utjvjokmbgac4311vc5v76klprv8li</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD2fViHnjgxotk_fDkeoV_h37qzT4Fekj0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>149664665206</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.lucashardman.AVIV</string>
+	<key>PROJECT_ID</key>
+	<string>aviv-prototype</string>
+	<key>STORAGE_BUCKET</key>
+	<string>aviv-prototype.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:149664665206:ios:8b7d749d96465ffd</string>
+	<key>DATABASE_URL</key>
+	<string>https://aviv-prototype.firebaseio.com</string>
+</dict>
+</plist>

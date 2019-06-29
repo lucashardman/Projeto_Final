@@ -24,6 +24,8 @@
 #import <OHHTTPStubs/NSURLRequest+HTTPBodyTesting.h>
 #import <OHHTTPStubs/OHHTTPStubs.h>
 
+#import "../FBSDKCoreKit/Basics/Internal/FBSDKBasicUtility+Internal.h"
+
 #import "FBSDKCoreKit.h"
 #import "FBSDKCoreKitTestUtility.h"
 #import "FBSDKGraphRequest+Internal.h"
@@ -35,8 +37,8 @@
 @property (nonatomic, copy) void (^requestConnectionCallback)(FBSDKGraphRequestConnection *connection, NSError *error);
 @end
 
-static id g_mockAccountStoreAdapter;
 static id g_mockNSBundle;
+static NSString *const _mockMobileAppInstallEventName = @"MOBILE_APP_INSTALL";
 
 @implementation FBSDKGraphRequestConnectionTests
 
@@ -50,17 +52,14 @@ static id g_mockNSBundle;
 + (void)setUp
 {
   [FBSDKSettings setAppID:@"appid"];
+  [FBSDKApplicationDelegate initializeSDK:nil];
   g_mockNSBundle = [FBSDKCoreKitTestUtility mainBundleMock];
-  g_mockAccountStoreAdapter = [FBSDKCoreKitTestUtility mockAccountStoreAdapter];
 }
 
 + (void)tearDown
 {
   [g_mockNSBundle stopMocking];
   g_mockNSBundle = nil;
-  [g_mockAccountStoreAdapter stopMocking];
-  g_mockAccountStoreAdapter = nil;
-
 }
 
 #pragma mark - Helpers
@@ -287,12 +286,14 @@ static id g_mockNSBundle;
   }];
   FBSDKAccessToken *tokenThatNeedsRefresh = [[FBSDKAccessToken alloc]
                                              initWithTokenString:@"token"
-                                             permissions:nil
-                                             declinedPermissions:nil
+                                             permissions:@[]
+                                             declinedPermissions:@[]
+                                             expiredPermissions:@[]
                                              appID:@"appid"
                                              userID:@"userid"
                                              expirationDate:[NSDate distantPast]
-                                             refreshDate:[NSDate distantPast]];
+                                             refreshDate:[NSDate distantPast]
+                                             dataAccessExpirationDate:[NSDate distantPast]];
   [FBSDKAccessToken setCurrentAccessToken:tokenThatNeedsRefresh];
   FBSDKGraphRequest *request = [[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@""}];
   XCTestExpectation *exp = [self expectationWithDescription:@"completed request"];
@@ -319,12 +320,14 @@ static id g_mockNSBundle;
   [FBSDKAccessToken setCurrentAccessToken:nil];
   FBSDKAccessToken *tokenNoRefresh = [[FBSDKAccessToken alloc]
                                       initWithTokenString:@"token"
-                                      permissions:nil
-                                      declinedPermissions:nil
+                                      permissions:@[]
+                                      declinedPermissions:@[]
+                                      expiredPermissions:@[]
                                       appID:@"appid"
                                       userID:@"userid"
                                       expirationDate:[NSDate distantPast]
-                                      refreshDate:[NSDate date]];
+                                      refreshDate:[NSDate date]
+                                      dataAccessExpirationDate:[NSDate distantPast]];
   [FBSDKAccessToken setCurrentAccessToken:tokenNoRefresh];
   FBSDKGraphRequest *request = [[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@""}];
   XCTestExpectation *exp = [self expectationWithDescription:@"completed request"];
@@ -367,11 +370,13 @@ static id g_mockNSBundle;
                            }];
   FBSDKAccessToken *accessToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
                                                                     permissions:@[@"public_profile"]
-                                                            declinedPermissions:nil
+                                                            declinedPermissions:@[]
+                                                            expiredPermissions:@[]
                                                                           appID:@"appid"
                                                                          userID:@"userid"
                                                                  expirationDate:nil
-                                                                    refreshDate:nil];
+                                                                    refreshDate:nil
+                                                       dataAccessExpirationDate:nil];
   [FBSDKAccessToken setCurrentAccessToken:accessToken];
   [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
     return YES;
@@ -408,11 +413,13 @@ static id g_mockNSBundle;
                            }];
   FBSDKAccessToken *accessToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
                                                                     permissions:@[@"public_profile"]
-                                                            declinedPermissions:nil
+                                                            declinedPermissions:@[]
+                                                             expiredPermissions:@[]
                                                                           appID:@"appid"
                                                                          userID:@"userid"
                                                                  expirationDate:nil
-                                                                    refreshDate:nil];
+                                                                    refreshDate:nil
+                                                       dataAccessExpirationDate:nil];
 
   [FBSDKAccessToken setCurrentAccessToken:accessToken];
   [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
@@ -428,7 +435,7 @@ static id g_mockNSBundle;
                                      parameters:@{@"fields":@""}
                                     tokenString:@"notCurrentToken"
                                         version:nil
-                                     HTTPMethod:nil]
+                                     HTTPMethod:@""]
    startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
      XCTAssertNil(result);
      XCTAssertEqualObjects(@"Token is broke", error.userInfo[FBSDKErrorDeveloperMessageKey]);
@@ -454,11 +461,13 @@ static id g_mockNSBundle;
                            }];
   FBSDKAccessToken *accessToken = [[FBSDKAccessToken alloc] initWithTokenString:@"token"
                                                                     permissions:@[@"public_profile"]
-                                                            declinedPermissions:nil
+                                                            declinedPermissions:@[]
+                                                             expiredPermissions:@[]
                                                                           appID:@"appid"
                                                                          userID:@"userid"
                                                                  expirationDate:nil
-                                                                    refreshDate:nil];
+                                                                    refreshDate:nil
+                                                       dataAccessExpirationDate:nil];
 
   [FBSDKAccessToken setCurrentAccessToken:accessToken];
   [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
@@ -486,6 +495,9 @@ static id g_mockNSBundle;
 
 - (void)testUserAgentSuffix
 {
+  // Disable compressing network request
+  id mockUtility  = [OCMockObject niceMockForClass:[FBSDKBasicUtility class]];
+  [[[mockUtility stub] andReturn:nil] gzip:[OCMArg any]];
   XCTestExpectation *exp = [self expectationWithDescription:@"completed request"];
   XCTestExpectation *exp2 = [self expectationWithDescription:@"completed request 2"];
 
@@ -494,12 +506,15 @@ static id g_mockNSBundle;
   [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
     NSString *actualUserAgent = [request valueForHTTPHeaderField:@"User-Agent"];
     NSString *body = [[NSString alloc] initWithData:request.OHHTTPStubs_HTTPBody encoding:NSUTF8StringEncoding];
-    BOOL expectUserAgentSuffix = ![body containsString:@"fields=name"];
-    if (expectUserAgentSuffix) {
-      XCTAssertTrue([actualUserAgent hasSuffix:@"/UnitTest.1.0.0"], @"unexpected user agent %@", actualUserAgent);
-    } else {
-      XCTAssertFalse([actualUserAgent hasSuffix:@"/UnitTest.1.0.0"], @"unexpected user agent %@", actualUserAgent);
+    if ([body containsString:@"with_suffix"] || [body containsString:@"without_suffix"]) {
+      BOOL expectUserAgentSuffix = [body containsString:@"fields=with_suffix"];
+      if (expectUserAgentSuffix) {
+        XCTAssertTrue([actualUserAgent hasSuffix:@"/UnitTest.1.0.0"], @"unexpected user agent %@", actualUserAgent);
+      } else {
+        XCTAssertFalse([actualUserAgent hasSuffix:@"/UnitTest.1.0.0"], @"unexpected user agent %@", actualUserAgent);
+      }
     }
+
     return YES;
   } withStubResponse:^OHHTTPStubsResponse *(NSURLRequest *request) {
     NSData *data =  [@"{\"error\": {\"message\": \"Missing oktne\",\"code\": 190, \"type\":\"OAuthException\"}}" dataUsingEncoding:NSUTF8StringEncoding];
@@ -508,13 +523,13 @@ static id g_mockNSBundle;
                                       statusCode:400
                                          headers:nil];
   }];
-  [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@""}] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
+  [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@"with_suffix"}] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
     [exp fulfill];
   }];
 
   [FBSDKSettings setUserAgentSuffix:nil];
   // issue a second request o verify clearing out of user agent suffix, passing a field=name to uniquely identify the request.
-  [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@"name"}] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
+  [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@"without_suffix"}] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
     [exp2 fulfill];
   }];
 
@@ -542,12 +557,14 @@ static id g_mockNSBundle;
   // adding fresh token to avoid piggybacking a token refresh
   FBSDKAccessToken *tokenNoRefresh = [[FBSDKAccessToken alloc]
                                       initWithTokenString:@"token"
-                                      permissions:nil
-                                      declinedPermissions:nil
+                                      permissions:@[]
+                                      declinedPermissions:@[]
+                                      expiredPermissions:@[]
                                       appID:@"appid"
                                       userID:@"userid"
                                       expirationDate:[NSDate distantPast]
-                                      refreshDate:[NSDate date]];
+                                      refreshDate:[NSDate date]
+                                      dataAccessExpirationDate:[NSDate distantPast]];
   [FBSDKAccessToken setCurrentAccessToken:tokenNoRefresh];
 
   [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@""}] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
@@ -597,7 +614,8 @@ static id g_mockNSBundle;
 - (void)testRetryDisabled
 {
   id mockPiggybackManager = [[self class] mockCachedServerConfiguration];
-  [FBSDKSettings setGraphErrorRecoveryDisabled:YES];
+  FBSDKSettings.graphErrorRecoveryEnabled = NO;
+
   __block int requestCount = 0;
   XCTestExpectation *expectation = [self expectationWithDescription:@"completed request"];
   [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
@@ -607,13 +625,16 @@ static id g_mockNSBundle;
     NSString *responseJSON = (requestCount == 1 ?
                               @"{\"error\": {\"message\": \"Server is busy\",\"code\": 1,\"error_subcode\": 463}}"
                               : @"{\"error\": {\"message\": \"Server is busy\",\"code\": 2,\"error_subcode\": 463}}" );
-    NSData *data =  [responseJSON dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [responseJSON dataUsingEncoding:NSUTF8StringEncoding];
 
     return [OHHTTPStubsResponse responseWithData:data
                                       statusCode:400
                                          headers:nil];
   }];
-  [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@""}] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
+
+  FBSDKGraphRequest *request = [[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{@"fields":@""}];
+
+  [request startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
     //verify we don't get the second error instance.
     XCTAssertEqual(1, [error.userInfo[FBSDKGraphRequestErrorGraphErrorCodeKey] integerValue]);
     [expectation fulfill];
@@ -623,7 +644,44 @@ static id g_mockNSBundle;
     XCTAssertNil(error);
   }];
   XCTAssertEqual(1, requestCount);
-  [FBSDKSettings setGraphErrorRecoveryDisabled:NO];
+  FBSDKSettings.graphErrorRecoveryEnabled = NO;
   [mockPiggybackManager stopMocking];
 }
+
+- (void)testGraphRequestWithIDFATrackingEnabled
+{
+  id mockUtility  = [OCMockObject niceMockForClass:[FBSDKBasicUtility class]];
+  [[[mockUtility stub] andReturn:nil] gzip:[OCMArg any]];
+
+  XCTestExpectation *exp = [self expectationWithDescription:@"completed request"];
+
+  [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+    NSString *body = [[NSString alloc] initWithData:request.OHHTTPStubs_HTTPBody encoding:NSUTF8StringEncoding];
+    XCTAssertTrue([body containsString:_mockMobileAppInstallEventName]);
+    XCTAssertTrue([body containsString:@"advertiser_tracking_enabled"]);
+    XCTAssertTrue([body containsString:@"application_tracking_enabled"]);
+    XCTAssertTrue([body containsString:@"advertiser_id"]);
+    return NO;
+  } withStubResponse:^OHHTTPStubsResponse *(NSURLRequest *request) {
+    return [OHHTTPStubsResponse responseWithData:[NSData data]
+                                      statusCode:200
+                                         headers:nil];
+  }];
+  NSMutableDictionary<NSString *, id> *params = [FBSDKAppEventsUtility activityParametersDictionaryForEvent:_mockMobileAppInstallEventName
+                                                                                         implicitEventsOnly:NO
+                                                                                  shouldAccessAdvertisingID:YES];
+  [[[FBSDKGraphRequest alloc] initWithGraphPath:[NSString stringWithFormat:@"%@/activities", @"mockAppID"]
+                                     parameters:params
+                                    tokenString:nil
+                                     HTTPMethod:FBSDKHTTPMethodPOST
+                                          flags:FBSDKGraphRequestFlagDoNotInvalidateTokenOnError | FBSDKGraphRequestFlagDisableErrorRecovery] startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
+    [exp fulfill];
+  }];
+
+  [self waitForExpectationsWithTimeout:5 handler:^(NSError *error) {
+    XCTAssertNil(error);
+  }];
+  [mockUtility stopMocking];
+}
+
 @end

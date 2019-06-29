@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import FirebaseFirestore
 import FacebookCore
 import PersonalityInsightsV3
 import LanguageTranslatorV3
@@ -140,9 +141,9 @@ class GenerateUserProfile: UIViewController {
         
         //Inicializando PersonalityInsights
         let personalityInsights = PersonalityInsights(
+            version: WatsonCredentials.version,
             username: WatsonCredentials.personalityInsightsUsername,
-            password: WatsonCredentials.personalityInsightsPassword,
-            version: WatsonCredentials.version)
+            password: WatsonCredentials.personalityInsightsPassword)
         
         let languageTranslator = LanguageTranslator(version: WatsonCredentials.version, apiKey: WatsonCredentials.languageTranslatorAPIKey)
         

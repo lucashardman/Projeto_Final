@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,51 @@ public struct DialogNodeOutputOptionsElementValue: Codable, Equatable {
     /**
      An input object that includes the input text.
      */
-    public var input: InputData?
+    public var input: MessageInput?
+
+    /**
+     An array of intents to be used while processing the input.
+     **Note:** This property is supported for backward compatibility with applications that use the v1 **Get response to
+     user input** method.
+     */
+    public var intents: [RuntimeIntent]?
+
+    /**
+     An array of entities to be used while processing the user input.
+     **Note:** This property is supported for backward compatibility with applications that use the v1 **Get response to
+     user input** method.
+     */
+    public var entities: [RuntimeEntity]?
 
     // Map each property name to the key that shall be used for encoding/decoding.
     private enum CodingKeys: String, CodingKey {
         case input = "input"
+        case intents = "intents"
+        case entities = "entities"
     }
 
     /**
      Initialize a `DialogNodeOutputOptionsElementValue` with member variables.
 
      - parameter input: An input object that includes the input text.
+     - parameter intents: An array of intents to be used while processing the input.
+       **Note:** This property is supported for backward compatibility with applications that use the v1 **Get response
+       to user input** method.
+     - parameter entities: An array of entities to be used while processing the user input.
+       **Note:** This property is supported for backward compatibility with applications that use the v1 **Get response
+       to user input** method.
 
      - returns: An initialized `DialogNodeOutputOptionsElementValue`.
     */
     public init(
-        input: InputData? = nil
+        input: MessageInput? = nil,
+        intents: [RuntimeIntent]? = nil,
+        entities: [RuntimeEntity]? = nil
     )
     {
         self.input = input
+        self.intents = intents
+        self.entities = entities
     }
 
 }

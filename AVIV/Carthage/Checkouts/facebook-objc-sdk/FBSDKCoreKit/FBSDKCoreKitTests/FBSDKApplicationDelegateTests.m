@@ -23,7 +23,14 @@
 #import "FBSDKCoreKit+Internal.h"
 #import "FBSDKCoreKitTestUtility.h"
 
+// An extension that redeclares a private method so that it can be mocked
+@interface FBSDKApplicationDelegate ()
+- (BOOL)isAppLaunched;
+@end
+
 @interface FBSDKApplicationDelegateTests : XCTestCase {
+  FBSDKApplicationDelegate *_delegate;
+  id _delegateMock;
   id _settingsMock;
 }
 
@@ -34,6 +41,7 @@ static id g_mockNSBundle;
 @interface FBSDKApplicationDelegate(Test)
 
 - (void)_logSDKInitialize;
+- (void)applicationDidBecomeActive:(NSNotification *)notification;
 
 @end
 
@@ -43,6 +51,10 @@ static id g_mockNSBundle;
   [super setUp];
   g_mockNSBundle = [FBSDKCoreKitTestUtility mainBundleMock];
   _settingsMock = OCMStrictClassMock([FBSDKSettings class]);
+
+  _delegate = [FBSDKApplicationDelegate sharedInstance];
+  _delegateMock = OCMPartialMock(_delegate);
+  [OCMStub([_delegateMock isAppLaunched]) andReturnValue: OCMOCK_VALUE(NO)];
 }
 
 - (void)tearDown {
@@ -50,27 +62,50 @@ static id g_mockNSBundle;
   g_mockNSBundle = nil;
   [_settingsMock stopMocking];
   _settingsMock = nil;
+  [_delegateMock stopMocking];
+  _delegateMock = nil;
 }
 
 - (void)testAutoLogAppEventsEnabled {
-  OCMStub(ClassMethod([_settingsMock autoLogAppEventsEnabled])).
-  _andReturn(OCMOCK_VALUE(@YES));
 
-  FBSDKApplicationDelegate *delegate = [FBSDKApplicationDelegate sharedInstance];
-  id delegateMock = OCMPartialMock(delegate);
-  [delegate application:nil didFinishLaunchingWithOptions:nil];
+  [OCMStub(ClassMethod([_settingsMock isAutoLogAppEventsEnabled])) andReturnValue: OCMOCK_VALUE(YES)];
 
-  OCMVerify([delegateMock _logSDKInitialize]);
+  id app = OCMClassMock([UIApplication class]);
+
+  [_delegate application:app didFinishLaunchingWithOptions:nil];
+
+  OCMVerify([_delegateMock _logSDKInitialize]);
 }
 
 - (void)testAutoLogAppEventsDisabled {
-  OCMStub(ClassMethod([_settingsMock autoLogAppEventsEnabled])).
-  _andReturn(OCMOCK_VALUE(@NO));
-  FBSDKApplicationDelegate *delegate = [FBSDKApplicationDelegate sharedInstance];
-  id delegateMock = OCMPartialMock(delegate);
-  [delegate application:nil didFinishLaunchingWithOptions:nil];
+  [OCMStub(ClassMethod([_settingsMock isAutoLogAppEventsEnabled])) andReturnValue: OCMOCK_VALUE(NO)];
 
-  [[delegateMock reject] _logSDKInitialize];
+  OCMReject([_delegateMock _logSDKInitialize]);
+
+  id app = OCMClassMock([UIApplication class]);
+  [_delegate application:app didFinishLaunchingWithOptions:nil];
 }
 
+- (void)testAppEventsEnabled {
+
+  [OCMStub(ClassMethod([_settingsMock isAutoLogAppEventsEnabled])) andReturnValue: OCMOCK_VALUE(YES)];
+
+  id appEvents = OCMClassMock([FBSDKAppEvents class]);
+
+  id notification = OCMClassMock([NSNotification class]);
+  [_delegate applicationDidBecomeActive:notification];
+
+  OCMVerify([appEvents activateApp]);
+}
+
+-(void)testAppEventsDisabled {
+
+  [OCMStub(ClassMethod([_settingsMock isAutoLogAppEventsEnabled])) andReturnValue: OCMOCK_VALUE(NO)];
+
+  id appEvents = OCMStrictClassMock([FBSDKAppEvents class]);
+  OCMReject([appEvents activateApp]);
+
+  id notification = OCMClassMock([NSNotification class]);
+  [_delegate applicationDidBecomeActive:notification];
+}
 @end

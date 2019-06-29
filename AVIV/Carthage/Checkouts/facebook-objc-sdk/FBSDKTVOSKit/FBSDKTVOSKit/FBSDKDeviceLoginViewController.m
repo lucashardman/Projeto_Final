@@ -30,7 +30,6 @@
 @implementation FBSDKDeviceLoginViewController {
   FBSDKDeviceLoginManager *_loginManager;
   BOOL _isRetry;
-  NSArray<NSString *> *_permissions;
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -43,27 +42,6 @@
 {
   [super viewDidLoad];
 
-  if ((self.readPermissions).count > 0) {
-    NSSet<NSString *> *permissionSet = [NSSet setWithArray:self.readPermissions];
-    if ((self.publishPermissions).count > 0 || ![FBSDKInternalUtility areAllPermissionsReadPermissions:permissionSet]) {
-      [[NSException exceptionWithName:NSInvalidArgumentException
-                               reason:@"Read permissions are not permitted to be requested with publish or manage permissions."
-                             userInfo:nil]
-       raise];
-    } else {
-      _permissions = self.readPermissions;
-    }
-  } else {
-    NSSet<NSString *> *permissionSet = [NSSet setWithArray:self.publishPermissions];
-    if (![FBSDKInternalUtility areAllPermissionsPublishPermissions:permissionSet]) {
-      [[NSException exceptionWithName:NSInvalidArgumentException
-                               reason:@"Publish or manage permissions are not permitted to be requested with read permissions."
-                             userInfo:nil]
-       raise];
-    } else {
-      _permissions = self.publishPermissions;
-    }
-  }
   [self _initializeLoginManager];
 }
 
@@ -104,21 +82,55 @@
                                          name:graphResult[@"name"] ?: token.userID];
       });
     }];
+  } else if ([self isNetworkError:error]) {
+    NSString *networkErrorMessage = NSLocalizedStringWithDefaultValue(@"LoginError.SystemAccount.Network", @"FacebookSDK", [FBSDKInternalUtility bundleForStrings],
+                                                                      @"Unable to connect to Facebook. Check your network connection and try again.",
+                                                                      @"The user facing error message when the Accounts framework encounters a network error.");
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:networkErrorMessage preferredStyle:UIAlertControllerStyleAlert];
+    NSString *localizedOK = NSLocalizedStringWithDefaultValue(@"ErrorRecovery.Alert.OK", @"FacebookSDK", [FBSDKInternalUtility bundleForStrings],
+                                                              @"OK",
+                                                              @"The title of the label to dismiss the alert when presenting user facing error messages");
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:localizedOK
+                                                       style:UIAlertActionStyleCancel
+                                                     handler:^(UIAlertAction * _Nonnull action) {
+                                                       [self dismissViewControllerAnimated:YES completion:^{
+                                                         [delegate deviceLoginViewController:self didFailWithError:error];
+                                                       }];
+                                                     }];
+    [alertController addAction:okAction];
+    [self presentViewController:alertController animated:YES completion:nil];
   } else {
     [self dismissViewControllerAnimated:YES completion:^{
       if (result.isCancelled) {
         [self _cancel];
       } else if (token != nil) {
         [self _notifySuccessForDelegate:delegate token:token];
-      } else if ([delegate respondsToSelector:@selector(deviceLoginViewController:didFailWithError:)]) {
+      } else {
         [delegate deviceLoginViewController:self didFailWithError:error];
-      } else if ([delegate respondsToSelector:@selector(deviceLoginViewControllerDidFail:error:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [delegate deviceLoginViewControllerDidFail:self error:error];
-#pragma clang diagnostic pop
       }
     }];
+  }
+}
+
+- (BOOL)isNetworkError:(NSError *)error
+{
+  NSError *innerError = error.userInfo[NSUnderlyingErrorKey];
+  if (innerError && [self isNetworkError:innerError]) {
+    return YES;
+  }
+  switch (error.code) {
+    case NSURLErrorTimedOut:
+    case NSURLErrorCannotFindHost:
+    case NSURLErrorCannotConnectToHost:
+    case NSURLErrorNetworkConnectionLost:
+    case NSURLErrorDNSLookupFailed:
+    case NSURLErrorNotConnectedToInternet:
+    case NSURLErrorInternationalRoamingOff:
+    case NSURLErrorCallIsActive:
+    case NSURLErrorDataNotAllowed:
+      return YES;
+    default:
+      return NO;
   }
 }
 
@@ -135,7 +147,7 @@
                                   token:(FBSDKAccessToken *)token
                                    name:(NSString *)name
 {
-    NSString *title =
+  NSString *title =
   NSLocalizedStringWithDefaultValue(@"SmartLogin.ConfirmationTitle", @"FacebookSDK", [FBSDKInternalUtility bundleForStrings],
                                     @"Confirm Login",
                                     @"The title for the alert when smart login requires confirmation");

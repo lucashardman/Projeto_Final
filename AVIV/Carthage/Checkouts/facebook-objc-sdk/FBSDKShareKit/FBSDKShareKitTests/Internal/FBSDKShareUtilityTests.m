@@ -30,11 +30,6 @@
 
 @implementation FBSDKShareUtilityTests
 
-- (NSURL *)fileURL
-{
-  return [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject;
-}
-
 - (void)testShareLinkContentValidationWithNilValues
 {
   FBSDKShareLinkContent *content = [[FBSDKShareLinkContent alloc] init];
@@ -95,21 +90,6 @@
   NSError *error;
   XCTAssertFalse([FBSDKShareUtility validateShareContent:content bridgeOptions:FBSDKShareBridgeOptionsDefault error:&error]);
   XCTAssertNotNil(error);
-}
-
-- (void)testMediaTemplateWithoutAttachmentIDOrMediaURL
-{
-  FBSDKShareMessengerMediaTemplateContent *contentWithNilAttachmentInitializer = [[FBSDKShareMessengerMediaTemplateContent alloc] initWithAttachmentID:nil];
-  XCTAssertNotNil(contentWithNilAttachmentInitializer.shareUUID);
-  NSError *error;
-  XCTAssertFalse([FBSDKShareUtility validateShareContent:contentWithNilAttachmentInitializer bridgeOptions:FBSDKShareBridgeOptionsDefault error:&error]);
-  XCTAssertNotNil(error);
-
-  FBSDKShareMessengerMediaTemplateContent *contentWithNilURLInitializer = [[FBSDKShareMessengerMediaTemplateContent alloc] initWithMediaURL:nil];
-  XCTAssertNotNil(contentWithNilURLInitializer.shareUUID);
-  NSError *error2;
-  XCTAssertFalse([FBSDKShareUtility validateShareContent:contentWithNilURLInitializer bridgeOptions:FBSDKShareBridgeOptionsDefault error:&error2]);
-  XCTAssertNotNil(error2);
 }
 
 - (void)testMediaTemplateWithAttachmentID

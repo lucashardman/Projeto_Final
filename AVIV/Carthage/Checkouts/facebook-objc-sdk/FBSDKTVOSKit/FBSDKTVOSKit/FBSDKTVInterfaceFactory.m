@@ -56,23 +56,17 @@ static Class FBSDKDynamicallyLoadShareKitClassFromString(NSString *className)
   id<TVInterfaceCreating> _interfaceCreator;
 }
 
-- (instancetype)init {
-  return [self initWithInterfaceCreator:nil];
-}
-
 - (instancetype)initWithInterfaceCreator:(id<TVInterfaceCreating>)interfaceCreator
 {
   if ((self = [super init])) {
     _interfaceCreator = interfaceCreator;
   }
-  return self;
-}
 
-+ (void)initialize
-{
   [TVElementFactory registerViewElementClass:[FBSDKTVLoginButtonElement class] forElementName:FBSDKLoginButtonTag];
   [TVElementFactory registerViewElementClass:[FBSDKTVLoginViewControllerElement class] forElementName:FBSDKLoginViewControllerTag];
   [TVElementFactory registerViewElementClass:[FBSDKTVShareButtonElement class] forElementName:FBSDKShareButtonTag];
+
+  return self;
 }
 
 #pragma mark - TVInterfaceCreating
@@ -83,8 +77,7 @@ static Class FBSDKDynamicallyLoadShareKitClassFromString(NSString *className)
   if ([element isKindOfClass:[FBSDKTVLoginButtonElement class]]) {
     FBSDKDeviceLoginButton *button = [[FBSDKDeviceLoginButton alloc] initWithFrame:CGRectZero];
     button.delegate = (FBSDKTVLoginButtonElement *)element;
-    button.publishPermissions = [element.attributes[@"publishPermissions"] componentsSeparatedByString:@","];
-    button.readPermissions = [element.attributes[@"readPermissions"] componentsSeparatedByString:@","];
+    button.permissions = [self permissionsFromElement:element];
     button.redirectURL = [NSURL URLWithString:element.attributes[@"redirectURL"]];
     return button;
   } else if ([element isKindOfClass:[FBSDKTVShareButtonElement class]]) {
@@ -101,7 +94,10 @@ static Class FBSDKDynamicallyLoadShareKitClassFromString(NSString *className)
       if (actionType.length > 0 && url && key.length > 0) {
         FBSDKShareOpenGraphAction *action = [FBSDKDynamicallyLoadShareKitClassFromString(@"FBSDKShareOpenGraphAction") actionWithType:actionType objectURL:url key:key];
         content = [[FBSDKDynamicallyLoadShareKitClassFromString(@"FBSDKShareOpenGraphContent") alloc] init];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         ((FBSDKShareOpenGraphContent *)content).action = action;
+#pragma clang diagnostic pop
       }
     }
 
@@ -127,10 +123,7 @@ static Class FBSDKDynamicallyLoadShareKitClassFromString(NSString *className)
   if ([element isKindOfClass:[FBSDKTVLoginViewControllerElement class]]) {
     FBSDKDeviceLoginViewController *vc = [[FBSDKDeviceLoginViewController alloc] init];
     vc.delegate = (FBSDKTVLoginViewControllerElement *)element;
-    NSArray *publishPermissions = [element.attributes[@"publishPermissions"] componentsSeparatedByString:@","];
-    vc.publishPermissions = publishPermissions;
-    NSArray *readPermissions = [element.attributes[@"readPermissions"] componentsSeparatedByString:@","];
-    vc.readPermissions = readPermissions;
+    vc.permissions = [self permissionsFromElement:element];
     vc.redirectURL = [NSURL URLWithString:element.attributes[@"redirectURL"]];
     return vc;
   }
@@ -147,4 +140,15 @@ static Class FBSDKDynamicallyLoadShareKitClassFromString(NSString *className)
   }
   return nil;
 }
+
+- (NSArray<NSString *> *)permissionsFromElement:(TVViewElement *)element
+{
+  NSMutableArray<NSString *> *permissions = [NSMutableArray new];
+  [permissions addObjectsFromArray:[element.attributes[@"permissions"] componentsSeparatedByString:@","]];
+  [permissions addObjectsFromArray:[element.attributes[@"readPermissions"] componentsSeparatedByString:@","]];
+  [permissions addObjectsFromArray:[element.attributes[@"publishPermissions"] componentsSeparatedByString:@","]];
+
+  return permissions;
+}
+
 @end

@@ -115,7 +115,8 @@ NSString *kFBSDKShareModelTestUtilityOpenGraphStringKey = @"TEST:OPEN_GRAPH_STRI
 
 + (FBSDKShareOpenGraphAction *)openGraphActionWithObjectID
 {
-  FBSDKShareOpenGraphAction *action = [[FBSDKShareOpenGraphAction alloc] init];
+  FBSDKShareOpenGraphObject *graphObject = [FBSDKShareOpenGraphObject objectWithProperties: @{}];
+  FBSDKShareOpenGraphAction *action = [FBSDKShareOpenGraphAction actionWithType:@"Foo" object: graphObject key: @"Bar"];
   action.actionType = [self openGraphActionType];
   [action setString:[self openGraphObjectID] forKey:[self previewPropertyName]];
   [action parseProperties:[self _openGraphProperties:NO]];
@@ -125,40 +126,6 @@ NSString *kFBSDKShareModelTestUtilityOpenGraphStringKey = @"TEST:OPEN_GRAPH_STRI
 + (BOOL)openGraphBoolValue
 {
   return YES;
-}
-
-+ (FBSDKShareOpenGraphContent *)openGraphContent
-{
-  FBSDKShareOpenGraphContent *content = [[FBSDKShareOpenGraphContent alloc] init];
-  content.action = [self openGraphAction];
-  content.contentURL = [self contentURL];
-  content.hashtag = [self hashtag];
-  content.peopleIDs = [self peopleIDs];
-  content.placeID = [self placeID];
-  content.previewPropertyName = [self previewPropertyName];
-  content.ref = [self ref];
-  return content;
-}
-
-+ (FBSDKShareOpenGraphContent *)openGraphContentWithObjectID
-{
-  FBSDKShareOpenGraphContent *content = [[FBSDKShareOpenGraphContent alloc] init];
-  content.action = [self openGraphActionWithObjectID];
-  content.contentURL = [self contentURL];
-  content.hashtag = [self hashtag];
-  content.peopleIDs = [self peopleIDs];
-  content.placeID = [self placeID];
-  content.previewPropertyName = [self previewPropertyName];
-  content.ref = [self ref];
-  return content;
-}
-
-+ (FBSDKShareOpenGraphContent *)openGraphContentWithURLOnly
-{
-  FBSDKShareOpenGraphContent *content = [[FBSDKShareOpenGraphContent alloc] init];
-  content.action = [self openGraphActionWithURLObject];
-  content.previewPropertyName = [self previewPropertyName];
-  return content;
 }
 
 + (double)openGraphDoubleValue
@@ -218,6 +185,18 @@ NSString *kFBSDKShareModelTestUtilityOpenGraphStringKey = @"TEST:OPEN_GRAPH_STRI
   return content;
 }
 
++ (FBSDKSharePhotoContent *)photoContentWithFileURLs
+{
+  FBSDKSharePhotoContent *const content = [[FBSDKSharePhotoContent alloc] init];
+  content.contentURL = [self contentURL];
+  content.hashtag = [self hashtag];
+  content.peopleIDs = [self peopleIDs];
+  content.photos = [self photosWithFileUrls];
+  content.placeID = [self placeID];
+  content.ref = [self ref];
+  return content;
+}
+
 + (FBSDKSharePhotoContent *)photoContentWithImages
 {
   FBSDKSharePhotoContent *content = [[FBSDKSharePhotoContent alloc] init];
@@ -256,12 +235,17 @@ NSString *kFBSDKShareModelTestUtilityOpenGraphStringKey = @"TEST:OPEN_GRAPH_STRI
   return [FBSDKSharePhoto photoWithImage:[self photoImage] userGenerated:[self photoUserGenerated]];
 }
 
++ (FBSDKSharePhoto *)photoWithFileURL
+{
+  return [FBSDKSharePhoto photoWithImageURL:[self fileURL] userGenerated:[self photoUserGenerated]];
+}
+
 + (FBSDKSharePhoto *)photoWithImageURL
 {
   return [FBSDKSharePhoto photoWithImageURL:[self photoImageURL] userGenerated:[self photoUserGenerated]];
 }
 
-+ (NSArray *)photos
++ (NSArray<FBSDKSharePhoto *> *)photos
 {
   return @[
            [FBSDKSharePhoto photoWithImageURL:[NSURL URLWithString:@"https://fbstatic-a.akamaihd.net/rsrc.php/v2/yC/r/YRwxe7CPWSs.png"]
@@ -273,7 +257,14 @@ NSString *kFBSDKShareModelTestUtilityOpenGraphStringKey = @"TEST:OPEN_GRAPH_STRI
            ];
 }
 
-+ (NSArray *)photosWithImages
++ (NSArray<FBSDKSharePhoto *> *)photosWithFileUrls
+{
+  return @[
+           [FBSDKShareModelTestUtility photoWithFileURL],
+           ];
+}
+
++ (NSArray<FBSDKSharePhoto *> *)photosWithImages
 {
    // equality checks are pointer equality for UIImage, so just return the same instance each time
   static NSArray *_photos = nil;
@@ -337,12 +328,8 @@ NSString *kFBSDKShareModelTestUtilityOpenGraphStringKey = @"TEST:OPEN_GRAPH_STRI
   content.hashtag = [self hashtag];
   content.peopleIDs = [self peopleIDs];
   content.placeID = [self placeID];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  content.previewPhoto = [self photoWithImage];
-#pragma clang diagnostic pop
   content.ref = [self ref];
-  content.video = [self video];
+  content.video = [self videoWithPreviewPhoto];
   return content;
 }
 

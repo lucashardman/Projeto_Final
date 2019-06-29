@@ -151,8 +151,7 @@
   } else {
     FBSDKDeviceLoginViewController *vc = [[FBSDKDeviceLoginViewController alloc] init];
     vc.delegate = self;
-    vc.readPermissions = self.readPermissions;
-    vc.publishPermissions = self.publishPermissions;
+    vc.permissions = self.permissions;
     vc.redirectURL = self.redirectURL;
     [parentViewController presentViewController:vc animated:YES completion:NULL];
   }
@@ -230,14 +229,7 @@
 
 - (void)deviceLoginViewController:(FBSDKDeviceLoginViewController *)viewController didFailWithError:(NSError *)error
 {
-  if ([self.delegate respondsToSelector:@selector(deviceLoginButton:didFailWithError:)]) {
-    [self.delegate deviceLoginButton:self didFailWithError:error];
-  } else if ([self.delegate respondsToSelector:@selector(deviceLoginButtonDidFail:error:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [self.delegate deviceLoginButtonDidFail:self error:error];
-#pragma clang diagnostic pop
-  }
+  [self.delegate deviceLoginButton:self didFailWithError:error];
 }
 
 @end
