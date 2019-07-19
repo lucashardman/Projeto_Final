@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import Foundation
 import RestKit
 
 /**
- The IBM Watson&trade; Assistant service combines machine learning, natural language understanding, and integrated
- dialog tools to create conversation flows between your apps and your users.
+ The IBM Watson&trade; Assistant service combines machine learning, natural language understanding, and an integrated
+ dialog editor to create conversation flows between your apps and your users.
  */
 public class Assistant {
 
@@ -36,22 +36,23 @@ public class Assistant {
     var authMethod: AuthenticationMethod
     let version: String
 
+    #if os(Linux)
     /**
      Create a `Assistant` object.
 
-     Use this initializer to automatically pull service credentials from your credentials file.
-     This file is downloaded from your service instance on IBM Cloud as ibm-credentials.env.
+     This initializer will retrieve credentials from the environment or a local credentials file.
+     The credentials file can be downloaded from your service instance on IBM Cloud as ibm-credentials.env.
      Make sure to add the credentials file to your project so that it can be loaded at runtime.
 
-     If the credentials cannot be loaded from the file, or the file is not found, initialization will fail.
+     If credentials are not available in the environment or a local credentials file, initialization will fail.
      In that case, try another initializer that directly passes in the credentials.
 
-     - parameter credentialsFile: The URL of the credentials file.
      - parameter version: The release date of the version of the API to use. Specify the date
        in "YYYY-MM-DD" format.
      */
-    public init?(credentialsFile: URL, version: String) {
-        guard let credentials = Shared.extractCredentials(from: credentialsFile, serviceName: "assistant") else {
+    public init?(version: String) {
+        self.version = version
+        guard let credentials = Shared.extractCredentials(serviceName: "assistant") else {
             return nil
         }
         guard let authMethod = Shared.getAuthMethod(from: credentials) else {
@@ -61,20 +62,22 @@ public class Assistant {
             self.serviceURL = serviceURL
         }
         self.authMethod = authMethod
-        self.version = version
+        RestRequest.userAgent = Shared.userAgent
     }
+    #endif
 
     /**
      Create a `Assistant` object.
 
-     - parameter username: The username used to authenticate with the service.
-     - parameter password: The password used to authenticate with the service.
      - parameter version: The release date of the version of the API to use. Specify the date
        in "YYYY-MM-DD" format.
+     - parameter username: The username used to authenticate with the service.
+     - parameter password: The password used to authenticate with the service.
      */
-    public init(username: String, password: String, version: String) {
-        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+    public init(version: String, username: String, password: String) {
         self.version = version
+        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+        RestRequest.userAgent = Shared.userAgent
     }
 
     /**
@@ -88,6 +91,7 @@ public class Assistant {
     public init(version: String, apiKey: String, iamUrl: String? = nil) {
         self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
         self.version = version
+        RestRequest.userAgent = Shared.userAgent
     }
 
     /**
@@ -98,8 +102,9 @@ public class Assistant {
      - parameter accessToken: An access token for the service.
      */
     public init(version: String, accessToken: String) {
-        self.authMethod = IAMAccessToken(accessToken: accessToken)
         self.version = version
+        self.authMethod = IAMAccessToken(accessToken: accessToken)
+        RestRequest.userAgent = Shared.userAgent
     }
 
     public func accessToken(_ newToken: String) {
@@ -107,6 +112,16 @@ public class Assistant {
             self.authMethod = IAMAccessToken(accessToken: newToken)
         }
     }
+
+    #if !os(Linux)
+    /**
+      Allow network requests to a server without verification of the server certificate.
+      **IMPORTANT**: This should ONLY be used if truly intended, as it is unsafe otherwise.
+     */
+    public func disableSSLVerification() {
+        session = InsecureConnection.session()
+    }
+    #endif
 
     /**
      Use the HTTP response and data received by the Watson Assistant v2 service to extract
@@ -122,16 +137,25 @@ public class Assistant {
         var metadata = [String: Any]()
 
         do {
-            let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            metadata = [:]
-            if case let .some(.string(message)) = json["error"] {
+            let json = try JSON.decoder.decode([String: JSON].self, from: data)
+            metadata["response"] = json
+            if case let .some(.array(errors)) = json["errors"],
+                case let .some(.object(error)) = errors.first,
+                case let .some(.string(message)) = error["message"] {
                 errorMessage = message
+            } else if case let .some(.string(message)) = json["error"] {
+                errorMessage = message
+            } else if case let .some(.string(message)) = json["message"] {
+                errorMessage = message
+            } else {
+                errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
             }
-            // If metadata is empty, it should show up as nil in the WatsonError
-            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
+            metadata["response"] = data
+            errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
         }
+
+        return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: metadata)
     }
 
     /**
@@ -140,9 +164,10 @@ public class Assistant {
      Create a new session. A session is used to send user input to a skill and receive responses. It also maintains the
      state of the conversation.
 
-     - parameter assistantID: Unique identifier of the assistant. You can find the assistant ID of an assistant on the
-       **Assistants** tab of the Watson Assistant tool. For information about creating assistants, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/create-assistant.html#creating-assistants).
+     - parameter assistantID: Unique identifier of the assistant. To find the assistant ID in the Watson Assistant
+       user interface, open the assistant settings and click **API Details**. For information about creating assistants,
+       see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-assistant-add#assistant-add-task).
        **Note:** Currently, the v2 API does not support creating assistants.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
@@ -157,8 +182,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createSession")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createSession")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -191,9 +216,10 @@ public class Assistant {
 
      Deletes a session explicitly before it times out.
 
-     - parameter assistantID: Unique identifier of the assistant. You can find the assistant ID of an assistant on the
-       **Assistants** tab of the Watson Assistant tool. For information about creating assistants, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/create-assistant.html#creating-assistants).
+     - parameter assistantID: Unique identifier of the assistant. To find the assistant ID in the Watson Assistant
+       user interface, open the assistant settings and click **API Details**. For information about creating assistants,
+       see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-assistant-add#assistant-add-task).
        **Note:** Currently, the v2 API does not support creating assistants.
      - parameter sessionID: Unique identifier of the session.
      - parameter headers: A dictionary of request headers to be sent with this request.
@@ -210,8 +236,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteSession")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteSession")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -244,13 +270,16 @@ public class Assistant {
      Send user input to an assistant and receive a response.
      There is no rate limit for this operation.
 
-     - parameter assistantID: Unique identifier of the assistant. You can find the assistant ID of an assistant on the
-       **Assistants** tab of the Watson Assistant tool. For information about creating assistants, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/create-assistant.html#creating-assistants).
+     - parameter assistantID: Unique identifier of the assistant. To find the assistant ID in the Watson Assistant
+       user interface, open the assistant settings and click **API Details**. For information about creating assistants,
+       see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-assistant-add#assistant-add-task).
        **Note:** Currently, the v2 API does not support creating assistants.
      - parameter sessionID: Unique identifier of the session.
      - parameter input: An input object that includes the input text.
-     - parameter context: State information for the conversation.
+     - parameter context: State information for the conversation. The context is stored by the assistant on a
+       per-session basis. You can use this property to set or modify context variables, which can also be accessed by
+       dialog nodes.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -266,7 +295,7 @@ public class Assistant {
         let messageRequest = MessageRequest(
             input: input,
             context: context)
-        guard let body = try? JSONEncoder().encodeIfPresent(messageRequest) else {
+        guard let body = try? JSON.encoder.encodeIfPresent(messageRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -276,8 +305,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "message")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "message")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 

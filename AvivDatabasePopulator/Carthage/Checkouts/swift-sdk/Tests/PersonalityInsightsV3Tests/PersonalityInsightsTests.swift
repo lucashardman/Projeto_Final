@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class PersonalityInsightsTests: XCTestCase {
         } else {
             let username = WatsonCredentials.PersonalityInsightsV3Username
             let password = WatsonCredentials.PersonalityInsightsV3Password
-            personalityInsights = PersonalityInsights(username: username, password: password, version: versionDate)
+            personalityInsights = PersonalityInsights(version: versionDate, username: username, password: password)
         }
         if let url = WatsonCredentials.PersonalityInsightsV3URL {
             personalityInsights.serviceURL = url

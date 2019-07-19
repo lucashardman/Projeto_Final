@@ -7,24 +7,55 @@
 //
 
 import UIKit
+import Foundation
 
 class SuggestionViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+    
+    @IBOutlet private weak var namePlaceHolder: UILabel!
+    @IBOutlet private weak var cityPlaceHolder: UILabel!
+    @IBOutlet private weak var categoryPlaceHolder: UILabel!
+    @IBOutlet private weak var descriptionPlaceHolder: UILabel!
+    @IBOutlet private weak var imagePlaceHolder: UIImageView!
+    
+    var name: String!
+    var city: String!
+    var category: String!
+    var text: String!
+    var image: String!
+    var link: String!
+    
+    @IBAction func backButton(_ sender: UIButton) {
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @IBAction func websiteButton(_ sender: UIButton) {
     }
-    */
+    
+    @IBAction func favoriteSwitch(_ sender: UISwitch) {
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        namePlaceHolder.text = self.name
+        cityPlaceHolder.text = self.city
+        categoryPlaceHolder.text = self.category
+        descriptionPlaceHolder.text = self.text
+        imagePlaceHolder.loadGif(name: "loading_image")
+        
+        let url = URL(string: self.image)
+        
+        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+            
+            if error != nil{
+                print(error ?? "Erro desconhecido")
+                return
+            }
+            DispatchQueue.main.async {
+                self.imagePlaceHolder.image = UIImage(data: data!)
+                self.imagePlaceHolder.contentMode = .scaleAspectFill
+            }
+        }).resume()
+    }
+    
 
 }

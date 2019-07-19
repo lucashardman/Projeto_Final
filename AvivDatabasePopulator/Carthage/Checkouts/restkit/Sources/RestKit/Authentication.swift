@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,14 +225,29 @@ public class IAMAuthentication: AuthenticationMethod {
         if let url = url {
             self.url = url
         } else {
-            self.url = "https://iam.bluemix.net/identity/token"
+            self.url = "https://iam.cloud.ibm.com/identity/token"
         }
         self.token = nil
     }
 
     internal func errorResponseDecoder(data: Data, response: HTTPURLResponse) -> RestError {
-        let genericMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
-        return RestError.http(statusCode: response.statusCode, message: genericMessage, metadata: nil)
+        var errorMessage: String?
+        var metadata = [String: Any]()
+
+        do {
+            let json = try JSON.decoder.decode([String: JSON].self, from: data)
+            metadata["response"] = json
+            if case let .some(.string(message)) = json["errorMessage"] {
+                errorMessage = message
+            } else {
+                errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
+            }
+        } catch {
+            metadata["response"] = data
+            errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
+        }
+
+        return RestError.http(statusCode: response.statusCode, message: errorMessage, metadata: metadata)
     }
 
     public func authenticate(request: RestRequest, completionHandler: @escaping (RestRequest?, RestError?) -> Void) {
@@ -293,6 +308,7 @@ public class IAMAuthentication: AuthenticationMethod {
                 completionHandler(nil, error)
                 return
             }
+            self.token = token
             completionHandler(token, nil)
         }
     }
@@ -315,6 +331,7 @@ public class IAMAuthentication: AuthenticationMethod {
                 completionHandler(nil, error)
                 return
             }
+            self.token = token
             completionHandler(token, nil)
         }
     }

@@ -63,7 +63,12 @@ main() {
       "AccountKit/AccountKit/Internal/AKFConstants.m"
     )
 
-    SDK_MAIN_VERSION_FILE="Configurations/Version.xcconfig"
+    SDK_GRAPH_API_VERSION_FILES=(
+      "FBSDKCoreKit/FBSDKCoreKit/FBSDKCoreKit.h"
+      "FBSDKCoreKit/FBSDKCoreKitTests/FBSDKGraphRequestTests.m"
+    )
+
+    SDK_MAIN_VERSION_FILE="FBSDKCoreKit/FBSDKCoreKit/FBSDKCoreKit.h"
 
     SDK_FRAMEWORK_NAME="FacebookSDK"
 
@@ -71,11 +76,20 @@ main() {
     SDK_POD_SPECS=("${SDK_POD_SPECS[@]/%/.podspec}")
     SDK_POD_SPECS[6]="AccountKit/${SDK_POD_SPECS[6]}"
 
-    SDK_CURRENT_VERSION=$(grep -Eo 'FBSDK_PROJECT_VERSION=.*' "$SDK_DIR/$SDK_MAIN_VERSION_FILE" | awk -F'=' '{print $2}')
+    SDK_LINT_POD_SPECS=(
+      "FBSDKCoreKit.podspec"
+      "FBSDKLoginKit.podspec"
+      "FBSDKShareKit.podspec"
+      "FBSDKPlacesKit.podspec"
+      "FBSDKTVOSKit.podspec"
+    )
+
+    SDK_CURRENT_VERSION=$(grep -Eo 'FBSDK_VERSION_STRING @".*"' "$SDK_DIR/$SDK_MAIN_VERSION_FILE" | awk -F'"' '{print $2}')
+    SDK_CURRENT_GRAPH_API_VERSION=$(grep -Eo 'FBSDK_TARGET_PLATFORM_VERSION @".*"' "$SDK_DIR/$SDK_MAIN_VERSION_FILE" | awk -F'"' '{print $2}')
 
     SDK_GIT_REMOTE="https://github.com/facebook/facebook-objc-sdk"
 
-    if [ -f "$PWD/internal/scripts/run.sh" ]; then SDK_INTERNAL=1; else SDK_INTERNAL=0; fi
+    if [ -f "$PWD/internal/scripts/internal_globals.sh" ]; then SDK_INTERNAL=1; else SDK_INTERNAL=0; fi
   fi
 
   local command_type=${1:-}
@@ -84,6 +98,7 @@ main() {
   case "$command_type" in
   "build") build_sdk "$@" ;;
   "bump-version") bump_version "$@" ;;
+  "bump-api-version") bump_api_version "$@" ;;
   "bump-changelog") bump_changelog "$@" ;;
   "check-release-status") check_release_status "$@" ;;
   "is-valid-semver") is_valid_semver "$@" ;;
@@ -161,6 +176,39 @@ bump_version() {
   bump_changelog "$new_version"
 }
 
+# Bump Version
+bump_api_version() {
+  local new_version=${1:-}
+
+  if [ "$new_version" == "$SDK_CURRENT_GRAPH_API_VERSION" ]; then
+    echo "This version is the same as the current version"
+    false
+    return
+  fi
+
+  echo "Changing from: $SDK_CURRENT_GRAPH_API_VERSION to: $new_version"
+
+  # Replace the previous version to the new version in relative files
+  for file_path in "${SDK_GRAPH_API_VERSION_FILES[@]}"; do
+    local full_file_path="$SDK_DIR/$file_path"
+
+    if [ ! -f "$full_file_path" ]; then
+      echo "*** NOTE: unable to find $full_file_path."
+      continue
+    fi
+
+    local temp_file="$full_file_path.tmp"
+    sed -e "s/$SDK_CURRENT_GRAPH_API_VERSION/$new_version/g" "$full_file_path" >"$temp_file"
+    if diff "$full_file_path" "$temp_file" >/dev/null; then
+      echo "*** ERROR: unable to update $full_file_path"
+      rm "$temp_file"
+      continue
+    fi
+
+    mv "$temp_file" "$full_file_path"
+  done
+}
+
 bump_changelog() {
   local new_version=${1:-}
 
@@ -225,12 +273,7 @@ build_sdk() {
     carthage build --no-skip-current
 
     if [ "${1:-}" == "--archive" ]; then
-      for kit in "${SDK_KITS[@]}"; do
-        if [ -d "$SDK_DIR"/Carthage/Build/iOS/"$kit".framework ] \
-          || [ -d "$SDK_DIR"/Carthage/Build/tvOS/"$kit".framework ]; then
-          carthage archive "$kit" --output Carthage/Release/
-        fi
-      done
+      carthage archive --output Carthage/Release/
     fi
   }
 
@@ -248,14 +291,27 @@ build_sdk() {
 lint_sdk() {
   # Lint Podspecs
   lint_cocoapods() {
-    for spec in "${SDK_POD_SPECS[@]}"; do
+    pod_lint_failures=()
+
+    for spec in "${SDK_LINT_POD_SPECS[@]}"; do
       if [ ! -f "$spec" ]; then
         echo "*** ERROR: unable to lint $spec"
         continue
       fi
 
-      pod lib lint "$spec" "$@"
+      set +e
+      if ! pod lib lint "$spec" "$@"; then
+        pod_lint_failures+=("$spec")
+      fi
+      set -e
     done
+
+    if [ ${#pod_lint_failures[@]} -ne 0 ]; then
+      echo "Failed lint for: ${pod_lint_failures[*]}"
+      exit 1
+    else
+      exit 0
+    fi
   }
 
   local lint_type=${1:-}
@@ -269,6 +325,81 @@ lint_sdk() {
 
 # Release
 release_sdk() {
+  # Release github
+  release_github() {
+    mkdir -p build/Release
+    rm -rf build/Release/*
+
+    # Release frameworks in dynamic (mostly for Carthage)
+    release_dynamic() {
+      carthage build --no-skip-current
+      carthage archive --output build/Release/
+      mv build/Release/FBSDKCoreKit.framework.zip build/Release/FacebookSDK_Dynamic.framework.zip
+    }
+
+    # Release frameworks in static
+    release_static() {
+      release_basics() {
+        xcodebuild build \
+         -workspace FacebookSDK.xcworkspace \
+         -scheme BuildCoreKitBasics \
+         -configuration Release \
+         | xcpretty
+        kit="FBSDKCoreKit_Basics"
+        cd build || exit
+
+        mkdir -p Release/"$kit"/iOS
+        mv FBSDKCoreKit.framework Release/"$kit"/iOS
+        mkdir -p Release/"$kit"/tvOS
+        mv tv/FBSDKCoreKit.framework Release/"$kit"/tvOS
+        cd Release || exit
+        zip -r -m "$kit".zip "$kit"
+        cd ..
+
+        cd ..
+      }
+
+      xcodebuild build \
+       -workspace FacebookSDK.xcworkspace \
+       -scheme BuildAllKits \
+       -configuration Release \
+       | xcpretty
+      xcodebuild build \
+       -workspace FacebookSDK.xcworkspace \
+       -scheme BuildAllKits_TV \
+       -configuration Release \
+       | xcpretty
+
+      cd build || exit
+      zip -r FacebookSDK_static.zip ./*.framework ./*/*.framework
+      mv FacebookSDK_Static.zip Release/
+      for kit in "${SDK_KITS[@]}"; do
+        if [ ! -d "$kit".framework ] \
+          && [ ! -d tv/"$kit".framework ]; then
+          continue
+        fi
+
+        mkdir -p Release/"$kit"
+        if [ -d "$kit".framework ]; then
+          mkdir -p Release/"$kit"/iOS
+          mv "$kit".framework Release/"$kit"/iOS
+        fi
+        if [ -d tv/"$kit".framework ]; then
+          mkdir -p Release/"$kit"/tvOS
+          mv tv/"$kit".framework Release/"$kit"/tvOS
+        fi
+        cd Release || exit
+        zip -r -m "$kit".zip "$kit"
+        cd ..
+      done
+      cd ..
+
+      release_basics
+    }
+
+    release_dynamic
+    release_static
+  }
 
   # Release Cocoapods
   release_cocoapods() {
@@ -294,7 +425,7 @@ release_sdk() {
       local prefix
       if [ "$kit" == "FBSDKMarketingKit" ]; then prefix="internal/"; else prefix=""; fi
 
-      local header_file="$SDK_DIR/$prefix$kit/$kit/$kit".h
+      local header_file="$prefix$kit/$kit/$kit".h
 
       if [ ! -f "$header_file" ]; then
         echo "*** ERROR: unable to document $kit"
@@ -302,33 +433,34 @@ release_sdk() {
       fi
 
       jazzy \
-        --config "$SDK_DIR"/.jazzy.yaml \
-        --framework-root "$SDK_DIR/$prefix$kit" \
-        --umbrella-header "$header_file" \
-        --output "$SDK_DIR"/docs/"$kit"
+        --framework-root "$prefix$kit" \
+        --output docs/"$kit" \
+        --umbrella-header "$header_file"
 
       # Zip the result so it can be uploaded easily
-      pushd "$SDK_DIR"/docs/ || continue
+      pushd docs/ || continue
       zip -r "$kit.zip" "$kit"
       popd || continue
 
       if [[ $SDK_INTERNAL == 1 ]] && [ "${1:-}" == "--publish" ]; then
-        echo api_update_reference_doc "$kit"
+        api_update_reference_doc "$kit"
       fi
     done
   }
 
   # Generate External Docs Changelog
   release_external_changelog() {
+    echo "Releasing Changelog"
+
     local current_version_underscore=${SDK_CURRENT_VERSION//./_}
     local current_date
     current_date=$(date +%Y-%m-%d)
     local external_changelog="## $SDK_CURRENT_VERSION - $current_date {#$current_version_underscore}"
     local start_logging=0
+    local tfile
+    tfile=$(mktemp)
 
     while IFS= read -r line; do
-      local updated_line
-
       case "$line" in
       "## $SDK_CURRENT_VERSION")
         start_logging=1
@@ -340,23 +472,21 @@ release_sdk() {
         ;;
       *)
         if [[ $start_logging == 1 ]]; then
-          updated_line="\n"$line
+          external_changelog=$external_changelog"\n"$line
         fi
         ;;
       esac
-
-      external_changelog=$external_changelog$updated_line
     done <"CHANGELOG.md"
 
-    external_changelog="<card>\n$external_changelog\n</card>"
-
-    api_update_guide_doc "$external_changelog"
+    echo "$external_changelog" >"$tfile"
+    api_update_guide_doc "$tfile"
   }
 
   local release_type=${1:-}
   if [ -n "$release_type" ]; then shift; fi
 
   case "$release_type" in
+  "github") release_github "$@" ;;
   "cocoapods") release_cocoapods "$@" ;;
   "docs" | "documentation") release_docs "$@" ;;
   "changelog") release_external_changelog "$@" ;;

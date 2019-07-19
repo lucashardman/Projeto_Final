@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ import NaturalLanguageClassifierV1
 
 class NaturalLanguageClassifierTests: XCTestCase {
 
-    // Several tests depend upon an already-trained classifier. If the classifier does not exist then use the
-    // API Explorer (watson-api-explorer.mybluemix.net) to create a classifier using the `trained_meta.txt`
-    // and `weather_data_train.csv` files. Be sure to update the `trainedClassifierId` property below!
+    // Several tests depend upon an already-trained classifier. If the classifier does not exist then 
+    // create a classifier using the `trained_meta.txt` and `weather_data_train.csv` files. Be sure 
+    // to update the `trainedClassifierId` property below!
 
     private var naturalLanguageClassifier: NaturalLanguageClassifier!
-    private let trainedClassifierId = "6b5ab4x398-nlc-95"
+    private let trainedClassifierId = "0af6f2x556-nlc-473"
     private let trainedClassifierName = "swift-sdk-test-classifier - DO NOT DELETE"
     private let temporaryClassifierName = "swift-sdk-temporary-classifier"
 
-    private var metadataFile: URL!
-    private var metadataFileEmpty: URL!
-    private var metadataFileMissingName: URL!
-    private var trainingFile: URL!
+    private var metadataFile: Data!
+    private var metadataFileEmpty: Data!
+    private var metadataFileMissingName: Data!
+    private var trainingFile: Data!
 
     // MARK: - Test Configuration
 
@@ -97,14 +97,15 @@ class NaturalLanguageClassifierTests: XCTestCase {
     }
 
     /** Load a file used when creating a classifier. */
-    func loadClassifierFile(name: String, withExtension: String) -> URL? {
+    func loadClassifierFile(name: String, withExtension: String) -> Data? {
         #if os(Linux)
             let url = URL(fileURLWithPath: "Tests/NaturalLanguageClassifierV1Tests/" + name + "." + withExtension)
         #else
             let bundle = Bundle(for: type(of: self))
             guard let url = bundle.url(forResource: name, withExtension: withExtension) else { return nil }
         #endif
-        return url
+        let data = try? Data(contentsOf: url)
+        return data
     }
 
     // MARK: - Positive Tests

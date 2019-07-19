@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1EF5C8F17FD8EB80A9D77015 /* Pods_AvivDatabasePopulatorTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5AE1F6EA33DBDF1A53FC326 /* Pods_AvivDatabasePopulatorTests.framework */; };
 		22A75B53228D941000EE3779 /* GenerateSuggestionProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A75B52228D941000EE3779 /* GenerateSuggestionProfile.swift */; };
 		22A75B55228D94BA00EE3779 /* SendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A75B54228D94BA00EE3779 /* SendViewController.swift */; };
 		22A75B57228D94CF00EE3779 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A75B56228D94CF00EE3779 /* Credentials.swift */; };
@@ -15,7 +14,6 @@
 		22F040912248420A004FE7C4 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F040902248420A004FE7C4 /* LoginViewController.swift */; };
 		22F040942248420A004FE7C4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22F040922248420A004FE7C4 /* Main.storyboard */; };
 		22F040962248420E004FE7C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22F040952248420E004FE7C4 /* Assets.xcassets */; };
-		22F040A42248420E004FE7C4 /* AvivDatabasePopulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F040A32248420E004FE7C4 /* AvivDatabasePopulatorTests.swift */; };
 		22F040AF2248467F004FE7C4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 22F040AE2248467E004FE7C4 /* GoogleService-Info.plist */; };
 		22F040EF224865E8004FE7C4 /* PersonalityInsightsV3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040E5224865E7004FE7C4 /* PersonalityInsightsV3.framework */; };
 		22F040F0224865E8004FE7C4 /* PersonalityInsightsV3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040E5224865E7004FE7C4 /* PersonalityInsightsV3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -26,7 +24,6 @@
 		22F040F5224865E8004FE7C4 /* RestKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040E8224865E7004FE7C4 /* RestKit.framework */; };
 		22F040F6224865E8004FE7C4 /* RestKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040E8224865E7004FE7C4 /* RestKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22F040F7224865E8004FE7C4 /* FacebookShare.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040E9224865E7004FE7C4 /* FacebookShare.framework */; };
-		22F040F8224865E8004FE7C4 /* FacebookShare.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040E9224865E7004FE7C4 /* FacebookShare.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22F040F9224865E8004FE7C4 /* FBSDKPlacesKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040EA224865E8004FE7C4 /* FBSDKPlacesKit.framework */; };
 		22F040FA224865E8004FE7C4 /* FBSDKPlacesKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040EA224865E8004FE7C4 /* FBSDKPlacesKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22F040FB224865E8004FE7C4 /* FacebookCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040EB224865E8004FE7C4 /* FacebookCore.framework */; };
@@ -39,16 +36,6 @@
 		22F04102224865E8004FE7C4 /* FBSDKShareKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22F040EE224865E8004FE7C4 /* FBSDKShareKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		61139CFD9B050F076DBA0EEC /* Pods_AvivDatabasePopulator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 975A5DFD5542706EC01D89EF /* Pods_AvivDatabasePopulator.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		22F040A02248420E004FE7C4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 22F040832248420A004FE7C4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 22F0408A2248420A004FE7C4;
-			remoteInfo = AvivDatabasePopulator;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		22F040C522485970004FE7C4 /* Embed Frameworks */ = {
@@ -63,7 +50,6 @@
 				22F040F2224865E8004FE7C4 /* FBSDKLoginKit.framework in Embed Frameworks */,
 				22F040F4224865E8004FE7C4 /* FacebookLogin.framework in Embed Frameworks */,
 				22F040F0224865E8004FE7C4 /* PersonalityInsightsV3.framework in Embed Frameworks */,
-				22F040F8224865E8004FE7C4 /* FacebookShare.framework in Embed Frameworks */,
 				22F040FC224865E8004FE7C4 /* FacebookCore.framework in Embed Frameworks */,
 				22F04100224865E8004FE7C4 /* FBSDKCoreKit.framework in Embed Frameworks */,
 				22F040F6224865E8004FE7C4 /* RestKit.framework in Embed Frameworks */,
@@ -85,9 +71,6 @@
 		22F040932248420A004FE7C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		22F040952248420E004FE7C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		22F0409A2248420E004FE7C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		22F0409F2248420E004FE7C4 /* AvivDatabasePopulatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AvivDatabasePopulatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		22F040A32248420E004FE7C4 /* AvivDatabasePopulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvivDatabasePopulatorTests.swift; sourceTree = "<group>"; };
-		22F040A52248420E004FE7C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22F040AE2248467E004FE7C4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		22F040E5224865E7004FE7C4 /* PersonalityInsightsV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PersonalityInsightsV3.framework; path = Carthage/Build/iOS/PersonalityInsightsV3.framework; sourceTree = "<group>"; };
 		22F040E6224865E7004FE7C4 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = Carthage/Build/iOS/FBSDKLoginKit.framework; sourceTree = "<group>"; };
@@ -124,14 +107,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22F0409C2248420E004FE7C4 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1EF5C8F17FD8EB80A9D77015 /* Pods_AvivDatabasePopulatorTests.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -148,7 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				22F0408D2248420A004FE7C4 /* AvivDatabasePopulator */,
-				22F040A22248420E004FE7C4 /* AvivDatabasePopulatorTests */,
 				22F0408C2248420A004FE7C4 /* Products */,
 				4D1F1204528E9D48D268953D /* Pods */,
 				000018630E14B3C2CC13646E /* Frameworks */,
@@ -169,7 +143,6 @@
 			isa = PBXGroup;
 			children = (
 				22F0408B2248420A004FE7C4 /* AvivDatabasePopulator.app */,
-				22F0409F2248420E004FE7C4 /* AvivDatabasePopulatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,15 +161,6 @@
 				22F0409A2248420E004FE7C4 /* Info.plist */,
 			);
 			path = AvivDatabasePopulator;
-			sourceTree = "<group>";
-		};
-		22F040A22248420E004FE7C4 /* AvivDatabasePopulatorTests */ = {
-			isa = PBXGroup;
-			children = (
-				22F040A32248420E004FE7C4 /* AvivDatabasePopulatorTests.swift */,
-				22F040A52248420E004FE7C4 /* Info.plist */,
-			);
-			path = AvivDatabasePopulatorTests;
 			sourceTree = "<group>";
 		};
 		4D1F1204528E9D48D268953D /* Pods */ = {
@@ -234,25 +198,6 @@
 			productReference = 22F0408B2248420A004FE7C4 /* AvivDatabasePopulator.app */;
 			productType = "com.apple.product-type.application";
 		};
-		22F0409E2248420E004FE7C4 /* AvivDatabasePopulatorTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 22F040AB2248420E004FE7C4 /* Build configuration list for PBXNativeTarget "AvivDatabasePopulatorTests" */;
-			buildPhases = (
-				80347AA80A8503CFC036E4DB /* [CP] Check Pods Manifest.lock */,
-				22F0409B2248420E004FE7C4 /* Sources */,
-				22F0409C2248420E004FE7C4 /* Frameworks */,
-				22F0409D2248420E004FE7C4 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				22F040A12248420E004FE7C4 /* PBXTargetDependency */,
-			);
-			name = AvivDatabasePopulatorTests;
-			productName = AvivDatabasePopulatorTests;
-			productReference = 22F0409F2248420E004FE7C4 /* AvivDatabasePopulatorTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -265,10 +210,7 @@
 				TargetAttributes = {
 					22F0408A2248420A004FE7C4 = {
 						CreatedOnToolsVersion = 10.1;
-					};
-					22F0409E2248420E004FE7C4 = {
-						CreatedOnToolsVersion = 10.1;
-						TestTargetID = 22F0408A2248420A004FE7C4;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -286,7 +228,6 @@
 			projectRoot = "";
 			targets = (
 				22F0408A2248420A004FE7C4 /* AvivDatabasePopulator */,
-				22F0409E2248420E004FE7C4 /* AvivDatabasePopulatorTests */,
 			);
 		};
 /* End PBXProject section */
@@ -299,13 +240,6 @@
 				22F040AF2248467F004FE7C4 /* GoogleService-Info.plist in Resources */,
 				22F040962248420E004FE7C4 /* Assets.xcassets in Resources */,
 				22F040942248420A004FE7C4 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		22F0409D2248420E004FE7C4 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,13 +258,11 @@
 				"$(SRCROOT)/Carthage/Build/iOS/LanguageTranslatorV3.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FacebookCore.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FacebookLogin.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/FacebookShare.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FBSDKCoreKit.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FBSDKLoginKit.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FBSDKPlacesKit.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FBSDKShareKit.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/RestKit.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Bolts.framework",
 			);
 			outputFileListPaths = (
 			);
@@ -339,28 +271,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
-		};
-		80347AA80A8503CFC036E4DB /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-AvivDatabasePopulatorTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
 		};
 		9E98F5B4EA9636EF63533A93 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -390,28 +300,11 @@
 			files = (
 			);
 			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AvivDatabasePopulator/Pods-AvivDatabasePopulator-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/BoringSSL-GRPC/openssl_grpc.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
-				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
-				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
-				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-AvivDatabasePopulator/Pods-AvivDatabasePopulator-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl_grpc.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-AvivDatabasePopulator/Pods-AvivDatabasePopulator-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -433,23 +326,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22F0409B2248420E004FE7C4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22F040A42248420E004FE7C4 /* AvivDatabasePopulatorTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		22F040A12248420E004FE7C4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 22F0408A2248420A004FE7C4 /* AvivDatabasePopulator */;
-			targetProxy = 22F040A02248420E004FE7C4 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		22F040922248420A004FE7C4 /* Main.storyboard */ = {
@@ -601,7 +478,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AvivDatabasePopulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -628,52 +505,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AvivDatabasePopulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		22F040AC2248420E004FE7C4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F44FFFE9D25EDB14B131D8CC /* Pods-AvivDatabasePopulatorTests.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5A4RJ634ZY;
-				INFOPLIST_FILE = AvivDatabasePopulatorTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AvivDatabasePopulatorTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AvivDatabasePopulator.app/AvivDatabasePopulator";
-			};
-			name = Debug;
-		};
-		22F040AD2248420E004FE7C4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5DBDCCAF9A21CEBCAE1DB760 /* Pods-AvivDatabasePopulatorTests.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5A4RJ634ZY;
-				INFOPLIST_FILE = AvivDatabasePopulatorTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.lucashardman.AvivDatabasePopulatorTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AvivDatabasePopulator.app/AvivDatabasePopulator";
 			};
 			name = Release;
 		};
@@ -694,15 +527,6 @@
 			buildConfigurations = (
 				22F040A92248420E004FE7C4 /* Debug */,
 				22F040AA2248420E004FE7C4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		22F040AB2248420E004FE7C4 /* Build configuration list for PBXNativeTarget "AvivDatabasePopulatorTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				22F040AC2248420E004FE7C4 /* Debug */,
-				22F040AD2248420E004FE7C4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

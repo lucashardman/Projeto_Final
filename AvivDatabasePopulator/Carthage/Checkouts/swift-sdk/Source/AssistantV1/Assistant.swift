@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import Foundation
 import RestKit
 
 /**
- The IBM Watson&trade; Assistant service combines machine learning, natural language understanding, and integrated
- dialog tools to create conversation flows between your apps and your users.
+ The IBM Watson&trade; Assistant service combines machine learning, natural language understanding, and an integrated
+ dialog editor to create conversation flows between your apps and your users.
  */
 public class Assistant {
 
@@ -36,22 +36,23 @@ public class Assistant {
     var authMethod: AuthenticationMethod
     let version: String
 
+    #if os(Linux)
     /**
      Create a `Assistant` object.
 
-     Use this initializer to automatically pull service credentials from your credentials file.
-     This file is downloaded from your service instance on IBM Cloud as ibm-credentials.env.
+     This initializer will retrieve credentials from the environment or a local credentials file.
+     The credentials file can be downloaded from your service instance on IBM Cloud as ibm-credentials.env.
      Make sure to add the credentials file to your project so that it can be loaded at runtime.
 
-     If the credentials cannot be loaded from the file, or the file is not found, initialization will fail.
+     If credentials are not available in the environment or a local credentials file, initialization will fail.
      In that case, try another initializer that directly passes in the credentials.
 
-     - parameter credentialsFile: The URL of the credentials file.
      - parameter version: The release date of the version of the API to use. Specify the date
        in "YYYY-MM-DD" format.
      */
-    public init?(credentialsFile: URL, version: String) {
-        guard let credentials = Shared.extractCredentials(from: credentialsFile, serviceName: "assistant") else {
+    public init?(version: String) {
+        self.version = version
+        guard let credentials = Shared.extractCredentials(serviceName: "assistant") else {
             return nil
         }
         guard let authMethod = Shared.getAuthMethod(from: credentials) else {
@@ -61,20 +62,22 @@ public class Assistant {
             self.serviceURL = serviceURL
         }
         self.authMethod = authMethod
-        self.version = version
+        RestRequest.userAgent = Shared.userAgent
     }
+    #endif
 
     /**
      Create a `Assistant` object.
 
-     - parameter username: The username used to authenticate with the service.
-     - parameter password: The password used to authenticate with the service.
      - parameter version: The release date of the version of the API to use. Specify the date
        in "YYYY-MM-DD" format.
+     - parameter username: The username used to authenticate with the service.
+     - parameter password: The password used to authenticate with the service.
      */
-    public init(username: String, password: String, version: String) {
-        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+    public init(version: String, username: String, password: String) {
         self.version = version
+        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+        RestRequest.userAgent = Shared.userAgent
     }
 
     /**
@@ -88,6 +91,7 @@ public class Assistant {
     public init(version: String, apiKey: String, iamUrl: String? = nil) {
         self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
         self.version = version
+        RestRequest.userAgent = Shared.userAgent
     }
 
     /**
@@ -98,8 +102,9 @@ public class Assistant {
      - parameter accessToken: An access token for the service.
      */
     public init(version: String, accessToken: String) {
-        self.authMethod = IAMAccessToken(accessToken: accessToken)
         self.version = version
+        self.authMethod = IAMAccessToken(accessToken: accessToken)
+        RestRequest.userAgent = Shared.userAgent
     }
 
     public func accessToken(_ newToken: String) {
@@ -107,6 +112,16 @@ public class Assistant {
             self.authMethod = IAMAccessToken(accessToken: newToken)
         }
     }
+
+    #if !os(Linux)
+    /**
+      Allow network requests to a server without verification of the server certificate.
+      **IMPORTANT**: This should ONLY be used if truly intended, as it is unsafe otherwise.
+     */
+    public func disableSSLVerification() {
+        session = InsecureConnection.session()
+    }
+    #endif
 
     /**
      Use the HTTP response and data received by the Watson Assistant v1 service to extract
@@ -122,16 +137,25 @@ public class Assistant {
         var metadata = [String: Any]()
 
         do {
-            let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            metadata = [:]
-            if case let .some(.string(message)) = json["error"] {
+            let json = try JSON.decoder.decode([String: JSON].self, from: data)
+            metadata["response"] = json
+            if case let .some(.array(errors)) = json["errors"],
+                case let .some(.object(error)) = errors.first,
+                case let .some(.string(message)) = error["message"] {
                 errorMessage = message
+            } else if case let .some(.string(message)) = json["error"] {
+                errorMessage = message
+            } else if case let .some(.string(message)) = json["message"] {
+                errorMessage = message
+            } else {
+                errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
             }
-            // If metadata is empty, it should show up as nil in the WatsonError
-            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
+            metadata["response"] = data
+            errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
         }
+
+        return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: metadata)
     }
 
     /**
@@ -142,14 +166,14 @@ public class Assistant {
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter input: An input object that includes the input text.
-     - parameter alternateIntents: Whether to return more than one intent. Set to `true` to return all matching
-       intents.
-     - parameter context: State information for the conversation. To maintain state, include the context from the
-       previous response.
-     - parameter entities: Entities to use when evaluating the message. Include entities from the previous response to
-       continue using those entities rather than detecting entities in the new input.
      - parameter intents: Intents to use when evaluating the user input. Include intents from the previous response to
        continue using those intents rather than trying to recognize intents in the new input.
+     - parameter entities: Entities to use when evaluating the message. Include entities from the previous response to
+       continue using those entities rather than detecting entities in the new input.
+     - parameter alternateIntents: Whether to return more than one intent. A value of `true` indicates that all
+       matching intents are returned.
+     - parameter context: State information for the conversation. To maintain state, include the context from the
+       previous response.
      - parameter output: An output object that includes the response to the user, the dialog nodes that were
        triggered, and messages from the log.
      - parameter nodesVisitedDetails: Whether to include additional diagnostic information about the dialog nodes that
@@ -159,11 +183,11 @@ public class Assistant {
      */
     public func message(
         workspaceID: String,
-        input: InputData? = nil,
+        input: MessageInput? = nil,
+        intents: [RuntimeIntent]? = nil,
+        entities: [RuntimeEntity]? = nil,
         alternateIntents: Bool? = nil,
         context: Context? = nil,
-        entities: [RuntimeEntity]? = nil,
-        intents: [RuntimeIntent]? = nil,
         output: OutputData? = nil,
         nodesVisitedDetails: Bool? = nil,
         headers: [String: String]? = nil,
@@ -172,12 +196,12 @@ public class Assistant {
         // construct body
         let messageRequest = MessageRequest(
             input: input,
+            intents: intents,
+            entities: entities,
             alternateIntents: alternateIntents,
             context: context,
-            entities: entities,
-            intents: intents,
             output: output)
-        guard let body = try? JSONEncoder().encodeIfPresent(messageRequest) else {
+        guard let body = try? JSON.encoder.encodeIfPresent(messageRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -187,8 +211,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "message")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "message")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -251,8 +275,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listWorkspaces")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listWorkspaces")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -302,19 +326,20 @@ public class Assistant {
      This operation is limited to 30 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter name: The name of the workspace. This string cannot contain carriage return, newline, or tab
-       characters, and it must be no longer than 64 characters.
+       characters.
      - parameter description: The description of the workspace. This string cannot contain carriage return, newline,
-       or tab characters, and it must be no longer than 128 characters.
+       or tab characters.
      - parameter language: The language of the workspace.
+     - parameter metadata: Any metadata related to the workspace.
+     - parameter learningOptOut: Whether training data from the workspace (including artifacts such as intents and
+       entities) can be used by IBM for general service improvements. `true` indicates that workspace training data is
+       not to be used.
+     - parameter systemSettings: Global settings for the workspace.
      - parameter intents: An array of objects defining the intents for the workspace.
-     - parameter entities: An array of objects defining the entities for the workspace.
-     - parameter dialogNodes: An array of objects defining the nodes in the dialog.
+     - parameter entities: An array of objects describing the entities for the workspace.
+     - parameter dialogNodes: An array of objects describing the dialog nodes in the workspace.
      - parameter counterexamples: An array of objects defining input examples that have been marked as irrelevant
        input.
-     - parameter metadata: Any metadata related to the workspace.
-     - parameter learningOptOut: Whether training data from the workspace can be used by IBM for general service
-       improvements. `true` indicates that workspace training data is not to be used.
-     - parameter systemSettings: Global settings for the workspace.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -322,13 +347,13 @@ public class Assistant {
         name: String? = nil,
         description: String? = nil,
         language: String? = nil,
-        intents: [CreateIntent]? = nil,
-        entities: [CreateEntity]? = nil,
-        dialogNodes: [CreateDialogNode]? = nil,
-        counterexamples: [CreateCounterexample]? = nil,
         metadata: [String: JSON]? = nil,
         learningOptOut: Bool? = nil,
         systemSettings: WorkspaceSystemSettings? = nil,
+        intents: [CreateIntent]? = nil,
+        entities: [CreateEntity]? = nil,
+        dialogNodes: [DialogNode]? = nil,
+        counterexamples: [Counterexample]? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Workspace>?, WatsonError?) -> Void)
     {
@@ -337,14 +362,14 @@ public class Assistant {
             name: name,
             description: description,
             language: language,
+            metadata: metadata,
+            learningOptOut: learningOptOut,
+            systemSettings: systemSettings,
             intents: intents,
             entities: entities,
             dialogNodes: dialogNodes,
-            counterexamples: counterexamples,
-            metadata: metadata,
-            learningOptOut: learningOptOut,
-            systemSettings: systemSettings)
-        guard let body = try? JSONEncoder().encodeIfPresent(createWorkspaceRequest) else {
+            counterexamples: counterexamples)
+        guard let body = try? JSON.encoder.encodeIfPresent(createWorkspaceRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -354,8 +379,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createWorkspace")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createWorkspace")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -404,15 +429,15 @@ public class Assistant {
         includeAudit: Bool? = nil,
         sort: String? = nil,
         headers: [String: String]? = nil,
-        completionHandler: @escaping (WatsonResponse<WorkspaceExport>?, WatsonError?) -> Void)
+        completionHandler: @escaping (WatsonResponse<Workspace>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getWorkspace")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getWorkspace")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -460,19 +485,20 @@ public class Assistant {
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter name: The name of the workspace. This string cannot contain carriage return, newline, or tab
-       characters, and it must be no longer than 64 characters.
+       characters.
      - parameter description: The description of the workspace. This string cannot contain carriage return, newline,
-       or tab characters, and it must be no longer than 128 characters.
+       or tab characters.
      - parameter language: The language of the workspace.
+     - parameter metadata: Any metadata related to the workspace.
+     - parameter learningOptOut: Whether training data from the workspace (including artifacts such as intents and
+       entities) can be used by IBM for general service improvements. `true` indicates that workspace training data is
+       not to be used.
+     - parameter systemSettings: Global settings for the workspace.
      - parameter intents: An array of objects defining the intents for the workspace.
-     - parameter entities: An array of objects defining the entities for the workspace.
-     - parameter dialogNodes: An array of objects defining the nodes in the dialog.
+     - parameter entities: An array of objects describing the entities for the workspace.
+     - parameter dialogNodes: An array of objects describing the dialog nodes in the workspace.
      - parameter counterexamples: An array of objects defining input examples that have been marked as irrelevant
        input.
-     - parameter metadata: Any metadata related to the workspace.
-     - parameter learningOptOut: Whether training data from the workspace can be used by IBM for general service
-       improvements. `true` indicates that workspace training data is not to be used.
-     - parameter systemSettings: Global settings for the workspace.
      - parameter append: Whether the new data is to be appended to the existing data in the workspace. If
        **append**=`false`, elements included in the new data completely replace the corresponding existing elements,
        including all subelements. For example, if the new data includes **entities** and **append**=`false`, all
@@ -487,13 +513,13 @@ public class Assistant {
         name: String? = nil,
         description: String? = nil,
         language: String? = nil,
-        intents: [CreateIntent]? = nil,
-        entities: [CreateEntity]? = nil,
-        dialogNodes: [CreateDialogNode]? = nil,
-        counterexamples: [CreateCounterexample]? = nil,
         metadata: [String: JSON]? = nil,
         learningOptOut: Bool? = nil,
         systemSettings: WorkspaceSystemSettings? = nil,
+        intents: [CreateIntent]? = nil,
+        entities: [CreateEntity]? = nil,
+        dialogNodes: [DialogNode]? = nil,
+        counterexamples: [Counterexample]? = nil,
         append: Bool? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Workspace>?, WatsonError?) -> Void)
@@ -503,14 +529,14 @@ public class Assistant {
             name: name,
             description: description,
             language: language,
+            metadata: metadata,
+            learningOptOut: learningOptOut,
+            systemSettings: systemSettings,
             intents: intents,
             entities: entities,
             dialogNodes: dialogNodes,
-            counterexamples: counterexamples,
-            metadata: metadata,
-            learningOptOut: learningOptOut,
-            systemSettings: systemSettings)
-        guard let body = try? JSONEncoder().encodeIfPresent(updateWorkspaceRequest) else {
+            counterexamples: counterexamples)
+        guard let body = try? JSON.encoder.encodeIfPresent(updateWorkspaceRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -520,8 +546,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateWorkspace")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateWorkspace")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -574,8 +600,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteWorkspace")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteWorkspace")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -639,8 +665,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listIntents")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listIntents")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -695,15 +721,16 @@ public class Assistant {
      Create intent.
 
      Create a new intent.
+     If you want to create multiple intents with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 2000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter intent: The name of the intent. This string must conform to the following restrictions:
        - It can contain only Unicode alphanumeric, underscore, hyphen, and dot characters.
        - It cannot begin with the reserved prefix `sys-`.
-       - It must be no longer than 128 characters.
      - parameter description: The description of the intent. This string cannot contain carriage return, newline, or
-       tab characters, and it must be no longer than 128 characters.
+       tab characters.
      - parameter examples: An array of user input examples for the intent.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
@@ -712,7 +739,7 @@ public class Assistant {
         workspaceID: String,
         intent: String,
         description: String? = nil,
-        examples: [CreateExample]? = nil,
+        examples: [Example]? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Intent>?, WatsonError?) -> Void)
     {
@@ -721,7 +748,7 @@ public class Assistant {
             intent: intent,
             description: description,
             examples: examples)
-        guard let body = try? JSONEncoder().encode(createIntentRequest) else {
+        guard let body = try? JSON.encoder.encode(createIntentRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -731,8 +758,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createIntent")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createIntent")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -784,15 +811,15 @@ public class Assistant {
         export: Bool? = nil,
         includeAudit: Bool? = nil,
         headers: [String: String]? = nil,
-        completionHandler: @escaping (WatsonResponse<IntentExport>?, WatsonError?) -> Void)
+        completionHandler: @escaping (WatsonResponse<Intent>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getIntent")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getIntent")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -832,6 +859,8 @@ public class Assistant {
 
      Update an existing intent with new or modified data. You must provide component objects defining the content of the
      updated intent.
+     If you want to update multiple intents with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 2000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -839,8 +868,8 @@ public class Assistant {
      - parameter newIntent: The name of the intent. This string must conform to the following restrictions:
        - It can contain only Unicode alphanumeric, underscore, hyphen, and dot characters.
        - It cannot begin with the reserved prefix `sys-`.
-       - It must be no longer than 128 characters.
-     - parameter newDescription: The description of the intent.
+     - parameter newDescription: The description of the intent. This string cannot contain carriage return, newline,
+       or tab characters.
      - parameter newExamples: An array of user input examples for the intent.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
@@ -850,7 +879,7 @@ public class Assistant {
         intent: String,
         newIntent: String? = nil,
         newDescription: String? = nil,
-        newExamples: [CreateExample]? = nil,
+        newExamples: [Example]? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Intent>?, WatsonError?) -> Void)
     {
@@ -859,7 +888,7 @@ public class Assistant {
             intent: newIntent,
             description: newDescription,
             examples: newExamples)
-        guard let body = try? JSONEncoder().encode(updateIntentRequest) else {
+        guard let body = try? JSON.encoder.encode(updateIntentRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -869,8 +898,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateIntent")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateIntent")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -921,8 +950,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteIntent")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteIntent")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -983,8 +1012,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listExamples")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listExamples")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1035,6 +1064,8 @@ public class Assistant {
      Create user input example.
 
      Add a new user input example to an intent.
+     If you want to add multiple exaples with a single API call, consider using the **[Update intent](#update-intent)**
+     method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -1042,7 +1073,6 @@ public class Assistant {
      - parameter text: The text of a user input example. This string must conform to the following restrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 1024 characters.
      - parameter mentions: An array of contextual entity mentions.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
@@ -1051,15 +1081,15 @@ public class Assistant {
         workspaceID: String,
         intent: String,
         text: String,
-        mentions: [Mentions]? = nil,
+        mentions: [Mention]? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Example>?, WatsonError?) -> Void)
     {
         // construct body
-        let createExampleRequest = CreateExample(
+        let createExampleRequest = Example(
             text: text,
             mentions: mentions)
-        guard let body = try? JSONEncoder().encode(createExampleRequest) else {
+        guard let body = try? JSON.encoder.encode(createExampleRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -1069,8 +1099,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createExample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createExample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -1126,8 +1156,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getExample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getExample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1162,6 +1192,8 @@ public class Assistant {
      Update user input example.
 
      Update the text of a user input example.
+     If you want to update multiple examples with a single API call, consider using the **[Update
+     intent](#update-intent)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -1170,7 +1202,6 @@ public class Assistant {
      - parameter newText: The text of the user input example. This string must conform to the following restrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 1024 characters.
      - parameter newMentions: An array of contextual entity mentions.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
@@ -1180,7 +1211,7 @@ public class Assistant {
         intent: String,
         text: String,
         newText: String? = nil,
-        newMentions: [Mentions]? = nil,
+        newMentions: [Mention]? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Example>?, WatsonError?) -> Void)
     {
@@ -1188,7 +1219,7 @@ public class Assistant {
         let updateExampleRequest = UpdateExample(
             text: newText,
             mentions: newMentions)
-        guard let body = try? JSONEncoder().encode(updateExampleRequest) else {
+        guard let body = try? JSON.encoder.encode(updateExampleRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -1198,8 +1229,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateExample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateExample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -1252,8 +1283,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteExample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteExample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1312,8 +1343,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listCounterexamples")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listCounterexamples")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1364,14 +1395,15 @@ public class Assistant {
      Create counterexample.
 
      Add a new counterexample to a workspace. Counterexamples are examples that have been marked as irrelevant input.
+     If you want to add multiple counterexamples with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter text: The text of a user input marked as irrelevant input. This string must conform to the following
        restrictions:
-       - It cannot contain carriage return, newline, or tab characters
-       - It cannot consist of only whitespace characters
-       - It must be no longer than 1024 characters.
+       - It cannot contain carriage return, newline, or tab characters.
+       - It cannot consist of only whitespace characters.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -1382,9 +1414,9 @@ public class Assistant {
         completionHandler: @escaping (WatsonResponse<Counterexample>?, WatsonError?) -> Void)
     {
         // construct body
-        let createCounterexampleRequest = CreateCounterexample(
+        let createCounterexampleRequest = Counterexample(
             text: text)
-        guard let body = try? JSONEncoder().encode(createCounterexampleRequest) else {
+        guard let body = try? JSON.encoder.encode(createCounterexampleRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -1394,8 +1426,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createCounterexample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createCounterexample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -1449,8 +1481,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getCounterexample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getCounterexample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1485,11 +1517,16 @@ public class Assistant {
      Update counterexample.
 
      Update the text of a counterexample. Counterexamples are examples that have been marked as irrelevant input.
+     If you want to update multiple counterexamples with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter text: The text of a user input counterexample (for example, `What are you wearing?`).
-     - parameter newText: The text of a user input counterexample.
+     - parameter newText: The text of a user input marked as irrelevant input. This string must conform to the
+       following restrictions:
+       - It cannot contain carriage return, newline, or tab characters.
+       - It cannot consist of only whitespace characters.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -1503,7 +1540,7 @@ public class Assistant {
         // construct body
         let updateCounterexampleRequest = UpdateCounterexample(
             text: newText)
-        guard let body = try? JSONEncoder().encode(updateCounterexampleRequest) else {
+        guard let body = try? JSON.encoder.encode(updateCounterexampleRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -1513,8 +1550,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateCounterexample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateCounterexample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -1565,8 +1602,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteCounterexample")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteCounterexample")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1630,8 +1667,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listEntities")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listEntities")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1686,19 +1723,20 @@ public class Assistant {
      Create entity.
 
      Create a new entity, or enable a system entity.
+     If you want to create multiple entities with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter entity: The name of the entity. This string must conform to the following restrictions:
        - It can contain only Unicode alphanumeric, underscore, and hyphen characters.
-       - It must be no longer than 64 characters.
-       If you specify an entity name beginning with the reserved prefix `sys-`, it must be the name of a system entity
+       - If you specify an entity name beginning with the reserved prefix `sys-`, it must be the name of a system entity
        that you want to enable. (Any entity content specified with the request is ignored.).
      - parameter description: The description of the entity. This string cannot contain carriage return, newline, or
-       tab characters, and it must be no longer than 128 characters.
-     - parameter metadata: Any metadata related to the value.
-     - parameter values: An array of objects describing the entity values.
+       tab characters.
+     - parameter metadata: Any metadata related to the entity.
      - parameter fuzzyMatch: Whether to use fuzzy matching for the entity.
+     - parameter values: An array of objects describing the entity values.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -1707,8 +1745,8 @@ public class Assistant {
         entity: String,
         description: String? = nil,
         metadata: [String: JSON]? = nil,
-        values: [CreateValue]? = nil,
         fuzzyMatch: Bool? = nil,
+        values: [CreateValue]? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Entity>?, WatsonError?) -> Void)
     {
@@ -1717,9 +1755,9 @@ public class Assistant {
             entity: entity,
             description: description,
             metadata: metadata,
-            values: values,
-            fuzzyMatch: fuzzyMatch)
-        guard let body = try? JSONEncoder().encode(createEntityRequest) else {
+            fuzzyMatch: fuzzyMatch,
+            values: values)
+        guard let body = try? JSON.encoder.encode(createEntityRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -1729,8 +1767,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createEntity")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createEntity")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -1782,15 +1820,15 @@ public class Assistant {
         export: Bool? = nil,
         includeAudit: Bool? = nil,
         headers: [String: String]? = nil,
-        completionHandler: @escaping (WatsonResponse<EntityExport>?, WatsonError?) -> Void)
+        completionHandler: @escaping (WatsonResponse<Entity>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getEntity")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getEntity")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1830,6 +1868,8 @@ public class Assistant {
 
      Update an existing entity with new or modified data. You must provide component objects defining the content of the
      updated entity.
+     If you want to update multiple entities with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -1837,12 +1877,11 @@ public class Assistant {
      - parameter newEntity: The name of the entity. This string must conform to the following restrictions:
        - It can contain only Unicode alphanumeric, underscore, and hyphen characters.
        - It cannot begin with the reserved prefix `sys-`.
-       - It must be no longer than 64 characters.
      - parameter newDescription: The description of the entity. This string cannot contain carriage return, newline,
-       or tab characters, and it must be no longer than 128 characters.
+       or tab characters.
      - parameter newMetadata: Any metadata related to the entity.
      - parameter newFuzzyMatch: Whether to use fuzzy matching for the entity.
-     - parameter newValues: An array of entity values.
+     - parameter newValues: An array of objects describing the entity values.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -1864,7 +1903,7 @@ public class Assistant {
             metadata: newMetadata,
             fuzzyMatch: newFuzzyMatch,
             values: newValues)
-        guard let body = try? JSONEncoder().encode(updateEntityRequest) else {
+        guard let body = try? JSON.encoder.encode(updateEntityRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -1874,8 +1913,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateEntity")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateEntity")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -1926,8 +1965,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteEntity")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteEntity")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -1984,8 +2023,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listMentions")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listMentions")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2058,8 +2097,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listValues")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listValues")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2111,9 +2150,11 @@ public class Assistant {
     }
 
     /**
-     Add entity value.
+     Create entity value.
 
      Create a new value for an entity.
+     If you want to create multiple entity values with a single API call, consider using the **[Update
+     entity](#update-entity)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -2121,18 +2162,16 @@ public class Assistant {
      - parameter value: The text of the entity value. This string must conform to the following restrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 64 characters.
      - parameter metadata: Any metadata related to the entity value.
-     - parameter synonyms: An array containing any synonyms for the entity value. You can provide either synonyms or
-       patterns (as indicated by **type**), but not both. A synonym must conform to the following restrictions:
+     - parameter valueType: Specifies the type of entity value.
+     - parameter synonyms: An array of synonyms for the entity value. A value can specify either synonyms or patterns
+       (depending on the value type), but not both. A synonym must conform to the following resrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 64 characters.
-     - parameter patterns: An array of patterns for the entity value. You can provide either synonyms or patterns (as
-       indicated by **type**), but not both. A pattern is a regular expression no longer than 512 characters. For more
-       information about how to specify a pattern, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/entities.html#creating-entities).
-     - parameter valueType: Specifies the type of value.
+     - parameter patterns: An array of patterns for the entity value. A value can specify either synonyms or patterns
+       (depending on the value type), but not both. A pattern is a regular expression; for more information about how to
+       specify a pattern, see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-entities#entities-create-dictionary-based).
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -2141,9 +2180,9 @@ public class Assistant {
         entity: String,
         value: String,
         metadata: [String: JSON]? = nil,
+        valueType: String? = nil,
         synonyms: [String]? = nil,
         patterns: [String]? = nil,
-        valueType: String? = nil,
         headers: [String: String]? = nil,
         completionHandler: @escaping (WatsonResponse<Value>?, WatsonError?) -> Void)
     {
@@ -2151,10 +2190,10 @@ public class Assistant {
         let createValueRequest = CreateValue(
             value: value,
             metadata: metadata,
+            valueType: valueType,
             synonyms: synonyms,
-            patterns: patterns,
-            valueType: valueType)
-        guard let body = try? JSONEncoder().encode(createValueRequest) else {
+            patterns: patterns)
+        guard let body = try? JSON.encoder.encode(createValueRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -2164,8 +2203,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createValue")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createValue")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -2218,15 +2257,15 @@ public class Assistant {
         export: Bool? = nil,
         includeAudit: Bool? = nil,
         headers: [String: String]? = nil,
-        completionHandler: @escaping (WatsonResponse<ValueExport>?, WatsonError?) -> Void)
+        completionHandler: @escaping (WatsonResponse<Value>?, WatsonError?) -> Void)
     {
         // construct header parameters
         var headerParameters = defaultHeaders
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getValue")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getValue")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2266,6 +2305,8 @@ public class Assistant {
 
      Update an existing entity value with new or modified data. You must provide component objects defining the content
      of the updated entity value.
+     If you want to update multiple entity values with a single API call, consider using the **[Update
+     entity](#update-entity)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -2274,18 +2315,16 @@ public class Assistant {
      - parameter newValue: The text of the entity value. This string must conform to the following restrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 64 characters.
      - parameter newMetadata: Any metadata related to the entity value.
-     - parameter newType: Specifies the type of value.
-     - parameter newSynonyms: An array of synonyms for the entity value. You can provide either synonyms or patterns
-       (as indicated by **type**), but not both. A synonym must conform to the following resrictions:
+     - parameter newValueType: Specifies the type of entity value.
+     - parameter newSynonyms: An array of synonyms for the entity value. A value can specify either synonyms or
+       patterns (depending on the value type), but not both. A synonym must conform to the following resrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 64 characters.
-     - parameter newPatterns: An array of patterns for the entity value. You can provide either synonyms or patterns
-       (as indicated by **type**), but not both. A pattern is a regular expression no longer than 512 characters. For
-       more information about how to specify a pattern, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/entities.html#creating-entities).
+     - parameter newPatterns: An array of patterns for the entity value. A value can specify either synonyms or
+       patterns (depending on the value type), but not both. A pattern is a regular expression; for more information
+       about how to specify a pattern, see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-entities#entities-create-dictionary-based).
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -2295,7 +2334,7 @@ public class Assistant {
         value: String,
         newValue: String? = nil,
         newMetadata: [String: JSON]? = nil,
-        newType: String? = nil,
+        newValueType: String? = nil,
         newSynonyms: [String]? = nil,
         newPatterns: [String]? = nil,
         headers: [String: String]? = nil,
@@ -2305,10 +2344,10 @@ public class Assistant {
         let updateValueRequest = UpdateValue(
             value: newValue,
             metadata: newMetadata,
-            valueType: newType,
+            valueType: newValueType,
             synonyms: newSynonyms,
             patterns: newPatterns)
-        guard let body = try? JSONEncoder().encode(updateValueRequest) else {
+        guard let body = try? JSON.encoder.encode(updateValueRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -2318,8 +2357,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateValue")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateValue")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -2372,8 +2411,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteValue")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteValue")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2436,8 +2475,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listSynonyms")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listSynonyms")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2485,9 +2524,11 @@ public class Assistant {
     }
 
     /**
-     Add entity value synonym.
+     Create entity value synonym.
 
      Add a new synonym to an entity value.
+     If you want to create multiple synonyms with a single API call, consider using the **[Update
+     entity](#update-entity)** or **[Update entity value](#update-entity-value)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -2496,7 +2537,6 @@ public class Assistant {
      - parameter synonym: The text of the synonym. This string must conform to the following restrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 64 characters.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -2509,9 +2549,9 @@ public class Assistant {
         completionHandler: @escaping (WatsonResponse<Synonym>?, WatsonError?) -> Void)
     {
         // construct body
-        let createSynonymRequest = CreateSynonym(
+        let createSynonymRequest = Synonym(
             synonym: synonym)
-        guard let body = try? JSONEncoder().encode(createSynonymRequest) else {
+        guard let body = try? JSON.encoder.encode(createSynonymRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -2521,8 +2561,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createSynonym")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createSynonym")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -2580,8 +2620,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getSynonym")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getSynonym")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2616,6 +2656,8 @@ public class Assistant {
      Update entity value synonym.
 
      Update an existing entity value synonym with new text.
+     If you want to update multiple synonyms with a single API call, consider using the **[Update
+     entity](#update-entity)** or **[Update entity value](#update-entity-value)** method instead.
      This operation is limited to 1000 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
@@ -2625,7 +2667,6 @@ public class Assistant {
      - parameter newSynonym: The text of the synonym. This string must conform to the following restrictions:
        - It cannot contain carriage return, newline, or tab characters.
        - It cannot consist of only whitespace characters.
-       - It must be no longer than 64 characters.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -2641,7 +2682,7 @@ public class Assistant {
         // construct body
         let updateSynonymRequest = UpdateSynonym(
             synonym: newSynonym)
-        guard let body = try? JSONEncoder().encode(updateSynonymRequest) else {
+        guard let body = try? JSON.encoder.encode(updateSynonymRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -2651,8 +2692,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateSynonym")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateSynonym")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -2707,8 +2748,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteSynonym")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteSynonym")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2767,8 +2808,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listDialogNodes")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listDialogNodes")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2819,36 +2860,37 @@ public class Assistant {
      Create dialog node.
 
      Create a new dialog node.
+     If you want to create multiple dialog nodes with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 500 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter dialogNode: The dialog node ID. This string must conform to the following restrictions:
        - It can contain only Unicode alphanumeric, space, underscore, hyphen, and dot characters.
-       - It must be no longer than 1024 characters.
      - parameter description: The description of the dialog node. This string cannot contain carriage return, newline,
-       or tab characters, and it must be no longer than 128 characters.
+       or tab characters.
      - parameter conditions: The condition that will trigger the dialog node. This string cannot contain carriage
-       return, newline, or tab characters, and it must be no longer than 2048 characters.
-     - parameter parent: The ID of the parent dialog node.
-     - parameter previousSibling: The ID of the previous dialog node.
+       return, newline, or tab characters.
+     - parameter parent: The ID of the parent dialog node. This property is omitted if the dialog node has no parent.
+     - parameter previousSibling: The ID of the previous sibling dialog node. This property is omitted if the dialog
+       node has no previous sibling.
      - parameter output: The output of the dialog node. For more information about how to specify dialog node output,
-       see the [documentation](https://cloud.ibm.com/docs/services/assistant/dialog-overview.html#complex).
+       see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-dialog-overview#dialog-overview-responses).
      - parameter context: The context for the dialog node.
      - parameter metadata: The metadata for the dialog node.
      - parameter nextStep: The next step to execute following this dialog node.
-     - parameter actions: An array of objects describing any actions to be invoked by the dialog node.
      - parameter title: The alias used to identify the dialog node. This string must conform to the following
        restrictions:
        - It can contain only Unicode alphanumeric, space, underscore, hyphen, and dot characters.
-       - It must be no longer than 64 characters.
      - parameter nodeType: How the dialog node is processed.
      - parameter eventName: How an `event_handler` node is processed.
      - parameter variable: The location in the dialog context where output is stored.
+     - parameter actions: An array of objects describing any actions to be invoked by the dialog node.
      - parameter digressIn: Whether this top-level dialog node can be digressed into.
      - parameter digressOut: Whether this dialog node can be returned to after a digression.
      - parameter digressOutSlots: Whether the user can digress to top-level nodes while filling out slots.
      - parameter userLabel: A label that can be displayed externally to describe the purpose of the node to users.
-       This string must be no longer than 512 characters.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -2863,11 +2905,11 @@ public class Assistant {
         context: [String: JSON]? = nil,
         metadata: [String: JSON]? = nil,
         nextStep: DialogNodeNextStep? = nil,
-        actions: [DialogNodeAction]? = nil,
         title: String? = nil,
         nodeType: String? = nil,
         eventName: String? = nil,
         variable: String? = nil,
+        actions: [DialogNodeAction]? = nil,
         digressIn: String? = nil,
         digressOut: String? = nil,
         digressOutSlots: String? = nil,
@@ -2876,7 +2918,7 @@ public class Assistant {
         completionHandler: @escaping (WatsonResponse<DialogNode>?, WatsonError?) -> Void)
     {
         // construct body
-        let createDialogNodeRequest = CreateDialogNode(
+        let createDialogNodeRequest = DialogNode(
             dialogNode: dialogNode,
             description: description,
             conditions: conditions,
@@ -2886,16 +2928,16 @@ public class Assistant {
             context: context,
             metadata: metadata,
             nextStep: nextStep,
-            actions: actions,
             title: title,
             nodeType: nodeType,
             eventName: eventName,
             variable: variable,
+            actions: actions,
             digressIn: digressIn,
             digressOut: digressOut,
             digressOutSlots: digressOutSlots,
             userLabel: userLabel)
-        guard let body = try? JSONEncoder().encode(createDialogNodeRequest) else {
+        guard let body = try? JSON.encoder.encode(createDialogNodeRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -2905,8 +2947,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createDialogNode")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "createDialogNode")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -2960,8 +3002,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getDialogNode")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "getDialogNode")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -2996,29 +3038,32 @@ public class Assistant {
      Update dialog node.
 
      Update an existing dialog node with new or modified data.
+     If you want to update multiple dialog nodes with a single API call, consider using the **[Update
+     workspace](#update-workspace)** method instead.
      This operation is limited to 500 requests per 30 minutes. For more information, see **Rate limiting**.
 
      - parameter workspaceID: Unique identifier of the workspace.
      - parameter dialogNode: The dialog node ID (for example, `get_order`).
      - parameter newDialogNode: The dialog node ID. This string must conform to the following restrictions:
        - It can contain only Unicode alphanumeric, space, underscore, hyphen, and dot characters.
-       - It must be no longer than 1024 characters.
      - parameter newDescription: The description of the dialog node. This string cannot contain carriage return,
-       newline, or tab characters, and it must be no longer than 128 characters.
+       newline, or tab characters.
      - parameter newConditions: The condition that will trigger the dialog node. This string cannot contain carriage
-       return, newline, or tab characters, and it must be no longer than 2048 characters.
-     - parameter newParent: The ID of the parent dialog node.
-     - parameter newPreviousSibling: The ID of the previous sibling dialog node.
+       return, newline, or tab characters.
+     - parameter newParent: The ID of the parent dialog node. This property is omitted if the dialog node has no
+       parent.
+     - parameter newPreviousSibling: The ID of the previous sibling dialog node. This property is omitted if the
+       dialog node has no previous sibling.
      - parameter newOutput: The output of the dialog node. For more information about how to specify dialog node
-       output, see the [documentation](https://cloud.ibm.com/docs/services/assistant/dialog-overview.html#complex).
+       output, see the
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-dialog-overview#dialog-overview-responses).
      - parameter newContext: The context for the dialog node.
      - parameter newMetadata: The metadata for the dialog node.
      - parameter newNextStep: The next step to execute following this dialog node.
      - parameter newTitle: The alias used to identify the dialog node. This string must conform to the following
        restrictions:
        - It can contain only Unicode alphanumeric, space, underscore, hyphen, and dot characters.
-       - It must be no longer than 64 characters.
-     - parameter newType: How the dialog node is processed.
+     - parameter newNodeType: How the dialog node is processed.
      - parameter newEventName: How an `event_handler` node is processed.
      - parameter newVariable: The location in the dialog context where output is stored.
      - parameter newActions: An array of objects describing any actions to be invoked by the dialog node.
@@ -3026,7 +3071,6 @@ public class Assistant {
      - parameter newDigressOut: Whether this dialog node can be returned to after a digression.
      - parameter newDigressOutSlots: Whether the user can digress to top-level nodes while filling out slots.
      - parameter newUserLabel: A label that can be displayed externally to describe the purpose of the node to users.
-       This string must be no longer than 512 characters.
      - parameter headers: A dictionary of request headers to be sent with this request.
      - parameter completionHandler: A function executed when the request completes with a successful result or error
      */
@@ -3043,7 +3087,7 @@ public class Assistant {
         newMetadata: [String: JSON]? = nil,
         newNextStep: DialogNodeNextStep? = nil,
         newTitle: String? = nil,
-        newType: String? = nil,
+        newNodeType: String? = nil,
         newEventName: String? = nil,
         newVariable: String? = nil,
         newActions: [DialogNodeAction]? = nil,
@@ -3066,7 +3110,7 @@ public class Assistant {
             metadata: newMetadata,
             nextStep: newNextStep,
             title: newTitle,
-            nodeType: newType,
+            nodeType: newNodeType,
             eventName: newEventName,
             variable: newVariable,
             actions: newActions,
@@ -3074,7 +3118,7 @@ public class Assistant {
             digressOut: newDigressOut,
             digressOutSlots: newDigressOutSlots,
             userLabel: newUserLabel)
-        guard let body = try? JSONEncoder().encode(updateDialogNodeRequest) else {
+        guard let body = try? JSON.encoder.encode(updateDialogNodeRequest) else {
             completionHandler(nil, WatsonError.serialization(values: "request body"))
             return
         }
@@ -3084,8 +3128,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateDialogNode")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "updateDialogNode")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = "application/json"
 
@@ -3136,8 +3180,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteDialogNode")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteDialogNode")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -3176,7 +3220,7 @@ public class Assistant {
        order, prefix the parameter value with a minus sign (`-`).
      - parameter filter: A cacheable parameter that limits the results to those matching the specified filter. For
        more information, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/filter-reference.html#filter-query-syntax).
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-filter-reference#filter-reference).
      - parameter pageLimit: The number of records to return in each page of results.
      - parameter cursor: A token identifying the page of results to retrieve.
      - parameter headers: A dictionary of request headers to be sent with this request.
@@ -3196,8 +3240,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listLogs")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listLogs")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -3250,7 +3294,7 @@ public class Assistant {
      - parameter filter: A cacheable parameter that limits the results to those matching the specified filter. You
        must specify a filter query that includes a value for `language`, as well as a value for `workspace_id` or
        `request.context.metadata.deployment`. For more information, see the
-       [documentation](https://cloud.ibm.com/docs/services/assistant/filter-reference.html#filter-query-syntax).
+       [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-filter-reference#filter-reference).
      - parameter sort: How to sort the returned log events. You can sort by **request_timestamp**. To reverse the sort
        order, prefix the parameter value with a minus sign (`-`).
      - parameter pageLimit: The number of records to return in each page of results.
@@ -3271,8 +3315,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listAllLogs")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "listAllLogs")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters
@@ -3314,7 +3358,7 @@ public class Assistant {
      the customer ID.
      You associate a customer ID with data by passing the `X-Watson-Metadata` header with a request that passes data.
      For more information about personal data and customer IDs, see [Information
-     security](https://cloud.ibm.com/docs/services/assistant/information-security.html).
+     security](https://cloud.ibm.com/docs/services/assistant?topic=assistant-information-security#information-security).
 
      - parameter customerID: The customer ID for which all data is to be deleted.
      - parameter headers: A dictionary of request headers to be sent with this request.
@@ -3330,8 +3374,8 @@ public class Assistant {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteUserData")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "deleteUserData")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
 
         // construct query parameters

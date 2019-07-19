@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ class CompareComplyTests: XCTestCase {
 
     private var compareComply: CompareComply!
 
-    var contractAFile: URL!
-    var contractBFile: URL!
-    var testTableFile: URL!
+    var contractAFile: Data!
+    var contractBFile: Data!
+    var testTableFile: Data!
 
     // MARK: - Test Configuration
 
@@ -63,14 +63,15 @@ class CompareComplyTests: XCTestCase {
         compareComply.defaultHeaders["x-watson-metadata"] = "customer_id=sdk-test-customer-id"
     }
 
-    func loadDocument(name: String, ext: String) -> URL? {
+    func loadDocument(name: String, ext: String) -> Data? {
         #if os(Linux)
         let url = URL(fileURLWithPath: "Tests/CompareComplyV1Tests/Resources/" + name + "." + ext)
         #else
         let bundle = Bundle(for: type(of: self))
         guard let url = bundle.url(forResource: name, withExtension: ext) else { return nil }
         #endif
-        return url
+        let data = try? Data(contentsOf: url)
+        return data
     }
 
     func waitForExpectations(timeout: TimeInterval = 20.0) {
@@ -89,8 +90,7 @@ class CompareComplyTests: XCTestCase {
 
         compareComply.convertToHTML(
             file: file,
-            modelID: nil,
-            fileContentType: nil) {
+            filename: "contract_A.pdf") {
                 response, error in
 
                 if let error = error {
@@ -121,7 +121,7 @@ class CompareComplyTests: XCTestCase {
 
         compareComply.classifyElements(
             file: contractAFile,
-            modelID: nil) {
+            fileContentType: "application/pdf") {
                 response, error in
 
                 if let error = error {
@@ -159,7 +159,6 @@ class CompareComplyTests: XCTestCase {
 
         compareComply.extractTables(
             file: testTableFile,
-            modelID: nil,
             fileContentType: "application/pdf") {
                 response, error in
 
@@ -191,11 +190,10 @@ class CompareComplyTests: XCTestCase {
         compareComply.compareDocuments(
             file1: contractAFile,
             file2: contractBFile,
-            file1Label: "contract_a",
-            file2Label: "contract_b",
-            modelID: nil,
             file1ContentType: "application/pdf",
-            file2ContentType: "application/pdf") {
+            file2ContentType: "application/pdf",
+            file1Label: "contract_a",
+            file2Label: "contract_b") {
                 response, error in
 
                 if let error = error {
@@ -296,14 +294,14 @@ class CompareComplyTests: XCTestCase {
                 }
 
                 XCTAssertEqual(result.comment, myComment)
-                XCTAssertEqual(result.userID, userID)
+                // Bug 11478
+                // XCTAssertEqual(result.userID, userID)
 
                 newFeedbackID = feedbackID
 
                 expectation1.fulfill()
         }
         waitForExpectations()
-
 
         let expectation2 = self.expectation(description: "Get feedback")
         compareComply.getFeedback(
@@ -319,12 +317,13 @@ class CompareComplyTests: XCTestCase {
                     return
                 }
 
-                XCTAssertEqual(result.comment, myComment)
+                // Bug 11500
+                // XCTAssertEqual(result.comment, myComment)
+                XCTAssertNotNil(result.comment)
 
                 expectation2.fulfill()
         }
         waitForExpectations()
-
 
         let expectation3 = self.expectation(description: "List feedback")
         compareComply.listFeedback() {
@@ -346,7 +345,6 @@ class CompareComplyTests: XCTestCase {
         }
         waitForExpectations()
 
-
         let expectation4 = self.expectation(description: "Delete feedback")
         compareComply.deleteFeedback(
             feedbackID: newFeedbackID) {
@@ -367,6 +365,215 @@ class CompareComplyTests: XCTestCase {
         }
         waitForExpectations()
     }
+
+    #if !os(Linux)  // Linux does not support teardown blocks
+    func testBug11478() {
+        let expectation1 = self.expectation(description: "Add feedback")
+
+        let location = Location(begin: 0, end: 1)
+        let text = """
+                    1. IBM will provide a Senior Managing Consultant / expert resource, for up to 80 hours, to assist
+                    Florida Power & Light (FPL) with the creation of an IT infrastructure unit cost model for existing
+                    infrastructure."
+                    """
+
+        let originalType1 = TypeLabel(
+            label: Label(nature: "Obligation", party: "IBM"),
+            provenanceIDs: ["85f5981a-ba91-44f5-9efa-0bd22e64b7bc", "ce0480a1-5ef1-4c3e-9861-3743b5610795"]
+        )
+        let originalType2 = TypeLabel(
+            label: Label(nature: "Exclusion", party: "End User"),
+            provenanceIDs: ["85f5981a-ba91-44f5-9efa-0bd22e64b7bc", "ce0480a1-5ef1-4c3e-9861-3743b5610795"]
+        )
+        let originalCategory1 = CompareComplyV1.Category(
+            label: "Responsibilities",
+            provenanceIDs: []
+        )
+        let originalCategory2 = CompareComplyV1.Category(
+            label: "Amendments",
+            provenanceIDs: []
+        )
+        let originalLabels = OriginalLabelsIn(types: [originalType1, originalType2], categories: [originalCategory1, originalCategory2])
+
+        let updatedType1 = TypeLabel(
+            label: Label(nature: "Obligation", party: "IBM"),
+            provenanceIDs: nil
+        )
+        let updatedType2 = TypeLabel(
+            label: Label(nature: "Disclaimer", party: "Buyer"),
+            provenanceIDs: nil
+        )
+        let updatedCategory1 = CompareComplyV1.Category(
+            label: "Responsibilities",
+            provenanceIDs: nil
+        )
+        let updatedCategory2 = CompareComplyV1.Category(
+            label: "Audits",
+            provenanceIDs: nil
+        )
+        let updatedLabels = UpdatedLabelsIn(types: [updatedType1, updatedType2], categories: [updatedCategory1, updatedCategory2])
+
+        let document = ShortDoc(title: "Super important document", hash: nil)
+        let modelID = "contracts"
+        let modelVersion = "11.00"
+
+        let feedbackDataInput = FeedbackDataInput(
+            feedbackType: "element_classification",
+            location: location,
+            text: text,
+            originalLabels: originalLabels,
+            updatedLabels: updatedLabels,
+            document: document,
+            modelID: modelID,
+            modelVersion: modelVersion)
+
+        var newFeedbackID: String!
+        // Add a teardown block to delete the Feedback entry
+        addTeardownBlock {
+            if newFeedbackID != nil {
+                self.compareComply.deleteFeedback(feedbackID: newFeedbackID) {_,_ in }
+            }
+        }
+        let userID = "Anthony"
+        let myComment = "Compare and Comply is the best!"
+        compareComply.addFeedback(
+            feedbackData: feedbackDataInput,
+            userID: userID,
+            comment: myComment) {
+                response, error in
+
+                if let error = error {
+                    XCTFail(unexpectedErrorMessage(error))
+                    return
+                }
+                guard let result = response?.result else {
+                    XCTFail(missingResultMessage)
+                    return
+                }
+                newFeedbackID = result.feedbackID
+
+                XCTAssertEqual(result.comment, myComment)
+                // Bug opened with CnC team: #11478
+                XCTAssertEqual(result.userID, userID)
+
+                expectation1.fulfill()
+        }
+        waitForExpectations()
+    }
+
+    func testBug11500() {
+        let expectation1 = self.expectation(description: "Add feedback")
+
+        let location = Location(begin: 0, end: 1)
+        let text = """
+                    1. IBM will provide a Senior Managing Consultant / expert resource, for up to 80 hours, to assist
+                    Florida Power & Light (FPL) with the creation of an IT infrastructure unit cost model for existing
+                    infrastructure."
+                    """
+
+        let originalType1 = TypeLabel(
+            label: Label(nature: "Obligation", party: "IBM"),
+            provenanceIDs: ["85f5981a-ba91-44f5-9efa-0bd22e64b7bc", "ce0480a1-5ef1-4c3e-9861-3743b5610795"]
+        )
+        let originalType2 = TypeLabel(
+            label: Label(nature: "Exclusion", party: "End User"),
+            provenanceIDs: ["85f5981a-ba91-44f5-9efa-0bd22e64b7bc", "ce0480a1-5ef1-4c3e-9861-3743b5610795"]
+        )
+        let originalCategory1 = CompareComplyV1.Category(
+            label: "Responsibilities",
+            provenanceIDs: []
+        )
+        let originalCategory2 = CompareComplyV1.Category(
+            label: "Amendments",
+            provenanceIDs: []
+        )
+        let originalLabels = OriginalLabelsIn(types: [originalType1, originalType2], categories: [originalCategory1, originalCategory2])
+
+        let updatedType1 = TypeLabel(
+            label: Label(nature: "Obligation", party: "IBM"),
+            provenanceIDs: nil
+        )
+        let updatedType2 = TypeLabel(
+            label: Label(nature: "Disclaimer", party: "Buyer"),
+            provenanceIDs: nil
+        )
+        let updatedCategory1 = CompareComplyV1.Category(
+            label: "Responsibilities",
+            provenanceIDs: nil
+        )
+        let updatedCategory2 = CompareComplyV1.Category(
+            label: "Audits",
+            provenanceIDs: nil
+        )
+        let updatedLabels = UpdatedLabelsIn(types: [updatedType1, updatedType2], categories: [updatedCategory1, updatedCategory2])
+
+        let document = ShortDoc(title: "Super important document", hash: nil)
+        let modelID = "contracts"
+        let modelVersion = "11.00"
+
+        let feedbackDataInput = FeedbackDataInput(
+            feedbackType: "element_classification",
+            location: location,
+            text: text,
+            originalLabels: originalLabels,
+            updatedLabels: updatedLabels,
+            document: document,
+            modelID: modelID,
+            modelVersion: modelVersion)
+
+        var newFeedbackID: String!
+        // Add a teardown block to delete the Feedback entry
+        addTeardownBlock {
+            if newFeedbackID != nil {
+                self.compareComply.deleteFeedback(feedbackID: newFeedbackID) {_,_ in }
+            }
+        }
+        let userID = "Anthony"
+        let myComment = "Compare and Comply is the best!"
+        compareComply.addFeedback(
+            feedbackData: feedbackDataInput,
+            userID: userID,
+            comment: myComment) {
+                response, error in
+
+                if let error = error {
+                    XCTFail(unexpectedErrorMessage(error))
+                    return
+                }
+                guard let result = response?.result else {
+                    XCTFail(missingResultMessage)
+                    return
+                }
+                newFeedbackID = result.feedbackID
+
+                XCTAssertEqual(result.comment, myComment)
+
+                expectation1.fulfill()
+        }
+        waitForExpectations()
+
+        let expectation2 = self.expectation(description: "Get feedback")
+        compareComply.getFeedback(
+        feedbackID: newFeedbackID) {
+            response, error in
+
+            if let error = error {
+                XCTFail(unexpectedErrorMessage(error))
+                return
+            }
+            guard let result = response?.result else {
+                XCTFail(missingResultMessage)
+                return
+            }
+
+            // Bug opened with CnC team: #11500
+            XCTAssertEqual(result.comment, myComment)
+
+            expectation2.fulfill()
+        }
+        waitForExpectations()
+    }
+    #endif
 
     func testBatchOperations() {
         guard let credentialsInput = loadDocument(name: "cloud-object-storage-credentials-input", ext: "json"),

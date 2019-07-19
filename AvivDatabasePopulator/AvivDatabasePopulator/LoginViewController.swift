@@ -7,8 +7,11 @@
 //
 
 import UIKit
-import FacebookLogin
-import FacebookCore
+//import FacebookLogin
+//import FacebookCore
+import FBSDKCoreKit
+//import FacebookLogin
+import FBSDKLoginKit
 
 class LoginViewController: UIViewController {
     
@@ -86,52 +89,69 @@ class LoginViewController: UIViewController {
             
             //Pede permissão ao Facebook
             let loginManager = LoginManager()
-            loginManager.logIn(readPermissions: [.publicProfile, .email, .userGender, .userPosts] , viewController: self){loginResult in
-                switch loginResult {
-                case .failed(let error):
-                    print(error)
-                case .cancelled:
-                    print("User cancelled login.")
-                case .success( _, _, _):
-                    print("Logged in!")
-                    
-                    let connection = GraphRequestConnection()
-                    connection.add(FacebookProfileRequest()) { response, result in
-                        switch result {
-                        case .success(let response):
-                            
-                            //Prints de teste:
-                            print("I'm at Login Button Clicked, Facebook graph request")
-                            print("Custom Graph Request Succeeded: \(response)")
-                            print("My facebook id is \(response.id)")
-                            print("My name is \(response.name)")
-                            print("My gender is \(response.gender)")
-                            print("My e-mail is \(response.email)")
-                            
-                            let profile = GenerateUserProfile.init()
-                            
-                            profile.sendUserInfoToFirebase(
-                                name: self.nameField.text!,
-                                city: self.cityField.text!,
-                                category: self.categoryField.text!,
-                                link: self.linkField.text!,
-                                image: self.imageField.text!,
-                                description: self.descriptionField.text!,
-                                id: response.id,
-                                posts: response.posts)
-                            
-                        case .failed(let error):
-                            print("Graph request at login have failed: \(error)")
-                        }
-                    }
-                    connection.start()
+//            loginManager.logIn(readPermissions: [.publicProfile, .email, .userGender, .userPosts] , viewController: self){loginResult in
+            loginManager.logIn(permissions: ["public_profile", "email", "user_gender", "user_posts"], from: self, handler: { result, error in
+                
+                guard let result = result else {
+                    print("No result found")
+                    return
+                }
+                
+                if result.isCancelled {
+                    print("Cancelled \(error?.localizedDescription ?? "unkown")")
+                } else if let error = error {
+                    print("Process error \(error.localizedDescription)")
+                } else {
+                    print("Logged in")
+                }
+            })
+        
+//
+//                switch loginResult {
+//                case .failed(let error):
+//                    print(error)
+//                case .cancelled:
+//                    print("User cancelled login.")
+//                case .success( _, _, _):
+//                    print("Logged in!")
+//
+//                    let connection = GraphRequestConnection()
+//                    connection.add(FacebookProfileRequest()) { response, result in
+//                        switch result {
+//                        case .success(let response):
+//
+//                            //Prints de teste:
+//                            print("I'm at Login Button Clicked, Facebook graph request")
+//                            print("Custom Graph Request Succeeded: \(response)")
+//                            print("My facebook id is \(response.id)")
+//                            print("My name is \(response.name)")
+//                            print("My gender is \(response.gender)")
+//                            print("My e-mail is \(response.email)")
+//
+//                            let profile = GenerateUserProfile.init()
+//
+//                            profile.sendUserInfoToFirebase(
+//                                name: self.nameField.text!,
+//                                city: self.cityField.text!,
+//                                category: self.categoryField.text!,
+//                                link: self.linkField.text!,
+//                                image: self.imageField.text!,
+//                                description: self.descriptionField.text!,
+//                                id: response.id,
+//                                posts: response.posts)
+//
+//                        case .failed(let error):
+//                            print("Graph request at login have failed: \(error)")
+//                        }
+//                    }
+                    //connection.start()
                     
                     //Change view to Tab Bar Controller
-                    let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-                    let newViewController = storyBoard.instantiateViewController(withIdentifier: "sendViewController")
-                    self.present(newViewController, animated: true, completion: nil)
-                }
-            }
+//                    let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//                    let newViewController = storyBoard.instantiateViewController(withIdentifier: "sendViewController")
+//                    self.present(newViewController, animated: true, completion: nil)
+//                }
+//            }
         }
     }
     

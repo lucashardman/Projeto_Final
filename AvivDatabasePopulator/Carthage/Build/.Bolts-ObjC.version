@@ -1,9 +1,0 @@
-{
-  "commitish" : "1.9.0",
-  "iOS" : [
-    {
-      "name" : "Bolts",
-      "hash" : "f7eb57fe6ad3eba029e7a4dc72613b07e72aefe30174ef0c22c7645e3c1887aa"
-    }
-  ]
-}

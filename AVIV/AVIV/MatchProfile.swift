@@ -208,9 +208,9 @@ class MatchProfile: UIViewController {
         var result: Double = 0
         
         if user > suggestion{
-            result = result + (1 - (user - suggestion))
+            result = 1 - (user - suggestion)
         }else{
-            result = result + (1 - (suggestion - user))
+            result = 1 - (suggestion - user)
         }
         return result
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class TextToSpeechTests: XCTestCase {
         "ja-JP_EmiVoice",
         "pt-BR_IsabelaVoice",
     ]
-    private let litePlanMessage = "This feature is not available for the Bluemix Lite plan."
+    private let litePlanMessage = "This feature is not available for the IBM Cloud Lite plan."
 
     static var allTests: [(String, (TextToSpeechTests) -> () throws -> Void)] {
         return [

@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class VisualRecognitionWithIAMTests: XCTestCase {
     /** Get access token using IAM API Key. */
     func getTokenInfo(apiKey: String, refreshToken: String? = nil) -> [String: Any]? {
         // swiftlint:disable force_unwrapping
-        let url = URL(string: "https://iam.ng.bluemix.net/identity/token")!
+        let url = URL(string: "https://iam.cloud.ibm.com/identity/token")!
         let auth = "bx:bx".data(using: String.Encoding.utf8)!.base64EncodedString()
         // swiftlint:enable force_unwrapping
         var request = URLRequest(url: url)
@@ -90,7 +90,7 @@ class VisualRecognitionWithIAMTests: XCTestCase {
 
         let expectation = self.expectation(description: "Access service using IAM API Key WatsonCredentials.")
 
-        visualRecognition.classify(acceptLanguage: "en", url: ginniURL) {
+        visualRecognition.classify(url: ginniURL, acceptLanguage: "en") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))
@@ -145,7 +145,7 @@ class VisualRecognitionWithIAMTests: XCTestCase {
         // Verify access to the service using the access token
 
         let expectation = self.expectation(description: "Access VR service with access token")
-        visualRecognition.classify(acceptLanguage: "en", url: obamaURL) {
+        visualRecognition.classify(url: obamaURL, acceptLanguage: "en") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))
@@ -192,7 +192,7 @@ class VisualRecognitionWithIAMTests: XCTestCase {
         // Verify access to the service using the refreshed access token
 
         let expectation2 = self.expectation(description: "Access VR service with refreshed access token")
-        visualRecognition.classify(acceptLanguage: "en", url: trumpURL) {
+        visualRecognition.classify(url: trumpURL, acceptLanguage: "en") {
             response, error in
             if let error = error {
                 XCTFail(unexpectedErrorMessage(error))

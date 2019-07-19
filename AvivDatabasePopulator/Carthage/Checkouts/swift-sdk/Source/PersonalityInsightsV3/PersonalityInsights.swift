@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,10 @@ import RestKit
  personality characteristics. The service can infer consumption preferences based on the results of its analysis and,
  for JSON content that is timestamped, can report temporal behavior.
  * For information about the meaning of the models that the service uses to describe personality characteristics, see
- [Personality models](https://cloud.ibm.com/docs/services/personality-insights/models.html).
+ [Personality
+ models](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-models#models).
  * For information about the meaning of the consumption preferences, see [Consumption
- preferences](https://cloud.ibm.com/docs/services/personality-insights/preferences.html).
+ preferences](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-preferences#preferences).
  **Note:** Request logging is disabled for the Personality Insights service. Regardless of whether you set the
  `X-Watson-Learning-Opt-Out` request header, the service does not log or retain data from requests and responses.
  */
@@ -47,22 +48,23 @@ public class PersonalityInsights {
     var authMethod: AuthenticationMethod
     let version: String
 
+    #if os(Linux)
     /**
      Create a `PersonalityInsights` object.
 
-     Use this initializer to automatically pull service credentials from your credentials file.
-     This file is downloaded from your service instance on IBM Cloud as ibm-credentials.env.
+     This initializer will retrieve credentials from the environment or a local credentials file.
+     The credentials file can be downloaded from your service instance on IBM Cloud as ibm-credentials.env.
      Make sure to add the credentials file to your project so that it can be loaded at runtime.
 
-     If the credentials cannot be loaded from the file, or the file is not found, initialization will fail.
+     If credentials are not available in the environment or a local credentials file, initialization will fail.
      In that case, try another initializer that directly passes in the credentials.
 
-     - parameter credentialsFile: The URL of the credentials file.
      - parameter version: The release date of the version of the API to use. Specify the date
        in "YYYY-MM-DD" format.
      */
-    public init?(credentialsFile: URL, version: String) {
-        guard let credentials = Shared.extractCredentials(from: credentialsFile, serviceName: "personality_insights") else {
+    public init?(version: String) {
+        self.version = version
+        guard let credentials = Shared.extractCredentials(serviceName: "personality_insights") else {
             return nil
         }
         guard let authMethod = Shared.getAuthMethod(from: credentials) else {
@@ -72,20 +74,22 @@ public class PersonalityInsights {
             self.serviceURL = serviceURL
         }
         self.authMethod = authMethod
-        self.version = version
+        RestRequest.userAgent = Shared.userAgent
     }
+    #endif
 
     /**
      Create a `PersonalityInsights` object.
 
-     - parameter username: The username used to authenticate with the service.
-     - parameter password: The password used to authenticate with the service.
      - parameter version: The release date of the version of the API to use. Specify the date
        in "YYYY-MM-DD" format.
+     - parameter username: The username used to authenticate with the service.
+     - parameter password: The password used to authenticate with the service.
      */
-    public init(username: String, password: String, version: String) {
-        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+    public init(version: String, username: String, password: String) {
         self.version = version
+        self.authMethod = Shared.getAuthMethod(username: username, password: password)
+        RestRequest.userAgent = Shared.userAgent
     }
 
     /**
@@ -99,6 +103,7 @@ public class PersonalityInsights {
     public init(version: String, apiKey: String, iamUrl: String? = nil) {
         self.authMethod = Shared.getAuthMethod(apiKey: apiKey, iamURL: iamUrl)
         self.version = version
+        RestRequest.userAgent = Shared.userAgent
     }
 
     /**
@@ -109,8 +114,9 @@ public class PersonalityInsights {
      - parameter accessToken: An access token for the service.
      */
     public init(version: String, accessToken: String) {
-        self.authMethod = IAMAccessToken(accessToken: accessToken)
         self.version = version
+        self.authMethod = IAMAccessToken(accessToken: accessToken)
+        RestRequest.userAgent = Shared.userAgent
     }
 
     public func accessToken(_ newToken: String) {
@@ -118,6 +124,16 @@ public class PersonalityInsights {
             self.authMethod = IAMAccessToken(accessToken: newToken)
         }
     }
+
+    #if !os(Linux)
+    /**
+      Allow network requests to a server without verification of the server certificate.
+      **IMPORTANT**: This should ONLY be used if truly intended, as it is unsafe otherwise.
+     */
+    public func disableSSLVerification() {
+        session = InsecureConnection.session()
+    }
+    #endif
 
     /**
      Use the HTTP response and data received by the Personality Insights service to extract
@@ -133,19 +149,25 @@ public class PersonalityInsights {
         var metadata = [String: Any]()
 
         do {
-            let json = try JSONDecoder().decode([String: JSON].self, from: data)
-            metadata = [:]
-            if case let .some(.string(message)) = json["error"] {
+            let json = try JSON.decoder.decode([String: JSON].self, from: data)
+            metadata["response"] = json
+            if case let .some(.array(errors)) = json["errors"],
+                case let .some(.object(error)) = errors.first,
+                case let .some(.string(message)) = error["message"] {
                 errorMessage = message
+            } else if case let .some(.string(message)) = json["error"] {
+                errorMessage = message
+            } else if case let .some(.string(message)) = json["message"] {
+                errorMessage = message
+            } else {
+                errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
             }
-            if case let .some(.string(help)) = json["help"] {
-                metadata["help"] = help
-            }
-            // If metadata is empty, it should show up as nil in the WatsonError
-            return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: !metadata.isEmpty ? metadata : nil)
         } catch {
-            return WatsonError.http(statusCode: statusCode, message: nil, metadata: nil)
+            metadata["response"] = data
+            errorMessage = HTTPURLResponse.localizedString(forStatusCode: response.statusCode)
         }
+
+        return WatsonError.http(statusCode: statusCode, message: errorMessage, metadata: metadata)
     }
 
     /**
@@ -155,8 +177,10 @@ public class PersonalityInsights {
      content, but it requires much less text to produce an accurate profile. The service can analyze text in Arabic,
      English, Japanese, Korean, or Spanish. It can return its results in a variety of languages.
      **See also:**
-     * [Requesting a profile](https://cloud.ibm.com/docs/services/personality-insights/input.html)
-     * [Providing sufficient input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient)
+     * [Requesting a
+     profile](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#input)
+     * [Providing sufficient
+     input](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#sufficient)
      ### Content types
       You can provide input content as plain text (`text/plain`), HTML (`text/html`), or JSON (`application/json`) by
      specifying the **Content-Type** parameter. The default is `text/plain`.
@@ -166,19 +190,21 @@ public class PersonalityInsights {
      When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the character
      encoding of the input text; for example, `Content-Type: text/plain;charset=utf-8`.
      **See also:** [Specifying request and response
-     formats](https://cloud.ibm.com/docs/services/personality-insights/input.html#formats)
+     formats](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#formats)
      ### Accept types
       You must request a response as JSON (`application/json`) or comma-separated values (`text/csv`) by specifying the
      **Accept** parameter. CSV output includes a fixed number of columns. Set the **csv_headers** parameter to `true` to
      request optional column headers for CSV output.
      **See also:**
-     * [Understanding a JSON profile](https://cloud.ibm.com/docs/services/personality-insights/output.html)
-     * [Understanding a CSV profile](https://cloud.ibm.com/docs/services/personality-insights/output-csv.html).
+     * [Understanding a JSON
+     profile](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-output#output)
+     * [Understanding a CSV
+     profile](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-outputCSV#outputCSV).
 
      - parameter profileContent: A maximum of 20 MB of content to analyze, though the service requires much less text;
        for more information, see [Providing sufficient
-       input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient). For JSON input, provide
-       an object of type `Content`.
+       input](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#sufficient). For
+       JSON input, provide an object of type `Content`.
      - parameter contentLanguage: The language of the input text for the request: Arabic, English, Japanese, Korean,
        or Spanish. Regional variants are treated as their parent language; for example, `en-US` is interpreted as `en`.
        The effect of the **Content-Language** parameter depends on the **Content-Type** parameter. When **Content-Type**
@@ -218,8 +244,8 @@ public class PersonalityInsights {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "profile")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "profile")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "application/json"
         headerParameters["Content-Type"] = profileContent.contentType
         if let contentLanguage = contentLanguage {
@@ -264,8 +290,10 @@ public class PersonalityInsights {
      content, but it requires much less text to produce an accurate profile. The service can analyze text in Arabic,
      English, Japanese, Korean, or Spanish. It can return its results in a variety of languages.
      **See also:**
-     * [Requesting a profile](https://cloud.ibm.com/docs/services/personality-insights/input.html)
-     * [Providing sufficient input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient)
+     * [Requesting a
+     profile](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#input)
+     * [Providing sufficient
+     input](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#sufficient)
      ### Content types
       You can provide input content as plain text (`text/plain`), HTML (`text/html`), or JSON (`application/json`) by
      specifying the **Content-Type** parameter. The default is `text/plain`.
@@ -275,19 +303,21 @@ public class PersonalityInsights {
      When specifying a content type of plain text or HTML, include the `charset` parameter to indicate the character
      encoding of the input text; for example, `Content-Type: text/plain;charset=utf-8`.
      **See also:** [Specifying request and response
-     formats](https://cloud.ibm.com/docs/services/personality-insights/input.html#formats)
+     formats](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#formats)
      ### Accept types
       You must request a response as JSON (`application/json`) or comma-separated values (`text/csv`) by specifying the
      **Accept** parameter. CSV output includes a fixed number of columns. Set the **csv_headers** parameter to `true` to
      request optional column headers for CSV output.
      **See also:**
-     * [Understanding a JSON profile](https://cloud.ibm.com/docs/services/personality-insights/output.html)
-     * [Understanding a CSV profile](https://cloud.ibm.com/docs/services/personality-insights/output-csv.html).
+     * [Understanding a JSON
+     profile](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-output#output)
+     * [Understanding a CSV
+     profile](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-outputCSV#outputCSV).
 
      - parameter profileContent: A maximum of 20 MB of content to analyze, though the service requires much less text;
        for more information, see [Providing sufficient
-       input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient). For JSON input, provide
-       an object of type `Content`.
+       input](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#sufficient). For
+       JSON input, provide an object of type `Content`.
      - parameter contentLanguage: The language of the input text for the request: Arabic, English, Japanese, Korean,
        or Spanish. Regional variants are treated as their parent language; for example, `en-US` is interpreted as `en`.
        The effect of the **Content-Language** parameter depends on the **Content-Type** parameter. When **Content-Type**
@@ -330,8 +360,8 @@ public class PersonalityInsights {
         if let headers = headers {
             headerParameters.merge(headers) { (_, new) in new }
         }
-        let metadataHeaders = Shared.getMetadataHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "profileAsCSV")
-        headerParameters.merge(metadataHeaders) { (_, new) in new }
+        let sdkHeaders = Shared.getSDKHeaders(serviceName: serviceName, serviceVersion: serviceVersion, methodName: "profileAsCSV")
+        headerParameters.merge(sdkHeaders) { (_, new) in new }
         headerParameters["Accept"] = "text/csv"
         headerParameters["Content-Type"] = profileContent.contentType
         if let contentLanguage = contentLanguage {

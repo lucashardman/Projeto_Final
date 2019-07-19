@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,7 +208,7 @@ internal class SpeechToTextSocket: WebSocketDelegate {
     }
 
     private func onErrorMessage(error: String) {
-        let error = WatsonError.other(message: error)
+        let error = WatsonError.other(message: error, metadata: nil)
         onError?(error)
     }
 
@@ -272,7 +272,7 @@ internal class SpeechToTextSocket: WebSocketDelegate {
             self.connect()
             return
         }
-        onError?(WatsonError.other(message: String(describing: error)))
+        onError?(WatsonError.other(message: String(describing: error), metadata: nil))
         onDisconnect?()
     }
 }

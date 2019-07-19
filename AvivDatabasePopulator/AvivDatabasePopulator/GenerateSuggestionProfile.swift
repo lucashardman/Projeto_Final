@@ -78,9 +78,9 @@ class GenerateUserProfile {
         
         //Inicializando PersonalityInsights
         let personalityInsights = PersonalityInsights(
+            version: WatsonCredentials.version,
             username: WatsonCredentials.personalityInsightsUsername,
-            password: WatsonCredentials.personalityInsightsPassword,
-            version: WatsonCredentials.version)
+            password: WatsonCredentials.personalityInsightsPassword)
         
         //Inicializando o LanguageTranslator
         let languageTranslator = LanguageTranslator(version: WatsonCredentials.version, apiKey: WatsonCredentials.languageTranslatorAPIKey)

@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  @abstract A delegate for `FBSDKDeviceLoginViewController`
  */
+NS_SWIFT_NAME(DeviceLoginViewControllerDelegate)
 @protocol FBSDKDeviceLoginViewControllerDelegate <NSObject>
 
 /*!
@@ -44,11 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 */
 - (void)deviceLoginViewController:(FBSDKDeviceLoginViewController *)viewController didFailWithError:(NSError *)error;
 
-@optional
-
-- (void)deviceLoginViewControllerDidFail:(FBSDKDeviceLoginViewController *)viewController error:(NSError *)error
-DEPRECATED_MSG_ATTRIBUTE("Renamed: `deviceLoginViewController:didFailWithError:`");
-
 @end
 
 /*!
@@ -58,7 +54,7 @@ DEPRECATED_MSG_ATTRIBUTE("Renamed: `deviceLoginViewController:didFailWithError:`
 
   Upon success, `FBSDKAccessToken.currentAccessToken` will be set.
 
-  See [Facebook Device Login](https://developers.facebook.com/docs/facebook-login/for-devices).
+  See [Facebook Device Login]( https://developers.facebook.com/docs/facebook-login/for-devices ).
 
  @code
  // from your view controller:
@@ -68,6 +64,7 @@ DEPRECATED_MSG_ATTRIBUTE("Renamed: `deviceLoginViewController:didFailWithError:`
                     animated:YES
                   completion:NULL];
  */
+NS_SWIFT_NAME(FBDeviceLoginViewController)
 @interface FBSDKDeviceLoginViewController : FBSDKDeviceViewControllerBase
 
 /*!
@@ -76,23 +73,16 @@ DEPRECATED_MSG_ATTRIBUTE("Renamed: `deviceLoginViewController:didFailWithError:`
 @property (nullable, nonatomic, weak) id<FBSDKDeviceLoginViewControllerDelegate> delegate;
 
 /*!
- @abstract The publish permissions to request.
- @discussion Note, that if publish permissions are specified, then read permissions should not be specified. Otherwise a NSException will be raised.
- To provide the best experience, you should minimize the number of permissions you request, and only ask for them when needed. For example, do
- not ask for "publish_actions" until you want to post something.
+ @abstract The permissions to request.
+ @discussion To provide the best experience, you should minimize the number of permissions you request, and only ask for them when needed.
+ For example, do not ask for "user_location" until you the information is actually used by the app.
 
- See [the permissions guide](https://developers.facebook.com/docs/facebook-login/permissions/) for more details.
+ Note this is converted to NSSet and is only
+ an NSArray for the convenience of literal syntax.
+
+ See [the permissions guide]( https://developers.facebook.com/docs/facebook-login/permissions/ ) for more details.
  */
-@property (nullable, nonatomic, copy) NSArray<NSString *> *publishPermissions;
-
-/*!
- @abstract The read permissions to request.
- @discussion Note, that if read permissions are specified, then publish permissions should not be specified. Otherwise a NSException will be raised.
- To provide the best experience, you should minimize the number of permissions you request, and only ask for them when needed.
-
- See [the permissions guide](https://developers.facebook.com/docs/facebook-login/permissions/) for more details.
- */
-@property (nullable, nonatomic, copy) NSArray<NSString *> *readPermissions;
+@property (nonatomic, copy) NSArray<NSString *> *permissions;
 
 /*!
  @abstract the optional URL to redirect the user to after they complete the login.

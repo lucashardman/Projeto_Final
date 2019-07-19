@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ class AssistantV1UnitTests: XCTestCase {
 
     override func setUp() {
         assistant = Assistant(version: versionDate, accessToken: accessToken)
-
+        #if !os(Linux)
         let configuration = URLSessionConfiguration.ephemeral
+        #else
+        let configuration = URLSessionConfiguration.default
+        #endif
         configuration.protocolClasses = [MockURLProtocol.self]
         let mockSession = URLSession(configuration: configuration)
         assistant.session = mockSession
@@ -53,17 +56,16 @@ class AssistantV1UnitTests: XCTestCase {
         let testResponse = HTTPURLResponse(url: exampleURL, statusCode: 500, httpVersion: nil, headerFields: nil)!
 
         let error = assistant.errorResponseDecoder(data: testData, response: testResponse)
-        if case let .http(statusCode, message, metadata) = error {
+        if case let .http(statusCode, message, _) = error {
             XCTAssertEqual(statusCode, 500)
-            XCTAssertNil(message)
-            XCTAssertNil(metadata)
+            XCTAssertNotNil(message)
         }
     }
 
     // MARK: - Message
 
     func testMessage() {
-        let input = InputData(text: "asdf")
+        let input = MessageInput(text: "asdf")
         let alternateIntents = true
         let context = Context(conversationID: "Hi, how are you?")
         let entities = [RuntimeEntity(entity: "entity", location: [0], value: "whatever")]
@@ -101,10 +103,10 @@ class AssistantV1UnitTests: XCTestCase {
         assistant.message(
             workspaceID: self.workspaceID,
             input: input,
+            intents: intents,
+            entities: entities,
             alternateIntents: alternateIntents,
             context: context,
-            entities: entities,
-            intents: intents,
             output: output,
             nodesVisitedDetails: true) {
                 _, _ in
@@ -151,8 +153,8 @@ class AssistantV1UnitTests: XCTestCase {
         let language = "en"
         let intents = [CreateIntent(intent: "intent")]
         let entities = [CreateEntity(entity: "entity")]
-        let dialogNodes = [CreateDialogNode(dialogNode: "Best node")]
-        let counterExamples = [CreateCounterexample(text: "no u")]
+        let dialogNodes = [DialogNode(dialogNode: "Best node")]
+        let counterExamples = [Counterexample(text: "no u")]
         let metadata: [String: JSON] = ["key": JSON.string("value")]
         let learningOptOut = true
         let systemSettings = WorkspaceSystemSettings(tooling: nil, disambiguation: nil, humanAgentAssist: nil)
@@ -190,13 +192,13 @@ class AssistantV1UnitTests: XCTestCase {
             name: name,
             description: description,
             language: language,
+            metadata: metadata,
+            learningOptOut: learningOptOut,
+            systemSettings: systemSettings,
             intents: intents,
             entities: entities,
             dialogNodes: dialogNodes,
-            counterexamples: counterExamples,
-            metadata: metadata,
-            learningOptOut: learningOptOut,
-            systemSettings: systemSettings) {
+            counterexamples: counterExamples) {
                 _, _ in
                 expectation.fulfill()
         }
@@ -238,8 +240,8 @@ class AssistantV1UnitTests: XCTestCase {
         let language = "en"
         let intents = [CreateIntent(intent: "intent")]
         let entities = [CreateEntity(entity: "entity")]
-        let dialogNodes = [CreateDialogNode(dialogNode: "Best node")]
-        let counterExamples = [CreateCounterexample(text: "no u")]
+        let dialogNodes = [DialogNode(dialogNode: "Best node")]
+        let counterExamples = [Counterexample(text: "no u")]
         let metadata: [String: JSON] = ["key": JSON.string("value")]
         let learningOptOut = true
         let systemSettings = WorkspaceSystemSettings(tooling: nil, disambiguation: nil, humanAgentAssist: nil)
@@ -281,13 +283,13 @@ class AssistantV1UnitTests: XCTestCase {
             name: name,
             description: description,
             language: language,
+            metadata: metadata,
+            learningOptOut: learningOptOut,
+            systemSettings: systemSettings,
             intents: intents,
             entities: entities,
             dialogNodes: dialogNodes,
             counterexamples: counterExamples,
-            metadata: metadata,
-            learningOptOut: learningOptOut,
-            systemSettings: systemSettings,
             append: true) {
                 _, _ in
                 expectation.fulfill()
@@ -357,7 +359,7 @@ class AssistantV1UnitTests: XCTestCase {
 
     func testCreateIntent() {
         let description = "The best intent there ever was"
-        let examples = [CreateExample(text: "example")]
+        let examples = [Example(text: "example")]
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
@@ -430,7 +432,7 @@ class AssistantV1UnitTests: XCTestCase {
         let intent = "intent"
         let newIntent = "my new intent"
         let newDescription = "the best intent there ever was"
-        let newExamples = [CreateExample(text: "example")]
+        let newExamples = [Example(text: "example")]
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
@@ -540,7 +542,7 @@ class AssistantV1UnitTests: XCTestCase {
     func testCreateExample() {
         let intent = "intent"
         let text = "text"
-        let mentions = [Mentions(entity: "entity", location: [0, 1])]
+        let mentions = [Mention(entity: "entity", location: [0, 1])]
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
@@ -556,7 +558,7 @@ class AssistantV1UnitTests: XCTestCase {
 
             do {
                 let body = Data(reading: request.httpBodyStream!)
-                let decodedBody = try JSONDecoder().decode(CreateExample.self, from: body)
+                let decodedBody = try JSONDecoder().decode(Example.self, from: body)
 
                 XCTAssertEqual(decodedBody.text, text)
                 XCTAssertEqual(decodedBody.mentions, mentions)
@@ -617,7 +619,7 @@ class AssistantV1UnitTests: XCTestCase {
         let intent = "intent"
         let text = "text"
         let newText = "new text"
-        let newMentions = [Mentions(entity: "entity", location: [0, 1])]
+        let newMentions = [Mention(entity: "entity", location: [0, 1])]
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
@@ -741,7 +743,7 @@ class AssistantV1UnitTests: XCTestCase {
 
             do {
                 let body = Data(reading: request.httpBodyStream!)
-                let decodedBody = try JSONDecoder().decode(CreateCounterexample.self, from: body)
+                let decodedBody = try JSONDecoder().decode(Counterexample.self, from: body)
 
                 XCTAssertEqual(decodedBody.text, text)
             } catch {
@@ -934,8 +936,8 @@ class AssistantV1UnitTests: XCTestCase {
             entity: entity,
             description: description,
             metadata: metadata,
-            values: values,
-            fuzzyMatch: fuzzyMatch) {
+            fuzzyMatch: fuzzyMatch,
+            values: values) {
                 _, _ in
                 expectation.fulfill()
         }
@@ -1171,9 +1173,9 @@ class AssistantV1UnitTests: XCTestCase {
             entity: entity,
             value: value,
             metadata: metadata,
+            valueType: valueType,
             synonyms: synonyms,
-            patterns: patterns,
-            valueType: valueType) {
+            patterns: patterns) {
                 _, _ in
                 expectation.fulfill()
         }
@@ -1261,7 +1263,7 @@ class AssistantV1UnitTests: XCTestCase {
             value: value,
             newValue: newValue,
             newMetadata: newMetadata,
-            newType: newType,
+            newValueType: newType,
             newSynonyms: newSynonyms,
             newPatterns: newPatterns) {
                 _, _ in
@@ -1368,7 +1370,7 @@ class AssistantV1UnitTests: XCTestCase {
 
             do {
                 let body = Data(reading: request.httpBodyStream!)
-                let decodedBody = try JSONDecoder().decode(CreateSynonym.self, from: body)
+                let decodedBody = try JSONDecoder().decode(Synonym.self, from: body)
 
                 XCTAssertEqual(decodedBody.synonym, synonym)
             } catch {
@@ -1580,7 +1582,7 @@ class AssistantV1UnitTests: XCTestCase {
 
             do {
                 let body = Data(reading: request.httpBodyStream!)
-                let decodedBody = try JSONDecoder().decode(CreateDialogNode.self, from: body)
+                let decodedBody = try JSONDecoder().decode(DialogNode.self, from: body)
 
                 XCTAssertEqual(decodedBody.dialogNode, dialogNode)
                 XCTAssertEqual(decodedBody.description, description)
@@ -1619,11 +1621,11 @@ class AssistantV1UnitTests: XCTestCase {
             context: context,
             metadata: metadata,
             nextStep: nextStep,
-            actions: actions,
             title: title,
             nodeType: nodeType,
             eventName: eventName,
             variable: variable,
+            actions: actions,
             digressIn: digressIn,
             digressOut: digressOut,
             digressOutSlots: digressOutSlots,
@@ -1741,7 +1743,7 @@ class AssistantV1UnitTests: XCTestCase {
             newMetadata: newMetadata,
             newNextStep: newNextStep,
             newTitle: newTitle,
-            newType: newType,
+            newNodeType: newType,
             newEventName: newEventName,
             newVariable: newVariable,
             newActions: newActions,
@@ -1869,4 +1871,38 @@ class AssistantV1UnitTests: XCTestCase {
         }
         waitForExpectations(timeout: timeout)
     }
+
+    // MARK: - Allow Insecure Connections
+
+    #if !os(Linux)
+    func testAllowInsecureConnections() {
+        let assistant = Assistant(version: versionDate, username: "username", password: "password")
+        XCTAssertNil(assistant.session.delegate)
+        assistant.disableSSLVerification()
+        XCTAssertNotNil(assistant.session.delegate)
+    }
+    #endif
+
+    // MARK: - Inject Credentials
+
+    #if os(Linux)
+    func testInjectCredentialsFromFile() {
+        setenv("IBM_CREDENTIALS_FILE", "Source/SupportingFiles/ibm-credentials.env", 1)
+        let assistant = Assistant(version: versionDate)
+        XCTAssertNotNil(assistant)
+        XCTAssert(assistant?.authMethod is IAMAuthentication)
+    }
+    #endif
 }
+
+#if os(Linux)
+extension AssistantV1UnitTests {
+    static var allTests: [(String, (AssistantV1UnitTests) -> () throws -> ())] {
+        let tests: [(String, (AssistantV1UnitTests) -> () throws -> Void)] = [
+            // Inject Credentials
+            ("testInjectCredentialsFromFile", testInjectCredentialsFromFile),
+        ]
+        return tests
+    }
+}
+#endif

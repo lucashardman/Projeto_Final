@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2016
+ * (C) Copyright IBM Corp. 2016, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class ToneAnalyzerTests: XCTestCase {
         } else {
             let username = WatsonCredentials.ToneAnalyzerUsername
             let password = WatsonCredentials.ToneAnalyzerPassword
-            toneAnalyzer = ToneAnalyzer(username: username, password: password, version: versionDate)
+            toneAnalyzer = ToneAnalyzer(version: versionDate, username: username, password: password)
         }
         if let url = WatsonCredentials.ToneAnalyzerURL {
             toneAnalyzer.serviceURL = url

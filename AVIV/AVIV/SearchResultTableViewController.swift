@@ -83,6 +83,34 @@ class SearchResultTableViewController: UIViewController, UITableViewDataSource, 
         return cell.bounds.height
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        print("ESTE É: \(suggestionsList[indexPath.row].getName())")
+        //let cell = tableView.cellForRow(at: indexPath) as! ResultCell
+        //print(cell.categoryPlaceHolder?.text ?? "Erro")
+//
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "suggestionViewController") as! SuggestionViewController
+
+        newViewController.name = suggestionsList[indexPath.row].getName()
+        newViewController.city = suggestionsList[indexPath.row].getCity()
+        newViewController.text = suggestionsList[indexPath.row].getText()
+        newViewController.category = suggestionsList[indexPath.row].getCategory()
+        newViewController.link = suggestionsList[indexPath.row].getLink()
+        newViewController.image = suggestionsList[indexPath.row].getMainPhoto()
+//        newViewController.profile = self.profile
+//        newViewController.categoryFilters = self.arrayOfCategoryFilter
+//
+//        let delimiter = ","
+//        let token = searchCityBar.text?.components(separatedBy: delimiter)
+//        let city = token![0]
+        //let province = token![1]
+        //let country = token![2]
+        
+   //     newViewController.searchForCity = city
+        
+        self.present(newViewController, animated: true, completion: nil)
+    }
 }
 class ResultCell: UITableViewCell{
     
@@ -99,6 +127,7 @@ class ResultCell: UITableViewCell{
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+        
     }
 }
 

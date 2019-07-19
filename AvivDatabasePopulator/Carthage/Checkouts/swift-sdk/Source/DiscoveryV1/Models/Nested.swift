@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@ public struct Nested: Codable, Equatable {
      */
     public var type: String?
 
+    /**
+     Array of aggregation results.
+     */
     public var results: [AggregationResult]?
 
     /**
@@ -32,7 +35,7 @@ public struct Nested: Codable, Equatable {
     public var matchingResults: Int?
 
     /**
-     Aggregations returned by the Discovery service.
+     Aggregations returned by Discovery.
      */
     public var aggregations: [QueryAggregation]?
 

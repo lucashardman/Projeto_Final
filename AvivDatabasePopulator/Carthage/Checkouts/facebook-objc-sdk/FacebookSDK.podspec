@@ -3,7 +3,7 @@
 Pod::Spec.new do |s|
 
   s.name         = 'FacebookSDK'
-  s.version      = '4.42.0'
+  s.version      = '5.2.3'
   s.summary      = 'Official Facebook SDK for iOS to access Facebook Platform'
 
   s.description  = <<-DESC
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.platform     = :ios, :tvos
   s.ios.deployment_target = '8.0'
-  s.tvos.deployment_target = '9.0'
+  s.tvos.deployment_target = '10.0'
 
   s.source       = { :git => 'https://github.com/facebook/facebook-objc-sdk.git',
                      :tag => "v#{s.version}" }
@@ -29,34 +29,33 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
 
-  s.dependency 'Bolts', '~> 1.9'
   s.default_subspecs = 'CoreKit', 'MarketingKit'
 
   s.subspec 'CoreKit' do |ss|
-    ss.dependency 'FBSDKCoreKit'
+    ss.dependency 'FBSDKCoreKit', "~> 5.0"
   end
   s.subspec 'LoginKit' do |ss|
     ss.dependency 'FacebookSDK/CoreKit'
-    ss.dependency 'FBSDKLoginKit'
+    ss.dependency 'FBSDKLoginKit', "~> 5.0"
   end
   s.subspec 'ShareKit' do |ss|
     ss.dependency 'FacebookSDK/CoreKit'
-    ss.dependency 'FBSDKShareKit'
+    ss.dependency 'FBSDKShareKit', "~> 5.0"
   end
   s.subspec 'TVOSKit' do |ss|
     ss.platform = :tvos
     ss.dependency 'FacebookSDK/ShareKit'
     ss.dependency 'FacebookSDK/LoginKit'
-    ss.dependency 'FBSDKTVOSKit'
+    ss.dependency 'FBSDKTVOSKit', "~> 5.0"
   end
   s.subspec 'PlacesKit' do |ss|
     ss.platform = :ios
     ss.dependency 'FacebookSDK/CoreKit'
-    ss.dependency 'FBSDKPlacesKit'
+    ss.dependency 'FBSDKPlacesKit', "~> 5.0"
   end
   s.subspec 'MarketingKit' do |ss|
     ss.platform = :ios
     ss.dependency 'FacebookSDK/CoreKit'
-    ss.dependency 'FBSDKMarketingKit'
+    ss.dependency 'FBSDKMarketingKit', "~> 5.0"
   end
 end

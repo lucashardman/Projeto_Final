@@ -1,9 +1,10 @@
 {
-  "commitish" : "2.0.0",
+  "commitish" : "3.0.3",
   "iOS" : [
     {
       "name" : "RestKit",
-      "hash" : "4a727677cc9922459f3839b2a9e1abd3a92e8aeeedf090cdb60dc3ba613159b4"
+      "hash" : "e1a0d1736676298ffd0953d46d2de96c1f7109ad6dd5b9364d5a25eb16c09fff",
+      "swiftToolchainVersion" : "5.0.1 (swiftlang-1001.0.82.4 clang-1001.0.46.5)"
     }
   ]
 }

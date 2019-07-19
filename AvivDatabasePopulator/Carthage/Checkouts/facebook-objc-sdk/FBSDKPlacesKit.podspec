@@ -3,7 +3,7 @@
 Pod::Spec.new do |s|
 
   s.name         = 'FBSDKPlacesKit'
-  s.version      = '4.42.0'
+  s.version      = '5.2.3'
   s.summary      = 'Official Facebook SDK for iOS to access Facebook Places'
 
   s.description  = <<-DESC
@@ -29,8 +29,6 @@ Pod::Spec.new do |s|
 
   s.source_files   = 'FBSDKPlacesKit/FBSDKPlacesKit/**/*.{h,m}'
   s.public_header_files = 'FBSDKPlacesKit/FBSDKPlacesKit/*.{h}'
-  # Allow the weak linking to Bolts (see FBSDKAppLinkResolver.h) in Cocoapods 0.39.0
-  s.pod_target_xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES' }
-  s.dependency 'FBSDKCoreKit'
+  s.dependency 'FBSDKCoreKit', "~> 5.0"
 
 end

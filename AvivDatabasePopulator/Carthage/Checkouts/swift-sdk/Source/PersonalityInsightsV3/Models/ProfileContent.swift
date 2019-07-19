@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corporation 2018
+ * (C) Copyright IBM Corp. 2018, 2019.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  **/
 
 import Foundation
+import RestKit
 
 /**
  A maximum of 20 MB of content to analyze, though the service requires much less text; for more information, see
- [Providing sufficient input](https://cloud.ibm.com/docs/services/personality-insights/input.html#sufficient). For JSON
+ [Providing sufficient
+ input](https://cloud.ibm.com/docs/services/personality-insights?topic=personality-insights-input#sufficient). For JSON
  input, provide an object of type `Content`.
  */
 public enum ProfileContent {
@@ -37,7 +39,7 @@ public enum ProfileContent {
 
     internal var content: Data? {
         switch self {
-        case .content(let content): return try? JSONEncoder().encode(content)
+        case .content(let content): return try? JSON.encoder.encode(content)
         case .html(let html): return html.data(using: .utf8)
         case .text(let text): return text.data(using: .utf8)
         }
