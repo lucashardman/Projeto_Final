@@ -59,30 +59,16 @@ class MatchProfile: UIViewController {
                 print("Total de sugestões: \(self.countSuggestionsTotal)")
                 print("Total de sugestões filtradas: \(self.countSuggestionsFiltered)")
                 
+                //Ordenação do vetor
+                self.sort()
+                
+                //Print de teste
                 for i in self.listOfSuggestions{
                     print("Testando: \(i.getId())\n\(i.getName())\n\(i.getCity())")
                     print ("O match é de \(i.getMatch())%")
                 }
-                /*
-                //Change view to Tab Bar Controller
-                let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 
-                let searchViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
-                let favoriteViewController = storyBoard.instantiateViewController(withIdentifier: "favoriteViewController")
-                let otherNavigationController = storyBoard.instantiateViewController(withIdentifier: "otherNavigationController")
-                
-                let tabViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
-                
-                self.sort()
-                searchViewController.profile = self.profile
-                searchViewController.listOfCities = self.listOfCities
-                
-                tabViewController.viewControllers = [searchViewController, favoriteViewController, otherNavigationController]
-                tabViewController.selectedViewController = searchViewController
-                
-                
-                self.present(tabViewController, animated: true, completion: nil)
-                */
+                //Mudança de view
                 let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 let newViewController = storyBoard.instantiateViewController(withIdentifier: "searchResultTableViewController") as! SearchResultTableViewController
                 
@@ -216,6 +202,7 @@ class MatchProfile: UIViewController {
     }
     
     private func sort(){
-        
+        self.listOfSuggestions = self.listOfSuggestions.sorted(by: {$0.getMatch() > $1.getMatch()})
+
     }
 }

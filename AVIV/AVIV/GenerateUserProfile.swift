@@ -165,8 +165,20 @@ class GenerateUserProfile: UIViewController {
             //Tratamento de erro
             guard let translation = response?.result else {
                 print("Language Translator error: ")
-               
                 print(error?.localizedDescription ?? "Erro desconhecido")
+                
+                let alert = UIAlertController(title: "Ops!", message: error?.localizedDescription ?? "Erro desconhecido", preferredStyle: .alert)
+                
+                alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: { action in
+                    let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                    
+                    let loginViewController = storyBoard.instantiateViewController(withIdentifier: "loginViewController") as! LoginViewController
+                    
+                    self.present(loginViewController, animated: true, completion: nil)
+                }))
+                
+                self.present(alert, animated: true)
+                
                 return
             }
             
@@ -193,6 +205,19 @@ class GenerateUserProfile: UIViewController {
                 guard let profile = response?.result else {
                     print("Personality Insights error: ")
                     print(error?.localizedDescription ?? "Erro desconhecido")
+                    
+                    let alert = UIAlertController(title: "Ops!", message: error?.localizedDescription ?? "Erro desconhecido", preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: { action in
+                        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                        
+                        let loginViewController = storyBoard.instantiateViewController(withIdentifier: "loginViewController") as! LoginViewController
+                        
+                        self.present(loginViewController, animated: true, completion: nil)
+                    }))
+                    
+                    self.present(alert, animated: true)
+                    
                     return
                 }
                 
@@ -235,5 +260,14 @@ class GenerateUserProfile: UIViewController {
         }
         self.profile = profile
         group.leave()
+    }
+    
+    private func exitErrorHandler(){
+        
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let loginViewController = storyBoard.instantiateViewController(withIdentifier: "loginViewController") as! LoginViewController
+        
+        self.present(loginViewController, animated: true, completion: nil)
     }
 }

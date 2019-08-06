@@ -56,6 +56,7 @@ class SearchResultTableViewController: UIViewController, UITableViewDataSource, 
         cell.cityPlaceHolder.text = suggestionsList[indexPath.row].getCity()
         cell.categoryPlaceHolder.text = suggestionsList[indexPath.row].getCategory()
         cell.descriptionPlaceHolder.text = suggestionsList[indexPath.row].getText()
+        cell.matchPlaceHolder.text = "Match: \(Int(suggestionsList[indexPath.row].getMatch()))%"
         cell.descriptionPlaceHolder.numberOfLines = 3
         cell.imagePlaceHolder.loadGif(name: "loading_image")
         
@@ -86,9 +87,7 @@ class SearchResultTableViewController: UIViewController, UITableViewDataSource, 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         print("ESTE É: \(suggestionsList[indexPath.row].getName())")
-        //let cell = tableView.cellForRow(at: indexPath) as! ResultCell
-        //print(cell.categoryPlaceHolder?.text ?? "Erro")
-//
+        
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let newViewController = storyBoard.instantiateViewController(withIdentifier: "suggestionViewController") as! SuggestionViewController
 
@@ -101,16 +100,6 @@ class SearchResultTableViewController: UIViewController, UITableViewDataSource, 
         
         newViewController.profile = self.profile
         newViewController.listOfCities = self.listOfCities
-//        newViewController.profile = self.profile
-//        newViewController.categoryFilters = self.arrayOfCategoryFilter
-//
-//        let delimiter = ","
-//        let token = searchCityBar.text?.components(separatedBy: delimiter)
-//        let city = token![0]
-        //let province = token![1]
-        //let country = token![2]
-        
-   //     newViewController.searchForCity = city
         
         self.present(newViewController, animated: true, completion: nil)
     }
@@ -122,6 +111,7 @@ class ResultCell: UITableViewCell{
     @IBOutlet weak var cityPlaceHolder: UILabel!
     @IBOutlet weak var categoryPlaceHolder: UILabel!
     @IBOutlet weak var descriptionPlaceHolder: UILabel!
+    @IBOutlet weak var matchPlaceHolder: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()

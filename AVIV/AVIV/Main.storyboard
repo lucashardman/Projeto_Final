@@ -562,7 +562,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cidade" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qtk-vn-8o1">
-                                                    <rect key="frame" x="30" y="425" width="354" height="18"/>
+                                                    <rect key="frame" x="30" y="425" width="266" height="18"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -579,20 +579,29 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="Match: xx%" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DdF-Ma-CjX">
+                                                    <rect key="frame" x="306" y="425" width="88" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="DdF-Ma-CjX" firstAttribute="top" secondItem="UQm-Cs-9mD" secondAttribute="bottom" constant="10" id="25w-A9-Dao"/>
                                                 <constraint firstAttribute="trailing" secondItem="7ju-aZ-8Dj" secondAttribute="trailing" id="2kG-mD-3wF"/>
                                                 <constraint firstItem="7ju-aZ-8Dj" firstAttribute="top" secondItem="6IS-Kc-snN" secondAttribute="top" id="5fT-0x-Pv5"/>
                                                 <constraint firstItem="XbL-Yq-438" firstAttribute="top" secondItem="Qtk-vn-8o1" secondAttribute="bottom" constant="10" id="7OF-Gq-tjy"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="XbL-Yq-438" secondAttribute="trailing" constant="10" id="CtQ-WU-43j"/>
                                                 <constraint firstItem="7ju-aZ-8Dj" firstAttribute="top" secondItem="6IS-Kc-snN" secondAttribute="top" id="DlS-Da-ObX"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="Ybx-Oe-eV8" secondAttribute="trailing" constant="10" id="GmI-gU-e6m"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="Qtk-vn-8o1" secondAttribute="trailing" constant="10" id="KVF-WB-4TV"/>
                                                 <constraint firstItem="Qtk-vn-8o1" firstAttribute="leading" secondItem="6IS-Kc-snN" secondAttribute="leadingMargin" constant="10" id="LiR-Lt-D5g"/>
                                                 <constraint firstItem="Qtk-vn-8o1" firstAttribute="top" secondItem="UQm-Cs-9mD" secondAttribute="bottom" constant="10" id="Qhb-xL-jPT"/>
+                                                <constraint firstItem="DdF-Ma-CjX" firstAttribute="trailing" secondItem="6IS-Kc-snN" secondAttribute="trailingMargin" id="XEk-R7-OXX"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="UQm-Cs-9mD" secondAttribute="trailing" constant="10" id="YCq-KX-rtx"/>
                                                 <constraint firstItem="UQm-Cs-9mD" firstAttribute="top" secondItem="7ju-aZ-8Dj" secondAttribute="bottom" constant="10" id="ahT-Pg-Smc"/>
                                                 <constraint firstItem="UQm-Cs-9mD" firstAttribute="leading" secondItem="6IS-Kc-snN" secondAttribute="leadingMargin" constant="10" id="c2f-8E-dcw"/>
+                                                <constraint firstItem="DdF-Ma-CjX" firstAttribute="trailing" secondItem="6IS-Kc-snN" secondAttribute="trailingMargin" id="ceq-7m-oWV"/>
+                                                <constraint firstItem="DdF-Ma-CjX" firstAttribute="leading" secondItem="Qtk-vn-8o1" secondAttribute="trailing" constant="10" id="hm5-YQ-DPJ"/>
                                                 <constraint firstItem="Ybx-Oe-eV8" firstAttribute="leading" secondItem="6IS-Kc-snN" secondAttribute="leadingMargin" constant="10" id="m19-we-IOY"/>
                                                 <constraint firstItem="Ybx-Oe-eV8" firstAttribute="top" secondItem="XbL-Yq-438" secondAttribute="bottom" constant="10" id="nLG-40-CGZ"/>
                                                 <constraint firstItem="7ju-aZ-8Dj" firstAttribute="leading" secondItem="6IS-Kc-snN" secondAttribute="leading" id="oDf-Gg-A8M"/>
@@ -604,6 +613,7 @@
                                             <outlet property="cityPlaceHolder" destination="Qtk-vn-8o1" id="Jag-FS-or0"/>
                                             <outlet property="descriptionPlaceHolder" destination="Ybx-Oe-eV8" id="mYn-Ve-wn1"/>
                                             <outlet property="imagePlaceHolder" destination="7ju-aZ-8Dj" id="qjN-3I-f3W"/>
+                                            <outlet property="matchPlaceHolder" destination="DdF-Ma-CjX" id="8H5-3o-wQe"/>
                                             <outlet property="namePlaceHolder" destination="UQm-Cs-9mD" id="Xa8-0i-FeZ"/>
                                         </connections>
                                     </tableViewCell>

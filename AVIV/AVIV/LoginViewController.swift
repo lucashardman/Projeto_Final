@@ -8,7 +8,6 @@
 
 import UIKit
 import FBSDKCoreKit
-//import FacebookLogin
 import FBSDKLoginKit
 
 class LoginViewController: UIViewController {
@@ -33,7 +32,6 @@ class LoginViewController: UIViewController {
         view.addSubview(loginButton)
     }
     
-    //THIS FUNCTION WORKS WITH FBSDKLoginKit
     @objc func loginButtonClicked() {
         let loginManager = LoginManager()
         loginManager.logIn(permissions: ["public_profile", "email", "user_gender", "user_posts"], from: self, handler: { result, error in
@@ -88,52 +86,6 @@ class LoginViewController: UIViewController {
             }
         })
     }
-//    //THIS FUNCION WORKS WITH FacebookLogin, BUT IS BUGGY
-//    @objc func loginButtonClicked() {
-//
-//        let loginManager = LoginManager()
-//        loginManager.logIn(readPermissions: [.publicProfile, .email, .userGender, .userPosts] , viewController: self){loginResult in
-//
-//            switch loginResult {
-//            case .failed(let error):
-//                print(error)
-//            case .cancelled:
-//                print("User cancelled login.")
-//            case .success( _, _, _):
-//                print("Logged in!")
-//
-//                let connection = GraphRequestConnection()
-//                connection.add(FacebookProfileRequest()) { response, result in
-//                    switch result {
-//                    case .success(let response):
-//
-//                        //Prints de teste:
-//                        print("I'm at Login Button Clicked, Facebook graph request")
-//                        print("Custom Graph Request Succeeded: \(response)")
-//                        print("My facebook id is \(response.id)")
-//                        print("My name is \(response.name)")
-//                        print("My gender is \(response.gender)")
-//                        print("My e-mail is \(response.email)")
-//
-//                        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//                        let newViewController = storyBoard.instantiateViewController(withIdentifier: "generateUserProfile") as! GenerateUserProfile
-//
-//                        newViewController.id = response.id
-//                        newViewController.name = response.name
-//                        newViewController.email = response.email
-//                        newViewController.gender = response.gender
-//                        newViewController.posts = response.posts
-//
-//                        self.present(newViewController, animated: true, completion: nil)
-//
-//                    case .failed(let error):
-//                        print("Graph request at login have failed: \(error)")
-//                    }
-//                }
-//                connection.start()
-//            }
-//        }
-//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

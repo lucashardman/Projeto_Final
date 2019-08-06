@@ -7,16 +7,15 @@
 //
 
 import UIKit
-//import FacebookLogin
-//import FacebookCore
 import FBSDKCoreKit
-//import FacebookLogin
 import FBSDKLoginKit
 
 class LoginViewController: UIViewController {
     
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var cityField: UITextField!
+    @IBOutlet weak var provinceField: UITextField!
+    @IBOutlet weak var countryField: UITextField!
     @IBOutlet weak var categoryField: UITextField!
     @IBOutlet weak var linkField: UITextField!
     @IBOutlet weak var imageField: UITextField!
@@ -27,7 +26,6 @@ class LoginViewController: UIViewController {
         super.viewDidLoad()
         
         loadForm()
-       // loadLoginButton()
     }
     
     private func loadForm(){
@@ -55,28 +53,50 @@ class LoginViewController: UIViewController {
     
     private func verifyFields() -> Bool{
         
+        let listOfCategory = ["Natureza", "Arte", "Cultura", "Vida Noturna", "Landmarks", "Gastronomia", "Compras", "Esportes", "família", "Negócios", "Tecnologia"]
+        
+        let alert = UIAlertController(title: "Ops!", message: "Há campos inválidos ou em branco.", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        
         if nameField.text == "" {
             print("Nome invalido")
+            self.present(alert, animated: true)
             return false
         }
         if cityField.text == ""{
             print("Cidade invalida")
+            self.present(alert, animated: true)
             return false
         }
-        if categoryField.text == ""{
+        if provinceField.text == ""{
+            print("Província invalida")
+            self.present(alert, animated: true)
+            return false
+        }
+        if countryField.text == ""{
+            print("País invalido")
+            self.present(alert, animated: true)
+            return false
+        }
+        if !listOfCategory.contains(categoryField.text ?? "empty"){
             print("Categoria invalida")
+            self.present(alert, animated: true)
             return false
         }
         if linkField.text == ""{
             print("Link invalido")
+            self.present(alert, animated: true)
             return false
         }
         if imageField.text == ""{
             print("Imagem invalida")
+            self.present(alert, animated: true)
             return false
         }
         if descriptionField.text == ""{
             print("Descrição invalida")
+            self.present(alert, animated: true)
             return false
         }
         return true
@@ -89,7 +109,6 @@ class LoginViewController: UIViewController {
             
             //Pede permissão ao Facebook
             let loginManager = LoginManager()
-//            loginManager.logIn(readPermissions: [.publicProfile, .email, .userGender, .userPosts] , viewController: self){loginResult in
             loginManager.logIn(permissions: ["public_profile", "email", "user_gender", "user_posts"], from: self, handler: { result, error in
                 
                 guard let result = result else {
@@ -103,60 +122,54 @@ class LoginViewController: UIViewController {
                     print("Process error \(error.localizedDescription)")
                 } else {
                     print("Logged in")
+                    GraphRequest(graphPath: "me", parameters: ["limit":"1000","fields": "name, id, gender, email, posts"]).start(completionHandler: { (connection, result, error) -> Void in
+                        if (error != nil){
+                            print(error ?? "unkown")
+                            return
+                        }
+                        if let result = result as? Dictionary<String, Any>{
+                            
+                            var posts:[Dictionary<String, Any>]!
+                            var id: String!
+                            
+                            //Prints de teste:
+                            print("I'm at Login Button Clicked, Facebook graph request")
+                            if let getId = result["id"] as? String{
+                                id = getId
+                                print("My facebook id is \(String(describing: id))")
+                            }
+                            if let name = result["name"] as? String{
+                                print("My name is \(name)")
+                            }
+                            if let gender = result["gender"] as? String{
+                                print("My gender is \(gender)")
+                            }
+                            if let email = result["email"] as? String{
+                                print("My e-mail is \(email)")
+                            }
+                            if let aux = result["posts"] as? Dictionary<String, Any>{
+                                posts = aux["data"] as? [Dictionary<String, Any>]
+                                print("Posts:\n \(String(describing: posts))")
+                            }
+                            
+                            let profile = GenerateSuggestionProfile.init()
+                            
+                            profile.sendUserInfoToFirebase(
+                                name: self.nameField.text!,
+                                city: self.cityField.text!,
+                                province: self.provinceField.text!,
+                                country: self.countryField.text!,
+                                category: self.categoryField.text!,
+                                link: self.linkField.text!,
+                                image: self.imageField.text!,
+                                description: self.descriptionField.text!,
+                                id: id,
+                                posts: posts)
+                            
+                        }
+                    })
                 }
             })
-        
-//
-//                switch loginResult {
-//                case .failed(let error):
-//                    print(error)
-//                case .cancelled:
-//                    print("User cancelled login.")
-//                case .success( _, _, _):
-//                    print("Logged in!")
-//
-//                    let connection = GraphRequestConnection()
-//                    connection.add(FacebookProfileRequest()) { response, result in
-//                        switch result {
-//                        case .success(let response):
-//
-//                            //Prints de teste:
-//                            print("I'm at Login Button Clicked, Facebook graph request")
-//                            print("Custom Graph Request Succeeded: \(response)")
-//                            print("My facebook id is \(response.id)")
-//                            print("My name is \(response.name)")
-//                            print("My gender is \(response.gender)")
-//                            print("My e-mail is \(response.email)")
-//
-//                            let profile = GenerateUserProfile.init()
-//
-//                            profile.sendUserInfoToFirebase(
-//                                name: self.nameField.text!,
-//                                city: self.cityField.text!,
-//                                category: self.categoryField.text!,
-//                                link: self.linkField.text!,
-//                                image: self.imageField.text!,
-//                                description: self.descriptionField.text!,
-//                                id: response.id,
-//                                posts: response.posts)
-//
-//                        case .failed(let error):
-//                            print("Graph request at login have failed: \(error)")
-//                        }
-//                    }
-                    //connection.start()
-                    
-                    //Change view to Tab Bar Controller
-//                    let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//                    let newViewController = storyBoard.instantiateViewController(withIdentifier: "sendViewController")
-//                    self.present(newViewController, animated: true, completion: nil)
-//                }
-//            }
         }
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 }

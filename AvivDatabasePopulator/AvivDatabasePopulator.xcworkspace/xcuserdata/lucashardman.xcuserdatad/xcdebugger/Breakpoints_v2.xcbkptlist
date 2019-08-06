@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AvivDatabasePopulator/LoginViewController.swift"
-            timestampString = "586799921.763193"
+            timestampString = "586815211.014683"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
             landmarkName = "loadLoginButton()"
             landmarkType = "7">
          </BreakpointContent>

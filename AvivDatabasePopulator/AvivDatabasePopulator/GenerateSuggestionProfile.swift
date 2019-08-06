@@ -53,7 +53,7 @@ struct FacebookProfileRequest: GraphRequestProtocol {
     var apiVersion: GraphAPIVersion = .defaultVersion
 }
 
-class GenerateUserProfile {
+class GenerateSuggestionProfile {
     
     var firebase: Firestore!
     
@@ -61,14 +61,12 @@ class GenerateUserProfile {
         firebase = Firestore.firestore()
     }
     
-    func sendUserInfoToFirebase(name: String, city: String, category: String, link: String, image: String, description: String, id: String, posts: [Dictionary<String, Any>]){
+    func sendUserInfoToFirebase(name: String, city: String, province: String, country: String, category: String, link: String, image: String, description: String, id: String, posts: [Dictionary<String, Any>]){
         
         print("\nDados recebidos do formulario:\n")
         print("nome: \(name)\ncity: \(city)\ncategory: \(category)\nlink: \(link)\nimage: \(image)\ndescription: \(description)\n")
         
-        let dataToSave: [String: String] = ["name": name,"city": city, "category": category, "link": link, "image": image, "description": description]
-        
-        //firebase.collection("suggestions").document(id).setData(dataToSave)
+        let dataToSave: [String: String] = ["name": name,"city": city, "province": province, "country": country, "category": category, "link": link, "image": image, "description": description]
  
         //Requisitando o processamento das postagens pelo Personality Insights
         self.processFacebookPostsWithPersonalityInsights(posts: posts, id: id, city: city, category: category, data: dataToSave)
