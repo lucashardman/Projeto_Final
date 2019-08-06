@@ -98,6 +98,9 @@ class SearchResultTableViewController: UIViewController, UITableViewDataSource, 
         newViewController.category = suggestionsList[indexPath.row].getCategory()
         newViewController.link = suggestionsList[indexPath.row].getLink()
         newViewController.image = suggestionsList[indexPath.row].getMainPhoto()
+        
+        newViewController.profile = self.profile
+        newViewController.listOfCities = self.listOfCities
 //        newViewController.profile = self.profile
 //        newViewController.categoryFilters = self.arrayOfCategoryFilter
 //

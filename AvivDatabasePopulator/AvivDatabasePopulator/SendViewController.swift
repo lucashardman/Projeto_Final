@@ -7,8 +7,10 @@
 //
 
 import UIKit
-import FacebookLogin
-import FacebookCore
+//import FacebookLogin
+//import FacebookCore
+import FBSDKCoreKit
+import FBSDKLoginKit
 
 class SendViewController: UIViewController {
     

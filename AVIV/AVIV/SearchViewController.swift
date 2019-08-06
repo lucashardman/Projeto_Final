@@ -41,14 +41,30 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var refineButton: UIButton!
     private var hiddenRefinedSearch: Bool = false
     
-    private let openAir: UIButton = UIButton(type: .custom)
-    private let nightClub: UIButton = UIButton(type: .custom)
-    private let theater: UIButton = UIButton(type: .custom)
-    private let shopping: UIButton = UIButton(type: .custom)
-    private let museum: UIButton = UIButton(type: .custom)
-    private let music: UIButton = UIButton(type: .custom)
-    private let hotel: UIButton = UIButton(type: .custom)
-    private let gastronomy: UIButton = UIButton(type: .custom)
+    //Switch e label dos filtros
+    @IBOutlet weak var naturezaSwitch: UISwitch!
+    @IBOutlet weak var naturezaLabel: UILabel!
+    @IBOutlet weak var arteSwitch: UISwitch!
+    @IBOutlet weak var arteLabel: UILabel!
+    @IBOutlet weak var culturaSwitch: UISwitch!
+    @IBOutlet weak var culturaLabel: UILabel!
+    @IBOutlet weak var vidaNoturnaSwitch: UISwitch!
+    @IBOutlet weak var vidaNoturnaLabel: UILabel!
+    @IBOutlet weak var landmarksSwitch: UISwitch!
+    @IBOutlet weak var landmarksLabel: UILabel!
+    @IBOutlet weak var gastronomiaSwitch: UISwitch!
+    @IBOutlet weak var gastronomiaLabel: UILabel!
+    @IBOutlet weak var comprasSwitch: UISwitch!
+    @IBOutlet weak var comprasLabel: UILabel!
+    @IBOutlet weak var esportesSwitch: UISwitch!
+    @IBOutlet weak var esportesLabel: UILabel!
+    @IBOutlet weak var familiaSwitch: UISwitch!
+    @IBOutlet weak var familiaLabel: UILabel!
+    @IBOutlet weak var negociosSwitch: UISwitch!
+    @IBOutlet weak var negociosLabel: UILabel!
+    @IBOutlet weak var tecnologiaSwitch: UISwitch!
+    @IBOutlet weak var tecnologiaLabel: UILabel!
+    
     
     //Flags de filtro de busca inicializadas como false, pois não há filtros por default
     private var openAirFlag: Bool = false
@@ -79,14 +95,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         print("Todas as cidades: \(self.listOfCities)")
         
         loadViewElements()
-        loadRefineButtons(buttons: [openAir,
-                                    nightClub,
-                                    theater,
-                                    shopping,
-                                    museum,
-                                    music,
-                                    hotel,
-                                    gastronomy])
+ 
     }
     
     private func loadViewElements(){
@@ -95,75 +104,42 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         refineButton.center = view.center;
         refineButton.setTitle("\u{2193} Refinar pesquisa", for: .normal)
         hiddenRefinedSearch = false
-    }
-    
-    private func loadRefineButtons(buttons: [UIButton]){
         
-        width = 70
-        height = 70
-        borderWidth = CGFloat(Double(3))
-        size = CGSize(width: width, height: height)
-        radius = CGFloat(Double(height/2))
+        naturezaSwitch.isHidden = true
+        naturezaLabel.isHidden = true
+        arteSwitch.isHidden = true
+        arteLabel.isHidden = true
+        culturaSwitch.isHidden = true
+        culturaLabel.isHidden = true
+        vidaNoturnaSwitch.isHidden = true
+        vidaNoturnaLabel.isHidden = true
+        landmarksSwitch.isHidden = true
+        landmarksLabel.isHidden = true
+        gastronomiaSwitch.isHidden = true
+        gastronomiaLabel.isHidden = true
+        comprasSwitch.isHidden = true
+        comprasLabel.isHidden = true
+        esportesSwitch.isHidden = true
+        esportesLabel.isHidden = true
+        familiaSwitch.isHidden = true
+        familiaLabel.isHidden = true
+        negociosSwitch.isHidden = true
+        negociosLabel.isHidden = true
+        tecnologiaSwitch.isHidden = true
+        tecnologiaLabel.isHidden = true
         
-        borderColor = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1)).cgColor
-        color = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1))
-        backgroundColor = UIColor.white
-        
-        openAir.titleLabel?.text = "openAir"
-        nightClub.titleLabel?.text = "nightClub"
-        theater.titleLabel?.text = "theater"
-        shopping.titleLabel?.text = "shopping"
-        museum.titleLabel?.text = "museum"
-        music.titleLabel?.text = "music"
-        hotel.titleLabel?.text = "hotel"
-        gastronomy.titleLabel?.text = "gastronomy"
-        
-        buttons.forEach{ button in
-            
-            view.addSubview(button)
-            button.isHidden = true
-            
-            button.setImage(UIImage(named: (button.titleLabel?.text)!)?.addImagePadding(extraWidth: width*8, extraHeight: height*8), for: .normal)
-            
-            button.layer.cornerRadius = radius
-            button.layer.borderWidth = borderWidth
-            button.layer.borderColor = borderColor
-            button.backgroundColor = backgroundColor
-            button.tintColor = color
-            
-            openAir.frame = CGRect(x: 50, y: 300, width: width, height: height)
-            nightClub.frame = CGRect(x: 150, y: 300, width: width, height: height)
-            theater.frame = CGRect(x: 250, y: 300, width: width, height: height)
-            shopping.frame = CGRect(x: 50, y: 400, width: width, height: height)
-            museum.frame = CGRect(x: 150, y: 400, width: width, height: height)
-            music.frame = CGRect(x: 250, y: 400, width: width, height: height)
-            hotel.frame = CGRect(x: 50, y: 500, width: width, height: height)
-            gastronomy.frame = CGRect(x: 150, y: 500, width: width, height: height)
-            
-            openAir.addTarget(self, action: #selector(self.openAirClicked), for: .touchUpInside )
-            nightClub.addTarget(self, action: #selector(self.nighClubClicked), for: .touchUpInside)
-            theater.addTarget(self, action: #selector(self.theaterClicked), for: .touchUpInside)
-            shopping.addTarget(self, action: #selector(self.shoppingClicked), for: .touchUpInside)
-            museum.addTarget(self, action: #selector(self.museumClicked), for: .touchUpInside)
-            music.addTarget(self, action: #selector(self.musicClicked), for: .touchUpInside)
-            hotel.addTarget(self, action: #selector(self.hotelClicked), for: .touchUpInside)
-            gastronomy.addTarget(self, action: #selector(self.gastronomyClicked), for: .touchUpInside)
-        }
-    }
-    
-    private func selectRefineButton(button: UIButton){
-
-        button.layer.borderWidth = CGFloat(Double(0))
-        button.backgroundColor = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1))
-        button.tintColor = UIColor.white
-
-    }
-    private func diselectRefineButton(button: UIButton){
-
-        button.layer.borderWidth = CGFloat(Double(3))
-        button.backgroundColor = UIColor.white
-        button.tintColor = UIColor.init(red: CGFloat(147.0/255.0), green: CGFloat(147.0/255.0), blue: CGFloat(149.0/255.0), alpha: CGFloat(1))
-
+        arrayOfCategoryFilter.append("Familia")
+        arrayOfCategoryFilter.append("Gastronomia")
+        arrayOfCategoryFilter.append("Natureza")
+        arrayOfCategoryFilter.append("Esportes")
+        arrayOfCategoryFilter.append("Arte")
+        arrayOfCategoryFilter.append("Cultura")
+        arrayOfCategoryFilter.append("Tecnologia")
+        arrayOfCategoryFilter.append("Vida Noturna")
+        arrayOfCategoryFilter.append("Landmarks")
+        arrayOfCategoryFilter.append("Compras")
+        arrayOfCategoryFilter.append("Negocios")
+        arrayOfCategoryFilter.append("Teste")
     }
     
     @IBAction func refineButtonClicked(_ sender: UIButton) {
@@ -174,144 +150,149 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             refineButton.setTitle("\u{2191} Ocultar opções refinadas", for: .normal)
             hiddenRefinedSearch = true
             
-            openAir.isHidden = false
-            nightClub.isHidden = false
-            theater.isHidden = false
-            shopping.isHidden = false
-            museum.isHidden = false
-            music.isHidden = false
-            hotel.isHidden = false
-            gastronomy.isHidden = false
+            naturezaSwitch.isHidden = false
+            naturezaLabel.isHidden = false
+            arteSwitch.isHidden = false
+            arteLabel.isHidden = false
+            culturaSwitch.isHidden = false
+            culturaLabel.isHidden = false
+            vidaNoturnaSwitch.isHidden = false
+            vidaNoturnaLabel.isHidden = false
+            landmarksSwitch.isHidden = false
+            landmarksLabel.isHidden = false
+            gastronomiaSwitch.isHidden = false
+            gastronomiaLabel.isHidden = false
+            comprasSwitch.isHidden = false
+            comprasLabel.isHidden = false
+            esportesSwitch.isHidden = false
+            esportesLabel.isHidden = false
+            familiaSwitch.isHidden = false
+            familiaLabel.isHidden = false
+            negociosSwitch.isHidden = false
+            negociosLabel.isHidden = false
+            tecnologiaSwitch.isHidden = false
+            tecnologiaLabel.isHidden = false
+        
         }else{
             refineButton.setTitle("\u{2193} Refinar pesquisa", for: .normal)
             hiddenRefinedSearch = false
             
-            openAir.isHidden = true
-            nightClub.isHidden = true
-            theater.isHidden = true
-            shopping.isHidden = true
-            museum.isHidden = true
-            music.isHidden = true
-            hotel.isHidden = true
-            gastronomy.isHidden = true
+            naturezaSwitch.isHidden = true
+            naturezaLabel.isHidden = true
+            arteSwitch.isHidden = true
+            arteLabel.isHidden = true
+            culturaSwitch.isHidden = true
+            culturaLabel.isHidden = true
+            vidaNoturnaSwitch.isHidden = true
+            vidaNoturnaLabel.isHidden = true
+            landmarksSwitch.isHidden = true
+            landmarksLabel.isHidden = true
+            gastronomiaSwitch.isHidden = true
+            gastronomiaLabel.isHidden = true
+            comprasSwitch.isHidden = true
+            comprasLabel.isHidden = true
+            esportesSwitch.isHidden = true
+            esportesLabel.isHidden = true
+            familiaSwitch.isHidden = true
+            familiaLabel.isHidden = true
+            negociosSwitch.isHidden = true
+            negociosLabel.isHidden = true
+            tecnologiaSwitch.isHidden = true
+            tecnologiaLabel.isHidden = true
+   
         }
     }
     
-    @objc func openAirClicked() {
-        if (openAirFlag == false){
-            openAirFlag = true
-            selectRefineButton(button: openAir)
-            arrayOfCategoryFilter.append("Familia")
+    @IBAction func naturezaButton(_ sender: UISwitch) {
+        if naturezaSwitch.isOn{
+            arrayOfCategoryFilter.append("Natureza")
         }
         else{
-            openAirFlag = false
-            diselectRefineButton(button: openAir)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Familia"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Natureza"}
         }
     }
-    @objc func nighClubClicked() {
-        if (nightClubFlag == false){
-            nightClubFlag = true
-            selectRefineButton(button: nightClub)
+    @IBAction func arteButton(_ sender: UISwitch) {
+        if arteSwitch.isOn{
+            arrayOfCategoryFilter.append("Arte")
+        }
+        else{
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Arte"}
+        }
+    }
+    @IBAction func culturaButton(_ sender: UISwitch) {
+        if culturaSwitch.isOn{
+            arrayOfCategoryFilter.append("Cultura")
+        }
+        else{
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Cultura"}
+        }
+    }
+    @IBAction func vidaNoturnaButton(_ sender: UISwitch) {
+        if vidaNoturnaSwitch.isOn{
+            arrayOfCategoryFilter.append("Vida Noturna")
+        }
+        else{
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Vida Noturna"}
+        }
+    }
+    @IBAction func landmarksButton(_ sender: UISwitch) {
+        if landmarksSwitch.isOn{
+            arrayOfCategoryFilter.append("Landmarks")
+        }
+        else{
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Landmarks"}
+        }
+    }
+    @IBAction func gastronomiaButton(_ sender: UISwitch) {
+        if gastronomiaSwitch.isOn{
             arrayOfCategoryFilter.append("Gastronomia")
         }
         else{
-            nightClubFlag = false
-            diselectRefineButton(button: nightClub)
             arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Gastronomia"}
         }
     }
-    @objc func theaterClicked() {
-        if (theaterFlag == false){
-            theaterFlag = true
-            selectRefineButton(button: theater)
-            arrayOfCategoryFilter.append("theater")
+    @IBAction func comprasButton(_ sender: UISwitch) {
+        if comprasSwitch.isOn{
+            arrayOfCategoryFilter.append("Compras")
         }
         else{
-            theaterFlag = false
-            diselectRefineButton(button: theater)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "theater"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Compras"}
         }
     }
-    @objc func shoppingClicked() {
-        if (shoppingFlag == false){
-            shoppingFlag = true
-            selectRefineButton(button: shopping)
-            arrayOfCategoryFilter.append("shopping")
+    @IBAction func esportesButton(_ sender: UISwitch) {
+        if esportesSwitch.isOn{
+            arrayOfCategoryFilter.append("Esportes")
         }
         else{
-            shoppingFlag = false
-            diselectRefineButton(button: shopping)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "shopping"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Esportes"}
         }
     }
-    @objc func museumClicked() {
-        if (museumFlag == false){
-            museumFlag = true
-            selectRefineButton(button: museum)
-            arrayOfCategoryFilter.append("museum")
+    @IBAction func familiaButton(_ sender: UISwitch) {
+        if familiaSwitch.isOn{
+            arrayOfCategoryFilter.append("Familia")
         }
         else{
-            museumFlag = false
-            diselectRefineButton(button: museum)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "museum"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Familia"}
         }
     }
-    @objc func musicClicked() {
-        if (musicFlag == false){
-            musicFlag = true
-            selectRefineButton(button: music)
-            arrayOfCategoryFilter.append("music")
+    @IBAction func negociosButton(_ sender: UISwitch) {
+        if negociosSwitch.isOn{
+            arrayOfCategoryFilter.append("Negocios")
         }
         else{
-            musicFlag = false
-            diselectRefineButton(button: music)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "music"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Negocios"}
         }
     }
-    @objc func hotelClicked() {
-        if (hotelFlag == false){
-            hotelFlag = true
-            selectRefineButton(button: hotel)
-            arrayOfCategoryFilter.append("hotel")
+    @IBAction func tecnologiaButton(_ sender: UISwitch) {
+        if tecnologiaSwitch.isOn{
+            arrayOfCategoryFilter.append("Tecnologia")
         }
         else{
-            hotelFlag = false
-            diselectRefineButton(button: hotel)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "hotel"}
+            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "Tecnologia"}
         }
     }
-    @objc func gastronomyClicked() {
-        if (gastronomyFlag == false){
-            gastronomyFlag = true
-            selectRefineButton(button: gastronomy)
-            arrayOfCategoryFilter.append("gastronomy")
-        }
-        else{
-            gastronomyFlag = false
-            diselectRefineButton(button: gastronomy)
-            arrayOfCategoryFilter = arrayOfCategoryFilter.filter(){$0 != "gastronomy"}
-        }
-    }
-    @IBOutlet weak var testandoParaVerSeMuda: UILabel!
     
     @IBAction func searchButton(_ sender: UIButton) {
-        
-        if openAirFlag == false && nightClubFlag == false && theaterFlag == false && shoppingFlag == false && museumFlag == false && musicFlag == false && hotelFlag == false && gastronomyFlag == false{
-            
-            arrayOfCategoryFilter.append("Familia")
-            arrayOfCategoryFilter.append("Gastronomia")
-            arrayOfCategoryFilter.append("Natureza")
-            arrayOfCategoryFilter.append("Esportes")
-            arrayOfCategoryFilter.append("Arte")
-            arrayOfCategoryFilter.append("Cultura")
-            arrayOfCategoryFilter.append("Tecnologia")
-            arrayOfCategoryFilter.append("Vida Noturna")
-            arrayOfCategoryFilter.append("Landmarks")
-            arrayOfCategoryFilter.append("Compras")
-            arrayOfCategoryFilter.append("Negocios")
-            arrayOfCategoryFilter.append("Teste")
-        }
         
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let newViewController = storyBoard.instantiateViewController(withIdentifier: "matchProfile") as! MatchProfile
@@ -322,8 +303,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         let delimiter = ","
         let token = searchCityBar.text?.components(separatedBy: delimiter)
         let city = token![0]
-        //let province = token![1]
-        //let country = token![2]
         
         newViewController.searchForCity = city
         

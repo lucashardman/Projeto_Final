@@ -8,6 +8,7 @@
 
 import UIKit
 import Foundation
+import PersonalityInsightsV3
 
 class SuggestionViewController: UIViewController {
     
@@ -24,10 +25,33 @@ class SuggestionViewController: UIViewController {
     var image: String!
     var link: String!
     
+    var profile: Profile!
+    var listOfCities = [String]()
+    
     @IBAction func backButton(_ sender: UIButton) {
+        
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let searchViewController = storyBoard.instantiateViewController(withIdentifier: "searchViewController") as! SearchViewController
+        let favoriteViewController = storyBoard.instantiateViewController(withIdentifier: "favoriteViewController")
+        let otherNavigationController = storyBoard.instantiateViewController(withIdentifier: "otherNavigationController")
+        
+        let tabViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
+        
+        searchViewController.profile = self.profile
+        searchViewController.listOfCities = self.listOfCities
+        
+        tabViewController.viewControllers = [searchViewController, favoriteViewController, otherNavigationController]
+        tabViewController.selectedViewController = searchViewController
+        
+        
+        self.present(tabViewController, animated: true, completion: nil)
     }
     
     @IBAction func websiteButton(_ sender: UIButton) {
+        if let url = URL(string: self.link){
+            UIApplication.shared.open(url)
+        }
     }
     
     @IBAction func favoriteSwitch(_ sender: UISwitch) {
